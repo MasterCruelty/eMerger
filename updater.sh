@@ -1,16 +1,49 @@
 #!/bin/bash
-echo -e "apt-get update: starting\n"
-sudo apt-get update
-echo -e "apt-get update: done\n"
-sleep 1
-echo -e "apt-get upgrade: starting\n"
-sudo apt-get upgrade
-echo -e "apt-get upgrade: done\n"
-sleep 1
-echo -e "autoclean: starting\n"
-sudo apt-get autoclean #this command deletes useless files so the cache will be clean.
-echo -e "autoclean: done\n"
-sleep 1
-echo -e "autoremove: starting\n"
-sudo apt-get autoremove #this command deletes dependencies that now are useless.
-echo -e "autoremove: done\n"
+RED=$(tput setaf 1)
+NORMAL=$(tput sgr0)
+
+if [[ -n "$(command -v apt-get)" ]]; then
+    PKG="apt-get"
+    if [[ -n "$(command -v apt)" ]]; then
+        PKG="apt"
+    
+    printf "${RED}Using $PKG\n\n${NORMAL}"
+
+    printf "${RED}update: starting\n${NORMAL}"
+    sudo $PKG update
+    printf "\n"
+
+    printf "${RED}upgrade: starting\n${NORMAL}"
+    sudo $PKG upgrade
+    printf "\n"
+
+    printf "${RED}autoclean: starting\n${NORMAL}"
+    sudo $PKG autoclean
+    printf "\n"
+
+    printf "${RED}autoremove: starting\n${NORMAL}"
+    sudo $PKG autoremove
+    printf "\n"
+    fi
+elif [[ -n "$(command -v yum)" ]]; then
+    PKG="yum"
+    if [[ -n "$(command -v dnf)" ]]; then
+        PKG="dnf"
+
+    printf "${RED}Using $PKG\n\n${NORMAL}"
+
+    printf "${RED}update: starting\n${NORMAL}"
+    sudo $PKG update
+    printf "\n"
+
+    printf "${RED}upgrade: starting\n${NORMAL}"
+    sudo $PKG upgrade
+    printf "\n"
+
+    printf "${RED}clean all: starting\n${NORMAL}"
+    sudo $PKG clean all
+    printf "\n"
+    fi
+else
+    printf "${RED}System non supported\n${NORMAL}"
+fi
