@@ -1,2 +1,2 @@
 # Updater
-A simple shell script which update your debian system.
+This works only on debian based system. Remember to give ```chmod +x``` to ```updater.sh``` otherwise you cannot execute it.
