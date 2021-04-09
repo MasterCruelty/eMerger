@@ -1,2 +1,6 @@
 # Updater
-This works only on debian based system. Remember to give ```chmod +x``` to ```updater.sh``` otherwise you cannot execute it.
+Simple script to clean update your system!
+<ol>
+    <li> Run <code>chmod +x updater.sh</code> </li>
+    <li> Execute <code>./updater.sh</code> </li>
+</ol>
