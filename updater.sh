@@ -48,13 +48,28 @@ elif [[ -n "$(command -v yum)" ]]; then
     sudo $PKG update
     printProgress update: completed
 
-    printf "${RED}\nupgrade: starting\n${NORMAL}"
     printProgress upgrade: starting
     sudo $PKG upgrade
     printProgress upgrade: completed
 
     printProgress cleanAll: starting
     sudo $PKG clean all
+    printProgress cleanAll: completed
+elif [[ -n "$(command -v pacman)" ]]; then
+    PKG="pacman"
+
+    printf "${RED}Using $PKG\n\n${NORMAL}"
+
+    printProgress update: starting
+    sudo $PKG -Syy
+    printProgress update: completed
+
+    printProgress upgrade: starting
+    sudo $PKG -Syu
+    printProgress upgrade: completed
+
+    printProgress cleanAll: starting
+    sudo $PKG -R $($PKG -Qtdq)
     printProgress cleanAll: completed
 else
     printf "${RED}System non supported\n${NORMAL}"
