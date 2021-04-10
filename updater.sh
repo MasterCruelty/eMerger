@@ -48,7 +48,6 @@ elif [[ -n "$(command -v yum)" ]]; then
     sudo $PKG update
     printProgress update: completed
 
-    printf "${RED}\nupgrade: starting\n${NORMAL}"
     printProgress upgrade: starting
     sudo $PKG upgrade
     printProgress upgrade: completed
@@ -65,7 +64,6 @@ elif [[ -n "$(command -v pacman)" ]]; then
     sudo $PKG -Syy
     printProgress update: completed
 
-    printf "${RED}\nupgrade: starting\n${NORMAL}"
     printProgress upgrade: starting
     sudo $PKG -Syu
     printProgress upgrade: completed
