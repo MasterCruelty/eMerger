@@ -1,7 +1,17 @@
 #!/bin/bash
 
 RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
+
+printProgress(){
+    if [[ "$2" == "starting" ]]; then
+	printf "${RED}\n$1 $2\n${NORMAL}"
+    fi
+    if [[ "$2" == "completed" ]]; then
+	printf "${GREEN}\n$1 $2\n${NORMAL}"
+    fi
+}
 
 if [[ -n "$(command -v apt-get)" ]]; then
     PKG="apt-get"
@@ -10,18 +20,22 @@ if [[ -n "$(command -v apt-get)" ]]; then
     fi
     
     printf "${RED}Using $PKG\n${NORMAL}"
-
-    printf "${RED}\nupdate: starting\n${NORMAL}"
+    
+    printProgress update: starting
     sudo $PKG update
+    printProgress update: completed
 
-    printf "${RED}\nupgrade: starting\n${NORMAL}"
+    printProgress upgrade: starting
     sudo $PKG upgrade
+    printProgress upgrade: completed
 
-    printf "${RED}\nautoclean: starting\n${NORMAL}"
+    printProgress autoclean: starting
     sudo $PKG autoclean
+    printProgress autoclean: completed
 
-    printf "${RED}\nautoremove: starting\n${NORMAL}"
+    printProgress autoremove: starting
     sudo $PKG autoremove
+    printProgress autoremove: completed
 elif [[ -n "$(command -v yum)" ]]; then
     PKG="yum"
     if [[ -n "$(command -v dnf)" ]]; then
@@ -30,14 +44,18 @@ elif [[ -n "$(command -v yum)" ]]; then
 
     printf "${RED}Using $PKG\n\n${NORMAL}"
 
-    printf "${RED}\nupdate: starting\n${NORMAL}"
+    printProgress update: starting
     sudo $PKG update
+    printProgress update: completed
 
     printf "${RED}\nupgrade: starting\n${NORMAL}"
+    printProgress upgrade: starting
     sudo $PKG upgrade
+    printProgress upgrade: completed
 
-    printf "${RED}\nclean all: starting\n${NORMAL}"
+    printProgress cleanAll: starting
     sudo $PKG clean all
+    printProgress cleanAll: completed
 else
     printf "${RED}System non supported\n${NORMAL}"
 fi
