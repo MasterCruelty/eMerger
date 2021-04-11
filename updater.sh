@@ -4,12 +4,11 @@ RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
 
-printProgress(){
+printProgress() {
     if [[ "$2" == "starting" ]]; then
-	printf "${RED}\n$1 $2\n${NORMAL}"
-    fi
-    if [[ "$2" == "completed" ]]; then
-	printf "${GREEN}\n$1 $2\n${NORMAL}"
+	    printf "${RED}\n$1 $2\n${NORMAL}"
+    else
+	    printf "${GREEN}$1 $2\n${NORMAL}"
     fi
 }
 
@@ -71,6 +70,23 @@ elif [[ -n "$(command -v pacman)" ]]; then
     printProgress cleanAll: starting
     sudo $PKG -R $($PKG -Qtdq)
     printProgress cleanAll: completed
+elif [[ -n "$(command -v emerge)" ]]; then
+    PKG="emerge"
+
+    printf "${RED}Using $PKG\n\n${NORMAL}"
+
+    printProgress syncing: starting
+    $PKG --sync
+    printProgress syncing: completed
+
+    printProgress update: starting
+    $PKG --update --deep --newuse --with-bdeps y @world --ask
+    printProgress update: completed
+
+    printProgress deepclean: starting
+    emerge --depclean --ask
+    revdep-rebuild
+    printProgress deepclean: completed
 else
     printf "${RED}System non supported\n${NORMAL}"
 fi
