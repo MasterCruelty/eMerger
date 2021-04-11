@@ -35,6 +35,7 @@ if [[ -n "$(command -v apt-get)" ]]; then
     printProgress autoremove: starting
     sudo $PKG autoremove
     printProgress autoremove: completed
+	
 elif [[ -n "$(command -v yum)" ]]; then
     PKG="yum"
     if [[ -n "$(command -v dnf)" ]]; then
@@ -54,6 +55,7 @@ elif [[ -n "$(command -v yum)" ]]; then
     printProgress cleanAll: starting
     sudo $PKG clean all
     printProgress cleanAll: completed
+	
 elif [[ -n "$(command -v pacman)" ]]; then
     PKG="pacman"
 
@@ -70,6 +72,7 @@ elif [[ -n "$(command -v pacman)" ]]; then
     printProgress cleanAll: starting
     sudo $PKG -R $($PKG -Qtdq)
     printProgress cleanAll: completed
+	
 elif [[ -n "$(command -v emerge)" ]]; then
     PKG="emerge"
 
@@ -88,5 +91,5 @@ elif [[ -n "$(command -v emerge)" ]]; then
     revdep-rebuild
     printProgress deepclean: completed
 else
-    printf "${RED}System non supported\n${NORMAL}"
+    printf "${RED}System not supported\n${NORMAL}"
 fi
