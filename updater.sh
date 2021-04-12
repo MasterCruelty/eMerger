@@ -15,13 +15,15 @@ printProgress() {
     fi
 }
 
+printf "${GREEN}This script requires the sudo password to execute the update commands.\nExample: sudo apt update.\n\n${NORMAL}"
+
 if [[ -n "$(command -v apt-get)" ]]; then
     PKG="apt-get"
     if [[ -n "$(command -v apt)" ]]; then
         PKG="apt"
     fi
     
-    printf "${RED}Using $PKG\n${NORMAL}"
+    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
     
     printProgress update: starting
     sudo $PKG update
@@ -44,7 +46,7 @@ elif [[ -n "$(command -v yum)" ]]; then
         PKG="dnf"
     fi
 
-    printf "${RED}Using $PKG\n\n${NORMAL}"
+    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
 
     printProgress update: starting
     sudo $PKG update
@@ -60,7 +62,7 @@ elif [[ -n "$(command -v yum)" ]]; then
 elif [[ -n "$(command -v pacman)" ]]; then
     PKG="pacman"
 
-    printf "${RED}Using $PKG\n\n${NORMAL}"
+    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
 
     printProgress update: starting
     sudo $PKG -Syy
@@ -76,7 +78,7 @@ elif [[ -n "$(command -v pacman)" ]]; then
 elif [[ -n "$(command -v emerge)" ]]; then
     PKG="emerge"
 
-    printf "${RED}Using $PKG\n\n${NORMAL}"
+    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
 
     printProgress syncing: starting
     $PKG --sync
