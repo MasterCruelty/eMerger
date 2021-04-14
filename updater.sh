@@ -1,11 +1,13 @@
 #!/bin/bash
 
+#DO NOT WRITE FROM HERE
+
+printf "\n\n\n"
+#DO NOT WRITE TO HERE
+
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
-
-cat ./logo
-printf "\n\n\n"
 
 printProgress() {
     if [[ "$2" == "starting" ]]; then
@@ -15,8 +17,8 @@ printProgress() {
     fi
 }
 
-printf "${GREEN}This script requires the sudo password to execute the update commands.\nExample: sudo apt update.\n\n${NORMAL}"
-
+printf "${RED}This script requires sudo to run commands.\n${NORMAL}"
+PKG=""
 if [[ -n "$(command -v apt-get)" ]]; then
     PKG="apt-get"
     if [[ -n "$(command -v apt)" ]]; then
@@ -93,5 +95,7 @@ elif [[ -n "$(command -v emerge)" ]]; then
     revdep-rebuild
     printProgress deepclean: completed
 else
-    printf "${RED}System not supported\n${NORMAL}"
+    printf "${RED}System not supported${NORMAL}"
 fi
+
+printf "\n"
