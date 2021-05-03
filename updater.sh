@@ -1,5 +1,6 @@
 #!/bin/bash
 
+printf "\n\n\n"
 #DO NOT WRITE FROM HERE
 
 printf "\n\n\n"
@@ -97,5 +98,7 @@ elif [[ -n "$(command -v emerge)" ]]; then
 else
     printf "${RED}System not supported${NORMAL}"
 fi
+
+sudo rm -rf ~/.local/share/Trash/*
 
 printf "\n"
