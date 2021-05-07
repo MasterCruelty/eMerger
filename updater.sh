@@ -99,15 +99,15 @@ else
     printf "${RED}System not supported${NORMAL}"
 fi
 
-printf "${RED}Showing files in .local/share/Trash/${NORMAL}\n"
-ls ~/.local/share/Trash/
-printf "Do you wanna clean trash?"
-read -p "[y/n]: " answer 
-if [[ "$answer" == "y" ]]; then
+printf "${RED}\nShowing files in .local/share/Trash/${NORMAL}\n"
+ls -hl ~/.local/share/Trash/
+printf "Do you wanna clean Trash?"
+read -p "[y/n]: " ANSW 
+if [[ "$ANSW" == "y" ]]; then
     sudo rm -rf ~/.local/share/Trash/*
-    printProgress trash: cleaned
+    printProgress Trash: empty
 else
-    printProgress trash: "not cleaned"
+    printProgress Trash: full
 fi
 
 printf "\n"
