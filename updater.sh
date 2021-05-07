@@ -105,9 +105,9 @@ printf "Do you wanna clean Trash?"
 read -p "[y/n]: " ANSW 
 if [[ "$ANSW" == "y" ]]; then
     sudo rm -rf ~/.local/share/Trash/*
-    printProgress Trash: empty
+    printProgress Trash: "cleaned"
 else
-    printProgress Trash: full
+    printProgress Trash: "not cleaned"
 fi
 
 printf "\n"
