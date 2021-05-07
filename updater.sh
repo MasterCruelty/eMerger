@@ -101,7 +101,7 @@ fi
 
 printf "${RED}\nShowing files in .local/share/Trash/${NORMAL}\n"
 ls -hl ~/.local/share/Trash/
-printf "Do you wanna clean Trash?"
+printf "Should I clean Trash?"
 read -p "[y/n]: " ANSW 
 if [[ "$ANSW" == "y" ]]; then
     sudo rm -rf ~/.local/share/Trash/*
