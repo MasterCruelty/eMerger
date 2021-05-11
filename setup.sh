@@ -4,10 +4,9 @@ RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
 
-sed -i "4i cat $(pwd)/logo" $(pwd)/updater.sh
-sed -i "5d" $(pwd)/updater.sh
-
 printf "${RED}\nSetup: starting\n${NORMAL}"
+
+cp -f $(pwd)/.logo ~/.logo
 
 EXST=$(cat ~/.bashrc | grep -c "updater.sh")
 if [[ $EXST -ne 0 ]]; then
