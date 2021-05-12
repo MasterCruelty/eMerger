@@ -29,9 +29,9 @@ if [[ -n "$(command -v pkg)" ]]; then
     $PKG upgrade
     printProgress "upgrade: completed"
 
-    printProgress "autoremove: starting"
-    $PKG autoremove
-    printProgress "autoremove: completed\n"
+    printProgress "autoclean: starting"
+    $PKG autoclean
+    printProgress "autoclean: completed\n"
 
     exit 1;
 elif [[ -n "$(command -v emerge)" ]]; then
