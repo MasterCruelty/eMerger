@@ -18,6 +18,6 @@ else
     printf "${GREEN}\nAlias 'up' added.\nUse 'up' or run './updater.sh'.\n\n${GREEN}Setup completed.\n${NORMAL}"
 fi
 
-read -p "${RED}Press enter, the terminal will be closed: open a new terminal to see changes.${NORMAL}" text
+read -p "${RED}Press enter, the process will be killed: if your terminal closes, open a new one to see changes.${NORMAL}" text
 kill -9 $PPID
 exit 0
