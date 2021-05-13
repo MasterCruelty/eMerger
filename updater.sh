@@ -142,3 +142,4 @@ else
 fi
 
 printf "\n"
+exit 0
