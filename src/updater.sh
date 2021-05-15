@@ -49,14 +49,8 @@ elif [[ -n "$(command -v emerge)" ]]; then
     exit 1;
 fi
 
-printProgress "Checking for sudo privileges"
-sudo -v >/dev/null 2>&1
-if [[ "$(echo $?)" -eq 0 ]]; then
-    printProgress "Access granted.\n"
-else
-    printProgress "Can't access: aborting script.\n"
-    exit 1
-fi
+#I call this file to check sudo privileges of the user who is launching this script.
+source ./privileges.sh
 
 if [[ -n "$(command -v apt-get)" ]]; then
     PKG="apt-get"
