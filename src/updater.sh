@@ -7,14 +7,8 @@ RED=$(tput setaf 1)
 NORMAL=$(tput sgr0)
 
 PKG=""
-
-printProgress() {
-    if [[ "$1" == *starting ]] || [[ "$1" == *privileges ]] || [[ "$1" == *aborting* ]]; then
-	    printf "${RED}\n$1\n${NORMAL}"
-    else
-	    printf "${GREEN}$1\n${NORMAL}"
-    fi
-}
+#I call printProgress function from another shell file
+source ./printProgress.sh
 
 if [[ -n "$(command -v pkg)" ]]; then
     PKG="pkg"
