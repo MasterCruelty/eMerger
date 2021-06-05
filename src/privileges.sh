@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./printProgress.sh
+src_path="$(dirname "$(readlink -f "$0")")"
+source "$src_path"/printProgress.sh
 
 printProgress "Checking for sudo privileges"
 sudo -v >/dev/null 2>&1
