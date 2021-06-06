@@ -8,7 +8,8 @@ NORMAL=$(tput sgr0)
 
 PKG=""
 #I call printProgress function from another shell file
-source ./printProgress.sh
+src_path="$(dirname "$(readlink -f "$0")")"
+source "$src_path"/printProgress.sh
 
 if [[ -n "$(command -v pkg)" ]]; then
     PKG="pkg"
@@ -50,7 +51,7 @@ elif [[ -n "$(command -v emerge)" ]]; then
 fi
 
 #I call this file to check sudo privileges of the user who is launching this script.
-source ./privileges.sh
+source "$src_path"/privileges.sh
 
 if [[ -n "$(command -v apt-get)" ]]; then
     PKG="apt-get"
