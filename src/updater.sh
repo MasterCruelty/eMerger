@@ -92,13 +92,14 @@ elif [[ -n "$(command -v yum)" ]]; then
     sudo $PKG upgrade
     printProgress "upgrade: completed"
 
+    printProgress "autoremove: starting"
+    sudo $PKG autoremove
+    printProgress "autoremove: completed"
+
     printProgress "clean all: starting"
     sudo $PKG clean all
     printProgress "clean all: completed"
 
-    printProgress "autoremove: starting"
-    sudo $PKG autoremove
-    printProgress "autoremove: completed"
 elif [[ -n "$(command -v pacman)" ]]; then
     PKG="pacman"
 
