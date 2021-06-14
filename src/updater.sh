@@ -7,46 +7,21 @@ RED=$(tput setaf 1)
 NORMAL=$(tput sgr0)
 
 PKG=""
-#I call printProgress function from another shell file
+#I find the absolute path of src folder
 src_path="$(dirname "$(readlink -f "$0")")"
+#I call printProgress function from another shell file
 source "$src_path"/printProgress.sh
 
 if [[ -n "$(command -v pkg)" ]]; then
-    PKG="pkg"
-
-    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
-
-    printProgress "update: starting"
-    $PKG update
-    printProgress "update: completed"
-
-    printProgress "upgrade: starting"
-    $PKG upgrade
-    printProgress "upgrade: completed"
-
-    printProgress "autoclean: starting"
-    $PKG autoclean
-    printProgress "autoclean: completed\n"
-
+	
+	#I call the sh file for termux commands		
+	source "$src_path"/systems/termux.sh	
     exit 1;
+
 elif [[ -n "$(command -v emerge)" ]]; then
-    PKG="emerge"
-
-    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
-
-    printProgress "syncing: starting"
-    $PKG --sync
-    printProgress "syncing: completed"
-
-    printProgress "update: starting"
-    $PKG --update --deep --newuse --with-bdeps y @world --ask
-    printProgress "update: completed"
-
-    printProgress "deepclean: starting"
-    $PKG --depclean --ask
-    revdep-rebuild
-    printProgress "deepclean: completed\n"
-
+	
+	#I call the sh file for gentoo commands		
+	source "$src_path"/systems/gentoo.sh	
     exit 1;
 fi
 
@@ -54,68 +29,19 @@ fi
 source "$src_path"/privileges.sh
 
 if [[ -n "$(command -v apt-get)" ]]; then
-    PKG="apt-get"
-    if [[ -n "$(command -v apt)" ]]; then
-        PKG="apt"
-    fi
-    
-    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
-    
-    printProgress "update: starting"
-    sudo $PKG update
-    printProgress "update: completed"
+	
+	#I call the sh file for debian commands		
+	source "$src_path"/systems/debian.sh	
 
-    printProgress "upgrade: starting"
-    sudo $PKG upgrade
-    printProgress "upgrade: completed"
-
-    printProgress "autoclean: starting"
-    sudo $PKG autoclean
-    printProgress "autoclean: completed"
-
-    printProgress "autoremove: starting"
-    sudo $PKG autoremove
-    printProgress "autoremove: completed"
 elif [[ -n "$(command -v yum)" ]]; then
-    PKG="yum"
-    if [[ -n "$(command -v dnf)" ]]; then
-        PKG="dnf"
-    fi
-
-    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
-
-    printProgress "update: starting"
-    sudo $PKG update
-    printProgress "update: completed"
-
-    printProgress "upgrade: starting"
-    sudo $PKG upgrade
-    printProgress "upgrade: completed"
-
-    printProgress "autoremove: starting"
-    sudo $PKG autoremove
-    printProgress "autoremove: completed"
-
-    printProgress "clean all: starting"
-    sudo $PKG clean all
-    printProgress "clean all: completed"
+	
+	#I call the sh file for fedora commands		
+	source "$src_path"/systems/fedora.sh	
 
 elif [[ -n "$(command -v pacman)" ]]; then
-    PKG="pacman"
 
-    printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
-
-    printProgress "update: starting"
-    sudo $PKG -Syy
-    printProgress "update: completed"
-
-    printProgress "upgrade: starting"
-    sudo $PKG -Syu
-    printProgress "upgrade: completed"
-
-    printProgress "cleanAll: starting"
-    sudo $PKG -R $($PKG -Qtdq)
-    printProgress "cleanAll: completed"
+	#I call the sh file for archlinux commands		
+	source "$src_path"/systems/archlinux.sh	
 else
     printf "${RED}System not supported${NORMAL}"
 fi
