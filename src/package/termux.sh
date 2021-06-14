@@ -1,14 +1,11 @@
 #!/bin/bash
 
 src_path="$(dirname "$(readlink -f "$0")")"
-
-source "$src_path"/printProgress.sh
-
+source "$src_path"/global.sh
 
 PKG="pkg"
 
 printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
-
 
 printProgress "update: starting"
 $PKG update

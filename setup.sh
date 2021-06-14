@@ -1,13 +1,9 @@
 #!/bin/bash
 
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-NORMAL=$(tput sgr0)
-
-source src/printProgress.sh
+source src/global.sh
 printProgress "Setup: starting"
 
-cp -f $(pwd)/.logo ~/.logo
+cp -f $(pwd)/src/other/.logo ~/.logo
 
 EXST=$(cat ~/.bashrc | grep -c "updater.sh")
 if [[ $EXST -ne 0 ]]; then
@@ -22,6 +18,6 @@ else
     printProgress "Setup completed."
 fi
 
-read -p "${RED}Press enter, the process will be killed: if your terminal closes, open a new one to see changes.${NORMAL}" text
+read -p "${RED}Press enter, the process will be killed:\nif your terminal closes, open a new one to see changes.${NORMAL}" text
 kill -9 $PPID
 exit 0

@@ -1,13 +1,12 @@
 #!/bin/bash
 
 src_path="$(dirname "$(readlink -f "$0")")"
+source "$src_path"/global.sh
 
-source "$src_path"/printProgress.sh
+PKG="apt-get"
 
-PKG="yum"
-
-if [[ -n "$(command -v dnf)" ]]; then
-	PKG="dnf"
+if [[ -n "$(command -v apt)" ]]; then
+	PKG="apt"
 fi
 
 printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
@@ -21,10 +20,10 @@ printProgress "upgrade: starting"
 sudo $PKG upgrade
 printProgress "upgrade: completed"
 
+printProgress "autoclean: starting"
+sudo $PKG autoclean
+printProgress "autoclean: completed"
+
 printProgress "autoremove: starting"
 sudo $PKG autoremove
 printProgress "autoremove: completed"
-
-printProgress "clean all: starting"
-sudo $PKG clean all
-printProgress "clean all: completed"

@@ -2,64 +2,49 @@
 
 cat ~/.logo
 
-GREEN=$(tput setaf 2)
-RED=$(tput setaf 1)
-NORMAL=$(tput sgr0)
 
-PKG=""
 #I find the absolute path of src folder
 src_path="$(dirname "$(readlink -f "$0")")"
 #I call printProgress function from another shell file
-source "$src_path"/printProgress.sh
+source "$src_path"/global.sh
 
 if [[ -n "$(command -v pkg)" ]]; then
-	
 	#I call the sh file for termux commands		
-	source "$src_path"/systems/termux.sh	
-    exit 1;
+	source "$src_path"/package/termux.sh
+	source "$src_path"/other/trash.sh
+    exit 0;
 
 elif [[ -n "$(command -v emerge)" ]]; then
-	
 	#I call the sh file for gentoo commands		
-	source "$src_path"/systems/gentoo.sh	
-    exit 1;
+	source "$src_path"/package/gentoo.sh
+	source "$src_path"/other/trash.sh
+    exit 0;
 fi
 
 #I call this file to check sudo privileges of the user who is launching this script.
-source "$src_path"/privileges.sh
+source "$src_path"/other/privileges.sh
 
 if [[ -n "$(command -v apt-get)" ]]; then
-	
 	#I call the sh file for debian commands		
-	source "$src_path"/systems/debian.sh	
+	source "$src_path"/package/debian.sh
 
 elif [[ -n "$(command -v yum)" ]]; then
-	
-	#I call the sh file for fedora commands		
-	source "$src_path"/systems/fedora.sh	
+	#I call the sh file for rpm commands		
+	source "$src_path"/package/rpm.sh
 
 elif [[ -n "$(command -v pacman)" ]]; then
-
 	#I call the sh file for archlinux commands		
-	source "$src_path"/systems/archlinux.sh	
+	source "$src_path"/package/archlinux.sh
 else
     printf "${RED}System not supported${NORMAL}"
 fi
 
-if [[ -d ~/.local/share/Trash/files ]]; then
-	printf "${RED}\nShowing files in .local/share/Trash/files${NORMAL}\n"
-	ls -hl ~/.local/share/Trash/files
-	printf "Should I clean Trash? "
-	read -p "[y/n]: " ANSW 
-	if [[ "$ANSW" == "y" ]]; then
-	    sudo rm -rf ~/.local/share/Trash/*
-	    printProgress "Trash: cleaned"
-	else
-	    printProgress "Trash: not cleaned"
-	fi
-else
-    printProgress "\nTrash is empty, nothing to clean."
+if [[ -n "$(command -v snap)" ]]; then
+	source "$src_path"/package/snap.sh
 fi
+
+printf "\n"
+source "$src_path"/other/trash.sh
 
 printf "\n"
 exit 0
