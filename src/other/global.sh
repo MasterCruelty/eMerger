@@ -1,8 +1,8 @@
 #!/bin/bash
 
-GREEN=$(tput setaf 2)
-RED=$(tput setaf 1)
-NORMAL=$(tput sgr0)
+GREEN="\e[1;32;49m"
+NORMAL="\e[0m"
+RED="\e[1;91;49m"
 
 printProgress() {
     if [[ "$1" == *starting ]] || [[ "$1" == *privileges ]] || [[ "$1" == *already* ]] || [[ "$1" == *aborting* ]]; then

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-printProgress "refreshing snap"
+printProgress "snap refreshing: starting"
 sudo snap refresh
-printProgress "refreshing ended"
+printProgress "snap refreshing: completed"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source src/global.sh
+source src/other/global.sh
 printProgress "Setup: starting"
 
 cp -f $(pwd)/src/other/.logo ~/.logo
@@ -17,7 +17,9 @@ else
     printProgress "Alias 'up' added.\nUse 'up' or run './src/updater.sh'."
     printProgress "Setup completed."
 fi
+printf "${RED}"
+read -p "Press enter, the process will be killed:\nif your terminal closes, open a new one to see changes." text
+printf "${NORMAL}"
 
-read -p "${RED}Press enter, the process will be killed:\nif your terminal closes, open a new one to see changes.${NORMAL}" text
 kill -9 $PPID
 exit 0
