@@ -2,4 +2,4 @@
 
 printProgress "snap refreshing: starting"
 sudo snap refresh
-printProgress "snap refreshing: completed"
+printProgress "snap refreshing: completed\n"

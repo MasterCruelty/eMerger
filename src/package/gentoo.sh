@@ -1,6 +1,6 @@
 #!/bin/bash
 
-src_path="$(dirname "$(readlink -f "$0")")"
+src_path=$(dirname "$(readlink -f "$0")")
 source "$src_path"/other/global.sh
 
 PKG="emerge"
