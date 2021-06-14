@@ -9,7 +9,7 @@ if [[ $(command -v apt) ]]; then
 	PKG="apt"
 fi
 
-printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
+printf "${GREEN}\nSystem detected: ${RED}Using $PKG\n${NORMAL}"
 
 
 printProgress "update: starting"

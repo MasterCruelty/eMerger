@@ -27,6 +27,11 @@ if [[ $(command -v snap) ]]; then
 	source "$src_path"/package/snap.sh
 fi
 
+# flatpak
+if [[ $(command -v flatpak) ]]; then
+	source "$src_path"/package/flatpak.sh
+fi
+
 # debian
 if [[ $(command -v apt-get) ]]; then
 	source "$src_path"/package/debian.sh

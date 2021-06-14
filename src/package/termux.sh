@@ -5,7 +5,7 @@ source "$src_path"/other/global.sh
 
 PKG="pkg"
 
-printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
+printf "${GREEN}\nSystem detected: ${RED}Using $PKG\n${NORMAL}"
 
 printProgress "update: starting"
 $PKG update

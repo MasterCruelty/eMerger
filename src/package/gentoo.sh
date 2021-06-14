@@ -5,7 +5,7 @@ source "$src_path"/other/global.sh
 
 PKG="emerge"
 
-printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
+printf "${GREEN}\nSystem detected: ${RED}Using $PKG\n${NORMAL}"
 
 printProgress "syncing: starting"
 $PKG --sync
