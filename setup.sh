@@ -1,9 +1,9 @@
 #!/bin/bash
 
-source src/other/global.sh
+source src/utils/global.sh
 printProgress "Setup: starting"
 
-cp -f $(pwd)/src/other/.logo ~/.logo
+cp -f $(pwd)/src/utils/.logo ~/.logo
 
 EXST=$(cat ~/.bashrc | grep -c "updater.sh")
 if [[ $EXST -ne 0 ]]; then

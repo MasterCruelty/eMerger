@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source src/other/global.sh
+source src/utils/global.sh
 
 rm ~/.logo
 printf "${RED}File '.logo' removed\n"

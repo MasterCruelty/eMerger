@@ -5,22 +5,22 @@ if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
 fi
 
 src_path=$(dirname "$(readlink -f "$0")")
-source "$src_path"/other/global.sh
+source "$src_path"/utils/global.sh
 
 # termux
 if [[ $(command -v pkg) ]]; then
 	source "$src_path"/package/termux.sh
-	source "$src_path"/other/trash.sh
+	source "$src_path"/utils/trash.sh
     exit 0;
 #gentoo
 elif [[ $(command -v emerge) ]]; then
 	source "$src_path"/package/gentoo.sh
-	source "$src_path"/other/trash.sh
+	source "$src_path"/utils/trash.sh
     exit 0;
 fi
 
 # check privileges
-source "$src_path"/other/privileges.sh
+source "$src_path"/utils/privileges.sh
 
 # snap
 if [[ $(command -v snap) ]]; then
@@ -47,7 +47,7 @@ else
 fi
 
 # check trash
-source "$src_path"/other/trash.sh
+source "$src_path"/utils/trash.sh
 
 printf "\n"
 exit 0
