@@ -1,65 +1,53 @@
 #!/bin/bash
 
-cat ~/.logo
-
-GREEN=$(tput setaf 2)
-RED=$(tput setaf 1)
-NORMAL=$(tput sgr0)
-
-PKG=""
-#I find the absolute path of src folder
-src_path="$(dirname "$(readlink -f "$0")")"
-#I call printProgress function from another shell file
-source "$src_path"/printProgress.sh
-
-if [[ -n "$(command -v pkg)" ]]; then
-	
-	#I call the sh file for termux commands		
-	source "$src_path"/systems/termux.sh	
-    exit 1;
-
-elif [[ -n "$(command -v emerge)" ]]; then
-	
-	#I call the sh file for gentoo commands		
-	source "$src_path"/systems/gentoo.sh	
-    exit 1;
+if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
+	cat ~/.logo
 fi
 
-#I call this file to check sudo privileges of the user who is launching this script.
-source "$src_path"/privileges.sh
+src_path=$(dirname "$(readlink -f "$0")")
+source "$src_path"/utils/global.sh
 
-if [[ -n "$(command -v apt-get)" ]]; then
-	
-	#I call the sh file for debian commands		
-	source "$src_path"/systems/debian.sh	
+# termux
+if [[ $(command -v pkg) ]]; then
+	source "$src_path"/package/termux.sh
+	source "$src_path"/utils/trash.sh
+    exit 0;
+#gentoo
+elif [[ $(command -v emerge) ]]; then
+	source "$src_path"/package/gentoo.sh
+	source "$src_path"/utils/trash.sh
+    exit 0;
+fi
 
-elif [[ -n "$(command -v yum)" ]]; then
-	
-	#I call the sh file for fedora commands		
-	source "$src_path"/systems/fedora.sh	
+# check privileges
+source "$src_path"/utils/privileges.sh
 
-elif [[ -n "$(command -v pacman)" ]]; then
+# snap
+if [[ $(command -v snap) ]]; then
+	source "$src_path"/package/snap.sh
+fi
 
-	#I call the sh file for archlinux commands		
-	source "$src_path"/systems/archlinux.sh	
+# flatpak
+if [[ $(command -v flatpak) ]]; then
+	source "$src_path"/package/flatpak.sh
+fi
+
+# debian
+if [[ $(command -v apt-get) ]]; then
+	source "$src_path"/package/debian.sh
+# rpm
+elif [[ $(command -v yum) ]]; then	
+	source "$src_path"/package/rpm.sh
+# arch
+elif [[ $(command -v pacman) ]]; then	
+	source "$src_path"/package/archlinux.sh
+# not found
 else
     printf "${RED}System not supported${NORMAL}"
 fi
 
-if [[ -d ~/.local/share/Trash/files ]]; then
-	printf "${RED}\nShowing files in .local/share/Trash/files${NORMAL}\n"
-	ls -hl ~/.local/share/Trash/files
-	printf "Should I clean Trash? "
-	read -p "[y/n]: " ANSW 
-	if [[ "$ANSW" == "y" ]]; then
-	    sudo rm -rf ~/.local/share/Trash/*
-	    printProgress "Trash: cleaned"
-	else
-	    printProgress "Trash: not cleaned"
-	fi
-else
-    printProgress "\nTrash is empty, nothing to clean."
-fi
+# check trash
+source "$src_path"/utils/trash.sh
 
 printf "\n"
 exit 0

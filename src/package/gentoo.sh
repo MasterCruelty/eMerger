@@ -1,14 +1,11 @@
 #!/bin/bash
 
-src_path="$(dirname "$(readlink -f "$0")")"
-
-source "$src_path"/printProgress.sh
-
+src_path=$(dirname "$(readlink -f "$0")")
+source "$src_path"/utils/global.sh
 
 PKG="emerge"
 
-printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
-
+printf "${GREEN}\nSystem detected: ${RED}Using $PKG\n${NORMAL}"
 
 printProgress "syncing: starting"
 $PKG --sync

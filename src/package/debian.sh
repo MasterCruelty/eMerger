@@ -1,16 +1,15 @@
 #!/bin/bash
 
-src_path="$(dirname "$(readlink -f "$0")")"
-
-source "$src_path"/printProgress.sh
+src_path=$(dirname "$(readlink -f "$0")")
+source "$src_path"/utils/global.sh
 
 PKG="apt-get"
 
-if [[ -n "$(command -v apt)" ]]; then
+if [[ $(command -v apt) ]]; then
 	PKG="apt"
 fi
 
-printf "${GREEN}System detected: ${RED}Using $PKG\n${NORMAL}"
+printf "${GREEN}\nSystem detected: ${RED}Using $PKG\n${NORMAL}"
 
 
 printProgress "update: starting"

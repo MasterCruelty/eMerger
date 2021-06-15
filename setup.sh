@@ -1,13 +1,9 @@
 #!/bin/bash
 
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-NORMAL=$(tput sgr0)
-
-source src/printProgress.sh
+source src/utils/global.sh
 printProgress "Setup: starting"
 
-cp -f $(pwd)/.logo ~/.logo
+cp -f $(pwd)/src/utils/.logo ~/.logo
 
 EXST=$(cat ~/.bashrc | grep -c "updater.sh")
 if [[ $EXST -ne 0 ]]; then
@@ -21,7 +17,9 @@ else
     printProgress "Alias 'up' added.\nUse 'up' or run './src/updater.sh'."
     printProgress "Setup completed."
 fi
+printf "${RED}"
+read -p "Press enter, the process will be killed:\nif your terminal closes, open a new one to see changes." text
+printf "${NORMAL}"
 
-read -p "${RED}Press enter, the process will be killed: if your terminal closes, open a new one to see changes.${NORMAL}" text
 kill -9 $PPID
 exit 0

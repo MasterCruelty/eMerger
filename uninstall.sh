@@ -1,15 +1,16 @@
 #!/bin/bash
 
-RED=$(tput setaf 1)
-NORMAL=$(tput sgr0)
+source src/utils/global.sh
 
 rm ~/.logo
-printf "${RED}File '.logo' removed ${NORMAL}"
+printf "${RED}File '.logo' removed\n"
 sed -i "/alias up=/d" ~/.bashrc
-printf "${RED}Alias 'up' removed\n${NORMAL}"
+printf "Alias 'up' removed\n"
 
-printf "${RED}\nUninstallation completed\n${NORMAL}"
+printf "\nUninstallation completed\n"
 
-read -p "${RED}Press enter, the process  will be killed. If your terminal closes, open a new one.${NORMAL}" text
+read -p "Press enter, the process  will be killed.\nIf your terminal closes, open a new one." text
+printf "${NORMAL}"
+
 kill -9 $PPID
 exit 0
