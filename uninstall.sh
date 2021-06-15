@@ -2,8 +2,6 @@
 
 source src/utils/global.sh
 
-rm ~/.logo
-printf "${RED}File '.logo' removed\n"
 sed -i "/alias up=/d" ~/.bashrc
 printf "Alias 'up' removed\n"
 
