@@ -1,7 +1,6 @@
 #!/bin/bash
 
-src_path=$(dirname "$(readlink -f "$0")")
-source "$src_path"/utils/global.sh
+source $(dirname "$(readlink -f "$0")")/utils/global.sh
 
 PKG="apt-get"
 

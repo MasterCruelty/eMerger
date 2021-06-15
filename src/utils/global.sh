@@ -1,6 +1,7 @@
 #!/bin/bash
 
 GREEN="\e[1;32;49m"
+LOGO="\e[2;37;49m"
 NORMAL="\e[0m"
 RED="\e[1;91;49m"
 
