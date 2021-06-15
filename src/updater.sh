@@ -4,7 +4,9 @@ src_path=$(dirname "$(readlink -f "$0")")
 source "$src_path"/utils/global.sh
 
 if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
+	printf "${LOGO}"
 	cat "$src_path"/utils/.logo
+	printf "${NORMAL}"
 fi
 
 # termux
