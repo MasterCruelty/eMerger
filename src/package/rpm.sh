@@ -8,7 +8,7 @@ if [[ $(command -v dnf) ]]; then
 	PKG="dnf"
 fi
 
-printf "${GREEN}\nSystem detected: ${RED}Using $PKG${NORMAL}"
+printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 printProgress "update: starting"
 sudo $PKG update

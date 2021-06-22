@@ -1,6 +1,6 @@
 #!/bin/bash
 
-printf "${GREEN}\nSystem detected: ${RED}Using snap${NORMAL}"
+printf "${GREEN}\nPackage manager detected: ${RED}Using snap${NORMAL}"
 
 printProgress "snap refresh: starting"
 sudo snap refresh
