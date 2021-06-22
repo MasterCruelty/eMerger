@@ -3,11 +3,11 @@
 src_path=$(dirname "$(readlink -f "$0")")
 source "$src_path"/utils/global.sh
 
+printf "${LOGO}"
 if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
-	printf "${LOGO}"
 	cat "$src_path"/utils/.logo
-	printf "${NORMAL}"
 fi
+printf "Running on: $(uname -rs)\n${NORMAL}"
 
 # termux
 if [[ $(command -v pkg) ]]; then

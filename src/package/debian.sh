@@ -8,7 +8,7 @@ if [[ $(command -v apt) ]]; then
 	PKG="apt"
 fi
 
-printf "${GREEN}\nSystem detected: ${RED}Using $PKG\n${NORMAL}"
+printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 
 printProgress "update: starting"
@@ -26,3 +26,5 @@ printProgress "autoclean: completed"
 printProgress "autoremove: starting"
 sudo $PKG autoremove
 printProgress "autoremove: completed"
+
+printf "\n"

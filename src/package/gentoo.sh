@@ -4,7 +4,7 @@ source $(dirname "$(readlink -f "$0")")/utils/global.sh
 
 PKG="emerge"
 
-printf "${GREEN}\nSystem detected: ${RED}Using $PKG\n${NORMAL}"
+printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 printProgress "syncing: starting"
 $PKG --sync
@@ -18,3 +18,5 @@ printProgress "deepclean: starting"
 $PKG --depclean --ask
 revdep-rebuild
 printProgress "deepclean: completed"
+
+printf "\n"

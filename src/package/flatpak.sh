@@ -2,14 +2,18 @@
 
 PKG="flatpak"
 
-printProgress "flatpak updating: starting"
+printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
+
+printProgress "flatpak update: starting"
 sudo $PKG update
-printProgress "flatpak updating: completed"
+printProgress "flatpak update: completed"
 
-printProgress "flatpak repairing: starting"
+printProgress "flatpak repair: starting"
 sudo $PKG repair
-printProgress "flatpak repairing: completed"
+printProgress "flatpak repair: completed"
 
-printProgress "flatpak uninstalling unused extensions: starting"
+printProgress "flatpak uninstall unused extensions: starting"
 sudo $PKG uninstall --unused
-printProgress "flatpak uninstalling unused extensions: completed"
+printProgress "flatpak uninstall unused extensions: completed"
+
+printf "\n"

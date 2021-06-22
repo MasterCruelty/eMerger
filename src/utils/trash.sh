@@ -14,5 +14,5 @@ if [[ -d ~/.local/share/Trash/files ]]; then
 	    printProgress "Trash: not cleaned"
 	fi
 else
-    printProgress "\nTrash is empty, nothing to clean."
+    printProgress "\nTrash is empty, nothing to clean"
 fi
