@@ -1,5 +1,7 @@
 #!/bin/bash
 
-printProgress "snap refreshing: starting"
+printf "${GREEN}\nSystem detected: ${RED}Using snap${NORMAL}"
+
+printProgress "snap refresh: starting"
 sudo snap refresh
-printProgress "snap refreshing: completed"
+printProgress "snap refresh: completed"
