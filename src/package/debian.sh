@@ -26,3 +26,5 @@ printProgress "autoclean: completed"
 printProgress "autoremove: starting"
 sudo $PKG autoremove
 printProgress "autoremove: completed"
+
+printf "\n"

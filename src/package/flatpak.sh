@@ -15,3 +15,5 @@ printProgress "flatpak repair: completed"
 printProgress "flatpak uninstall unused extensions: starting"
 sudo $PKG uninstall --unused
 printProgress "flatpak uninstall unused extensions: completed"
+
+printf "\n"

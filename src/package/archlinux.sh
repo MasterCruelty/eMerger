@@ -17,3 +17,6 @@ printProgress "upgrade: completed"
 printProgress "clean all: starting"
 sudo $PKG -R $($PKG -Qtdq)
 printProgress "clean all: completed"
+
+
+printf "\n"

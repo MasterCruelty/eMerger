@@ -17,3 +17,5 @@ printProgress "upgrade: completed"
 printProgress "autoclean: starting"
 $PKG autoclean
 printProgress "autoclean: completed"
+
+printf "\n"

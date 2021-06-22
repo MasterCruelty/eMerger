@@ -10,4 +10,3 @@ else
     printProgress "Can't access: aborting script\n"
     exit 1
 fi
-

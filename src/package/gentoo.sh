@@ -18,3 +18,5 @@ printProgress "deepclean: starting"
 $PKG --depclean --ask
 revdep-rebuild
 printProgress "deepclean: completed"
+
+printf "\n"
