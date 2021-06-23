@@ -1,21 +1,23 @@
 #!/bin/bash
 
-source $(dirname "$(readlink -f "$0")")/utils/global.sh
+SRC=$(dirname "$(readlink -f "$0")")
+source $SRC/utils/global.sh
 
+PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="pacman"
 
 printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 printProgress "update: starting"
-sudo $PKG -Syy
+$PWR $PKG -Syy
 printProgress "update: completed"
 
 printProgress "upgrade: starting"
-sudo $PKG -Syu
+$PWR $PKG -Syu
 printProgress "upgrade: completed"
 
 printProgress "clean all: starting"
-sudo $PKG -R $($PKG -Qtdq)
+$PWR $PKG -R $($PKG -Qtdq)
 printProgress "clean all: completed"
 
 

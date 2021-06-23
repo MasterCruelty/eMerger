@@ -1,19 +1,23 @@
 #!/bin/bash
 
+SRC=$(dirname "$(readlink -f "$0")")
+source $SRC/utils/global.sh
+
+PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="flatpak"
 
 printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 printProgress "flatpak update: starting"
-sudo $PKG update
+$PWR $PKG update
 printProgress "flatpak update: completed"
 
 printProgress "flatpak repair: starting"
-sudo $PKG repair
+$PWR $PKG repair
 printProgress "flatpak repair: completed"
 
 printProgress "flatpak uninstall unused extensions: starting"
-sudo $PKG uninstall --unused
+$PWR $PKG uninstall --unused
 printProgress "flatpak uninstall unused extensions: completed"
 
 printf "\n"

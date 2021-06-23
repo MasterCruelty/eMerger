@@ -1,21 +1,23 @@
 #!/bin/bash
 
-source $(dirname "$(readlink -f "$0")")/utils/global.sh
+SRC=$(dirname "$(readlink -f "$0")")
+source $SRC/utils/global.sh
 
+PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="emerge"
 
 printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 printProgress "syncing: starting"
-$PKG --sync
+$PWR $PKG --sync
 printProgress "syncing: completed"
 
 printProgress "update: starting"
-$PKG --update --deep --newuse --with-bdeps y @world --ask
+$PWR $PKG --update --deep --newuse --with-bdeps y @world --ask
 printProgress "update: completed"
 
 printProgress "deepclean: starting"
-$PKG --depclean --ask
+$PWR $PKG --depclean --ask
 revdep-rebuild
 printProgress "deepclean: completed"
 

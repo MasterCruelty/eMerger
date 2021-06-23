@@ -1,55 +1,30 @@
 #!/bin/bash
 
-src_path=$(dirname "$(readlink -f "$0")")
-source "$src_path"/utils/global.sh
+SRC=$(dirname "$(readlink -f "$0")")
+source $SRC/utils/global.sh
 
-printf "${LOGO}"
-if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
-	cat "$src_path"/utils/.logo
-fi
-printf "Running on: $(uname -rs)\n${NORMAL}"
-
-# termux
-if [[ $(command -v pkg) ]]; then
-	source "$src_path"/package/termux.sh
-	source "$src_path"/utils/trash.sh
-    exit 0;
-#gentoo
-elif [[ $(command -v emerge) ]]; then
-	source "$src_path"/package/gentoo.sh
-	source "$src_path"/utils/trash.sh
-    exit 0;
-fi
-
-# check privileges
-source "$src_path"/utils/privileges.sh
-
-# snap
-if [[ $(command -v snap) ]]; then
-	source "$src_path"/package/snap.sh
-fi
-
-# flatpak
-if [[ $(command -v flatpak) ]]; then
-	source "$src_path"/package/flatpak.sh
-fi
-
-# debian
-if [[ $(command -v apt-get) ]]; then
-	source "$src_path"/package/debian.sh
-# rpm
-elif [[ $(command -v yum) ]]; then	
-	source "$src_path"/package/rpm.sh
-# arch
-elif [[ $(command -v pacman) ]]; then	
-	source "$src_path"/package/archlinux.sh
-# not found
+if [[ -f "$SRC/utils/.cache" ]]; then
+	HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
+	if [[ $HASH != $(cat $SRC/utils/.md5) ]]; then
+		md5sum $SRC/utils/.cache | cut -d " " -f1 > $SRC/utils/.md5
+	fi
 else
-    printf "${RED}System not supported${NORMAL}"
+    $SRC/utils/cachegen.sh > $SRC/utils/.cache
+    md5sum $SRC/utils/.cache | cut -d " " -f1 > $SRC/utils/.md5
+    chmod 775 $SRC/utils/.cache
 fi
+chmod 775 $SRC/utils/.md5
 
-# check trash
-source "$src_path"/utils/trash.sh
+printf "$LOGO"
+if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
+	cat $SRC/utils/.logo
+fi
+printf "Running on: $(uname -rs)\n$NORMAL"
 
-printf "\n"
+while read line; do
+	if [[ "$line" != "" ]]; then
+            source $SRC/$line.sh;
+    fi
+done < $SRC/utils/.cache
+
 exit 0
