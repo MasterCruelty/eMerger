@@ -1,21 +1,23 @@
 #!/bin/bash
 
-source $(dirname "$(readlink -f "$0")")/utils/global.sh
+SRC=$(dirname "$(readlink -f "$0")")
+source $SRC/utils/global.sh
 
+PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="pkg"
 
 printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 printProgress "update: starting"
-$PKG update
+$PWR $PKG update
 printProgress "update: completed"
 
 printProgress "upgrade: starting"
-$PKG upgrade
+$PWR $PKG upgrade
 printProgress "upgrade: completed"
 
 printProgress "autoclean: starting"
-$PKG autoclean
+$PWR $PKG autoclean
 printProgress "autoclean: completed"
 
 printf "\n"

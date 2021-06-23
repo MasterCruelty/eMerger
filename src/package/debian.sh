@@ -1,7 +1,9 @@
 #!/bin/bash
 
-source $(dirname "$(readlink -f "$0")")/utils/global.sh
+SRC=$(dirname "$(readlink -f "$0")")
+source $SRC/utils/global.sh
 
+PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="apt-get"
 
 if [[ $(command -v apt) ]]; then
@@ -12,19 +14,19 @@ printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 
 printProgress "update: starting"
-sudo $PKG update
+$PWR $PKG update
 printProgress "update: completed"
 
 printProgress "upgrade: starting"
-sudo $PKG upgrade
+$PWR $PKG upgrade
 printProgress "upgrade: completed"
 
 printProgress "autoclean: starting"
-sudo $PKG autoclean
+$PWR $PKG autoclean
 printProgress "autoclean: completed"
 
 printProgress "autoremove: starting"
-sudo $PKG autoremove
+$PWR $PKG autoremove
 printProgress "autoremove: completed"
 
 printf "\n"

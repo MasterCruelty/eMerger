@@ -1,7 +1,9 @@
 #!/bin/bash
 
-source $(dirname "$(readlink -f "$0")")/utils/global.sh
+SRC=$(dirname "$(readlink -f "$0")")
+source $SRC/utils/global.sh
 
+PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="yum"
 
 if [[ $(command -v dnf) ]]; then
@@ -11,19 +13,19 @@ fi
 printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
 printProgress "update: starting"
-sudo $PKG update
+$PWR $PKG update
 printProgress "update: completed"
 
 printProgress "upgrade: starting"
-sudo $PKG upgrade
+$PWR $PKG upgrade
 printProgress "upgrade: completed"
 
 printProgress "autoremove: starting"
-sudo $PKG autoremove
+$PWR $PKG autoremove
 printProgress "autoremove: completed"
 
 printProgress "clean all: starting"
-sudo $PKG clean all
+$PWR $PKG clean all
 printProgress "clean all: completed"
 
 printf "\n"

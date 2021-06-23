@@ -3,12 +3,8 @@
 source src/utils/global.sh
 printProgress "Setup: starting"
 
-if [[ -f "src/utils/.cache" ]]; then
-	md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
-else
-    src/utils/cachegen.sh > src/utils/.cache
-    md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
-fi
+src/utils/cachegen.sh > src/utils/.cache
+md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
 chmod 775 src/utils/.cache
 chmod 775 src/utils/.md5
 
