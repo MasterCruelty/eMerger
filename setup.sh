@@ -3,11 +3,20 @@
 source src/utils/global.sh
 printProgress "Setup: starting"
 
+if [[ -f "src/utils/.cache" ]]; then
+	md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
+else
+    echo "create .cache test"
+    echo "create .cache test" > src/utils/.cache
+    md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
+fi
+chmod 775 src/utils/.cache
+chmod 775 src/utils/.md5
+
 EXST=$(cat ~/.bashrc | grep -c "updater.sh")
 if [[ $EXST -ne 0 ]]; then
-   
 	printProgress "Alias 'up' already exists. Use 'up' or run './src/updater.sh'."
-	printProgress "Setup completed"
+	printProgress "Setup completed."
     exit 0
 else
     echo "alias up='bash $(pwd)/src/updater.sh'" >> ~/.bashrc
@@ -15,6 +24,7 @@ else
     printProgress "Alias 'up' added.\nUse 'up' or run './src/updater.sh'."
     printProgress "Setup completed."
 fi
+
 printf "${RED}"
 read -p "Press enter, the process will be killed:\nif your terminal closes, open a new one to see changes." text
 printf "${NORMAL}"

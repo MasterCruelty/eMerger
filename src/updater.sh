@@ -3,6 +3,19 @@
 src_path=$(dirname "$(readlink -f "$0")")
 source "$src_path"/utils/global.sh
 
+if [[ -f "$src_path/utils/.cache" ]]; then
+	echo "found .cache test"
+	HASH=$(md5sum "$src_path/utils/.cache" | cut -d " " -f1)
+	if [[ $HASH != $(cat $src_path/utils/.md5) ]]; then
+		echo "found .cache, but changed test"
+		md5sum "$src_path"/utils/.cache | cut -d " " -f1 > "$src_path"/utils/.md5
+	fi
+else
+	echo "no .cache test"
+    echo "no .cache test" > src/utils/.cache
+    md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
+fi
+
 printf "${LOGO}"
 if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
 	cat "$src_path"/utils/.logo
@@ -51,5 +64,4 @@ fi
 # check trash
 source "$src_path"/utils/trash.sh
 
-printf "\n"
 exit 0
