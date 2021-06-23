@@ -11,7 +11,7 @@ if [[ -f "$SRC/utils/.cache" ]]; then
 else
     $SRC/utils/cachegen.sh > $SRC/utils/.cache
     md5sum $SRC/utils/.cache | cut -d " " -f1 > $SRC/utils/.md5
-	chmod 775 $SRC/utils/.cache
+    chmod 775 $SRC/utils/.cache
 fi
 chmod 775 $SRC/utils/.md5
 
@@ -23,7 +23,7 @@ printf "Running on: $(uname -rs)\n$NORMAL"
 
 while read line; do
 	if [[ "$line" != "" ]]; then
-        source $SRC/$line.sh;
+            source $SRC/$line.sh;
     fi
 done < $SRC/utils/.cache
 
