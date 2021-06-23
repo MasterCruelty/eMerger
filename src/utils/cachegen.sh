@@ -3,6 +3,8 @@
 ### generates default caches ###
 OUT=""
 
+OUT+="utils/privileges\n"
+
 # arch
 if [[ $(command -v pacman) ]]; then	
 	OUT+="package/archlinux\n"

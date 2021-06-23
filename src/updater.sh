@@ -21,7 +21,6 @@ if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
 fi
 printf "Running on: $(uname -rs)\n${NORMAL}"
 
-source "$src_path"/utils/privileges.sh
 while read line; do
 	if [[ "$line" != "" ]]; then
         source "$src_path"/"$line".sh;
