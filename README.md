@@ -1,3 +1,4 @@
+![GitHub release (latest by date including pre-releases)](https://badgen.net/github/release/MasterCruelty/Updater?label=Latest%20release)
 ![License](https://img.shields.io/github/license/MasterCruelty/Updater)
 [![image](https://img.shields.io/github/stars/MasterCruelty/Updater)](https://github.com/MasterCruelty/Updater/stargazers)
 [![image](https://img.shields.io/github/forks/MasterCruelty/Updater)](https://github.com/MasterCruelty/Updater/network/members)
