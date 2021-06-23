@@ -5,37 +5,39 @@ OUT=""
 
 # arch
 if [[ $(command -v pacman) ]]; then	
-	OUT+="archlinux\n"
+	OUT+="package/archlinux\n"
 fi
 
 # debian
 if [[ $(command -v apt-get) ]]; then
-	OUT+="debian\n"
+	OUT+="package/debian\n"
 fi
 
 # flatpak
 if [[ $(command -v flatpak) ]]; then
-	OUT+="flatpak\n"
+	OUT+="package/flatpak\n"
 fi
 
 #gentoo
 if [[ $(command -v emerge) ]]; then
-	OUT+="gentoo\n"
+	OUT+="package/gentoo\n"
 fi
 
 # rpm
 if [[ $(command -v yum) ]]; then	
-	OUT+="rpm\n"
+	OUT+="package/rpm\n"
 fi
 
 # snap
 if [[ $(command -v snap) ]]; then
-	OUT+="snap\n"
+	OUT+="package/snap\n"
 fi
 
 # termux
 if [[ $(command -v pkg) ]]; then
-	OUT+="termux"
+	OUT+="package/termux\n"
 fi
+
+OUT+="utils/trash"
 
 echo -e "$OUT"

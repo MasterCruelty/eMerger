@@ -24,11 +24,8 @@ printf "Running on: $(uname -rs)\n${NORMAL}"
 source "$src_path"/utils/privileges.sh
 while read line; do
 	if [[ "$line" != "" ]]; then
-        source "$src_path"/package/"$line".sh;
+        source "$src_path"/"$line".sh;
     fi
 done < $src_path/utils/.cache
-
-# check trash
-source "$src_path"/utils/trash.sh
 
 exit 0
