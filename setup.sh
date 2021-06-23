@@ -12,7 +12,7 @@ EXST=$(cat ~/.bashrc | grep -c "updater.sh")
 if [[ $EXST -ne 0 ]]; then
 	printProgress "Alias 'up' already exists. Use 'up' or run './src/updater.sh'."
 	printProgress "Setup completed."
-    exit 0
+	exit 0
 else
     echo "alias up='bash $(pwd)/src/updater.sh'" >> ~/.bashrc
     chmod +x src/updater.sh

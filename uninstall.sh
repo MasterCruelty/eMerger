@@ -5,7 +5,7 @@ source src/utils/global.sh
 sed -i "/alias up=/d" ~/.bashrc
 printf "Alias 'up' removed\n"
 
-printf "\nUninstallation completed\n"
+printf "\n${RED}Uninstallation completed\n"
 
 read -p "Press enter, the process  will be killed.\nIf your terminal closes, open a new one." text
 printf "${NORMAL}"
