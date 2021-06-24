@@ -27,4 +27,5 @@ for LINE in $(cat $SRC/utils/.cache); do
     fi
 done
 
+printf "\a"
 exit 0
