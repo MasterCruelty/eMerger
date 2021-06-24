@@ -21,10 +21,10 @@ if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
 fi
 printf "Running on: $(uname -rs)\n$NORMAL"
 
-while read line; do
+for line in $(cat $SRC/utils/.cache); do
 	if [[ "$line" != "" ]]; then
         source $SRC/$line.sh;
     fi
-done < $SRC/utils/.cache
+done
 
 exit 0
