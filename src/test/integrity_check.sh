@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+#I check for printProgress so I can use it later
 SRC=$(dirname "$(readlink -f "../$0")")
 if [[ -f "$SRC/utils/global.sh" ]]; then
     source $SRC/utils/global.sh
@@ -9,8 +9,11 @@ else
     exit 0
 fi
 
-files_utils=( "cachegen.sh" "checkpwr.sh" "global.sh" "privileges.sh" "trash.sh" )
+#I define an empty array for /utils files and I fill it with content of utils file.
+file_utils=();
+mapfile -t files_utils < "$SRC/utils/utils"
 printProgress "checking /utils files: starting"
+
 for i in "${files_utils[@]}" 
 do
     if [[ -f "$SRC/utils/$i" ]]; then
@@ -23,8 +26,11 @@ done
 
 printProgress "/utils files: all checked.\n"
 
-files_package=( "archlinux.sh" "debian.sh" "flatpak.sh" "gentoo.sh" "opensuse.sh" "rpm.sh" "snap.sh" "termux.sh" )
+#I define an ampty array for /package files and I fill it with content of package file.
+file_package=();
+mapfile -t files_package < "$SRC/utils/package"
 printProgress "checking /package files: starting"
+
 for i in "${files_package[@]}" 
 do
     if [[ -f "$SRC/package/$i" ]]; then
@@ -36,6 +42,7 @@ do
 done
 printProgress "/package files: all checked.\n"
 
+#In the end I check for updater.sh file.
 if [[ -f "$SRC/updater.sh" ]]; then
     printProgress "updater.sh checked\nAll files checked."
     exit 0
