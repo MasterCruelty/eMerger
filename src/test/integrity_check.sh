@@ -9,7 +9,9 @@ else
     exit 0
 fi
 
-files_utils=( "cachegen.sh" "checkpwr.sh" "global.sh" "privileges.sh" "trash.sh" )
+file_utils=();
+mapfile -t files_utils < "$SRC/utils/utils"
+
 printProgress "checking /utils files: starting"
 for i in "${files_utils[@]}" 
 do
@@ -23,7 +25,8 @@ done
 
 printProgress "/utils files: all checked.\n"
 
-files_package=( "archlinux.sh" "debian.sh" "flatpak.sh" "gentoo.sh" "opensuse.sh" "rpm.sh" "snap.sh" "termux.sh" )
+file_package=();
+mapfile -t files_package < "$SRC/utils/package"
 printProgress "checking /package files: starting"
 for i in "${files_package[@]}" 
 do
