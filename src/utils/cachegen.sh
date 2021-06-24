@@ -20,9 +20,14 @@ if [[ $(command -v flatpak) ]]; then
     OUT+="package/flatpak\n"
 fi
 
-#gentoo
+# gentoo
 if [[ $(command -v emerge) ]]; then
     OUT+="package/gentoo\n"
+fi
+
+# opensuse
+if [[ $(command -v zypper) ]]; then
+    OUT+="package/opensuse\n"
 fi
 
 # rpm
