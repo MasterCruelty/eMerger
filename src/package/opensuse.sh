@@ -6,7 +6,7 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="zypper"
 
-printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
+printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}\n"
 
 printProgress "refresh: starting"
 $PWR $PKG refresh
