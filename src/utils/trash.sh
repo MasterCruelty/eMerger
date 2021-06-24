@@ -6,7 +6,7 @@ if [[ -d ~/.local/share/Trash/files ]]; then
 	printf "$RED\nShowing files in .local/share/Trash/files$NORMAL\n"
 	ls -Ahl ~/.local/share/Trash/files
 	printf "Should I clean Trash? "
-	read -p "[y/n]: " ANSW
+	read -p "[Y/n]: " ANSW
 	if [[ "$ANSW" == "y" ]]; then
 	    sudo rm -rf ~/.local/share/Trash/*
 	    printProgress "Trash: cleaned"
