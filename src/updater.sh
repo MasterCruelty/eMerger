@@ -4,10 +4,10 @@ SRC=$(dirname "$(readlink -f "$0")")
 source $SRC/utils/global.sh
 
 if [[ -f "$SRC/utils/.cache" ]]; then
-	HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
-	if [[ $HASH != $(cat $SRC/utils/.md5) ]]; then
-		md5sum $SRC/utils/.cache | cut -d " " -f1 > $SRC/utils/.md5
-	fi
+    HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
+    if [[ $HASH != $(cat $SRC/utils/.md5) ]]; then
+        md5sum $SRC/utils/.cache | cut -d " " -f1 > $SRC/utils/.md5
+    fi
 else
     $SRC/utils/cachegen.sh > $SRC/utils/.cache
     md5sum $SRC/utils/.cache | cut -d " " -f1 > $SRC/utils/.md5
@@ -17,14 +17,14 @@ chmod 775 $SRC/utils/.md5
 
 printf "$LOGO"
 if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
-	cat $SRC/utils/.logo
+    cat $SRC/utils/.logo
 fi
 printf "Running on: $(uname -rs)\n$NORMAL"
 
-while read line; do
-	if [[ "$line" != "" ]]; then
+for line in $(cat $SRC/utils/.cache); do
+    if [[ "$line" != "" ]]; then
             source $SRC/$line.sh;
     fi
-done < $SRC/utils/.cache
+done
 
 exit 0

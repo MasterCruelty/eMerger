@@ -7,7 +7,7 @@ PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="yum"
 
 if [[ $(command -v dnf) ]]; then
-	PKG="dnf"
+    PKG="dnf"
 fi
 
 printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"

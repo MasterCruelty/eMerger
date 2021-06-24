@@ -8,16 +8,16 @@ PKG="flatpak"
 
 printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
 
-printProgress "flatpak update: starting"
+printProgress "update: starting"
 $PWR $PKG update
-printProgress "flatpak update: completed"
+printProgress "update: completed"
 
-printProgress "flatpak repair: starting"
+printProgress "repair: starting"
 $PWR $PKG repair
-printProgress "flatpak repair: completed"
+printProgress "repair: completed"
 
-printProgress "flatpak uninstall unused extensions: starting"
+printProgress "uninstall unused extensions: starting"
 $PWR $PKG uninstall --unused
-printProgress "flatpak uninstall unused extensions: completed"
+printProgress "uninstall unused extensions: completed"
 
 printf "\n"

@@ -7,7 +7,7 @@ PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="apt-get"
 
 if [[ $(command -v apt) ]]; then
-	PKG="apt"
+    PKG="apt"
 fi
 
 printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"

@@ -7,8 +7,8 @@ PWR=$(source $SRC/utils/checkpwr.sh)
 
 printf "${GREEN}\nPackage manager detected: ${RED}Using snap${NORMAL}"
 
-printProgress "snap refresh: starting"
+printProgress "refresh: starting"
 $PWR snap refresh
-printProgress "snap refresh: completed"
+printProgress "refresh: completed"
 
 printf "\n"
