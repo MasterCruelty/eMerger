@@ -16,4 +16,12 @@ printProgress "update: starting"
 $PWR $PKG up 2>/dev/null || $PWR $PKG dup
 printProgress "update: completed"
 
+printProgress "remove dependencies: starting"
+$PWR $PKG rm chromium --clean-deps
+printProgress "remove dependencies: completed"
+
+printProgress "list unneeded packages: starting"
+$PWR $PKG packages --unneeded
+printProgress "list unneeded packages: completed"
+
 printf "\n"
