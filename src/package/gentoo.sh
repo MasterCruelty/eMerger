@@ -6,7 +6,7 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/checkpwr.sh)
 PKG="emerge"
 
-printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}"
+printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}\n"
 
 printProgress "syncing: starting"
 $PWR $PKG --sync

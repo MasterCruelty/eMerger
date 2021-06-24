@@ -19,12 +19,13 @@ printf "$LOGO"
 if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
     cat $SRC/utils/.logo
 fi
-printf "Running on: $(uname -rs)\n$NORMAL"
+printf "Running on: $(uname -rs)\n\n$NORMAL"
 
-for line in $(cat $SRC/utils/.cache); do
-    if [[ "$line" != "" ]]; then
-            source $SRC/$line.sh;
+for LINE in $(cat $SRC/utils/.cache); do
+    if [[ "$LINE" != "" ]]; then
+            source $SRC/$LINE.sh;
     fi
 done
 
+printf "\a"
 exit 0

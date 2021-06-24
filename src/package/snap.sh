@@ -5,7 +5,7 @@ source $SRC/utils/global.sh
 
 PWR=$(source $SRC/utils/checkpwr.sh)
 
-printf "${GREEN}\nPackage manager detected: ${RED}Using snap${NORMAL}"
+printf "${GREEN}\nPackage manager detected: ${RED}Using snap${NORMAL}\n"
 
 printProgress "refresh: starting"
 $PWR snap refresh
