@@ -23,7 +23,7 @@ printf "Running on: $(uname -rs)\n\n$NORMAL"
 
 for LINE in $(cat $SRC/utils/.cache); do
     if [[ "$LINE" != "" ]]; then
-            source $SRC/$LINE.sh;
+        source $SRC/$LINE.sh
     fi
 done
 
