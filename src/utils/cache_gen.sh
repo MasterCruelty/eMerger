@@ -4,7 +4,7 @@
 OUT=""
 
 OUT+="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
-OUT+="utils/privileges\n"
+$(command -v pkg) || OUT+="utils/privileges\n"
 
 # arch
 if [[ $(command -v pacman) ]]; then
