@@ -3,52 +3,24 @@
 ### generates default caches ###
 OUT="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
 
-# privileges
+# array that contain all package manager
+pkg=("pacman" "apt-get" "flatpak" "emerge" "zypper" "yum" "snap" "pkg")
+system=("archlinux" "debian" "flatpak" "gentoo" "opensuse" "rpm" "snap" "termux")
+
+# check for privileges
 if [[ $(command -v pkg) ]]; then
     :
 else
     OUT+="utils/privileges\n"
 fi
 
-# arch
-if [[ $(command -v pacman) ]]; then
-    OUT+="package/archlinux\n"
-fi
-
-# debian
-if [[ $(command -v apt-get) ]]; then
-    OUT+="package/debian\n"
-fi
-
-# flatpak
-if [[ $(command -v flatpak) ]]; then
-    OUT+="package/flatpak\n"
-fi
-
-# gentoo
-if [[ $(command -v emerge) ]]; then
-    OUT+="package/gentoo\n"
-fi
-
-# opensuse
-if [[ $(command -v zypper) ]]; then
-    OUT+="package/opensuse\n"
-fi
-
-# rpm
-if [[ $(command -v yum) ]]; then
-    OUT+="package/rpm\n"
-fi
-
-# snap
-if [[ $(command -v snap) ]]; then
-    OUT+="package/snap\n"
-fi
-
-# termux
-if [[ $(command -v pkg) ]]; then
-    OUT+="package/termux\n"
-fi
+# I check for every package which one is available on the system.
+for i in "${!pkg[@]}"
+do
+    if [[ $(command -v ${pkg[i]}) ]]; then
+        OUT+="package/${system[i]}\n"
+    fi
+done
 
 OUT+="utils/trash"
 
