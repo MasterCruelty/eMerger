@@ -3,6 +3,7 @@
 ### generates default caches ###
 OUT=""
 
+OUT+="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
 OUT+="utils/privileges\n"
 
 # arch
