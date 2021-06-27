@@ -18,3 +18,5 @@ If you want to remove the previously created alias
     <li>Run <code>./uninstall.sh</code></li>
     <li>The process will be killed. Again, if your terminal closes, open a new one to see changes.</li>
 </ol>
+
+### Feel free to contribute to the project. Just explain what you did and why.
