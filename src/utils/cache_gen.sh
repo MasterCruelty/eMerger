@@ -1,10 +1,14 @@
 #!/bin/bash
 
 ### generates default caches ###
-OUT=""
+OUT="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
 
-OUT+="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
-$(command -v pkg) || OUT+="utils/privileges\n"
+# privileges
+if [[ $(command -v pkg) ]]; then
+    :
+else
+    OUT+="utils/privileges\n"
+fi
 
 # arch
 if [[ $(command -v pacman) ]]; then
