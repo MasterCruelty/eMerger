@@ -22,5 +22,9 @@ else
     printProgress "Setup completed."
 fi
 
-exec bash
-exit 0
+if [[ $1 == "fetch" ]]; then
+    exit 0	
+else
+    exec bash
+    exit 0
+fi
