@@ -7,5 +7,9 @@ printf "${RED}Alias 'up' removed\n"
 
 printf "\nUninstallation completed\n${NORMAL}"
 
-exec bash
-exit 0
+if [[ $1 == "fetch" ]]; then
+    exit 0	
+else
+    exec bash
+    exit 0
+fi
