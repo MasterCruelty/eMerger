@@ -10,13 +10,13 @@
 Simple script to clean update your system!
 <ol>
     <li> Run <code>./setup.sh</code> </li>
-    <li> The process will be killed. Open a new terminal if yours is closed. </li>
+    <li> The terminal will reboot automatically. </li>
     <li> Run <code>up</code> or go to <code>./src/</code> and run <code>updater.sh</code></li>
 </ol>
 If you want to remove the previously created alias
 <ol>
     <li>Run <code>./uninstall.sh</code></li>
-    <li>The process will be killed. Again, if your terminal closes, open a new one to see changes.</li>
+    <li>The alias is now removed and terminal has rebooted automatically.</li>
 </ol>
 
 ### Feel free to contribute to the project. Just explain what you did and why.
