@@ -22,9 +22,5 @@ else
     printProgress "Setup completed."
 fi
 
-printf "${RED}"
-read -p "Press enter, the process will be killed:\nif your terminal closes, open a new one to see changes." text
-printf "${NORMAL}"
-
-kill -9 $PPID
+exec bash
 exit 0
