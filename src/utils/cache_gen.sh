@@ -4,8 +4,17 @@
 OUT="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
 
 # array that contain all package manager
-pkg=("pacman" "apt-get" "flatpak" "emerge" "zypper" "yum" "snap" "pkg")
-system=("archlinux" "debian" "flatpak" "gentoo" "opensuse" "rpm" "snap" "termux")
+declare -A pkg
+pkg=(
+    ["pacman"]="archlinux"
+    ["apt-get"]="debian"
+    ["flatpak"]="flatpak"
+    ["emerge"]="gentoo"
+    ["zypper"]="opensuse"
+    ["yum"]="rpm"
+    ["snap"]="snap"
+    ["pkg"]="termux"
+)
 
 # check for privileges
 if [[ $(command -v pkg) ]]; then
@@ -15,10 +24,9 @@ else
 fi
 
 # I check for every package which one is available on the system.
-for i in "${!pkg[@]}"
-do
-    if [[ $(command -v ${pkg[i]}) ]]; then
-        OUT+="package/${system[i]}\n"
+for i in ${!pkg[@]}; do
+    if [[ $(command -v $i) ]]; then
+        OUT+="package/${pkg[$i]}\n"
     fi
 done
 
