@@ -1,11 +1,38 @@
 #!/bin/bash
 
 ### generates default caches ###
+
+# path
 OUT="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
 
-# array that contain all package manager
-declare -A pkg
-pkg=(
+# check for first available terminal
+# LEAVE IT AS TERMINAL, DO NOT CALL IT TERM
+declare -a TERMINAL
+TERMINAL=(
+    "xterm"
+    "konsole"
+    "terminator"
+    "lxterminal"
+    "gnome-terminal"
+)
+
+# this flag goes to 1 if we have a known terminal
+FLAG=0
+for i in ${TERMINAL[@]}; do
+    if [[ $(command -v $i) ]]; then
+        OUT+="$i\n"
+        FLAG=1
+        break
+    fi
+done
+
+if [[ $FLAG -eq 0 ]]; then
+    OUT+="unknown\n"
+fi
+
+# package managers dictionary
+declare -A PKG
+PKG=(
     ["pacman"]="archlinux"
     ["apt-get"]="debian"
     ["flatpak"]="flatpak"
@@ -23,10 +50,10 @@ else
     OUT+="utils/privileges\n"
 fi
 
-# I check for every package which one is available on the system.
-for i in ${!pkg[@]}; do
+# check for available package manager
+for i in ${!PKG[@]}; do
     if [[ $(command -v $i) ]]; then
-        OUT+="package/${pkg[$i]}\n"
+        OUT+="package/${PKG[$i]}\n"
     fi
 done
 

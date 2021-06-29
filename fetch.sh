@@ -2,14 +2,14 @@
 
 source src/utils/global.sh
 
-#I do the git pull from the repository
-printProgress "Fetching repository: starting"
-git pull  https://www.github.com/MasterCruelty/Updater
-printProgress "Fetching repository: done\n"
+# git pull from main
+printProgress "Update repository: starting"
+git pull https://www.github.com/MasterCruelty/Updater
 
-#I launch uninstall and setup
-printProgress "Uninstalling old version and setup: starting"
-bash uninstall.sh "fetch"  
-bash setup.sh "fetch"
-printProgress "Uninstalling old version and setup: done"
-exec bash
+# re-install but keep old caches
+source uninstall.sh "fetch" 1>/dev/null
+source setup.sh "fetch" 1>/dev/null
+printProgress "Update repository: completed"
+
+# no need to exec bash
+exit 0
