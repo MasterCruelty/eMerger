@@ -6,7 +6,6 @@
 OUT="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
 
 # check for first available terminal
-# LEAVE IT AS TERMINAL, DO NOT CALL IT TERM
 declare -a TERMINAL
 TERMINAL=(
     "xterm"

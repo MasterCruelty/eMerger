@@ -11,5 +11,4 @@ source uninstall.sh "fetch" 1>/dev/null
 source setup.sh "fetch" 1>/dev/null
 printProgress "Update repository: completed"
 
-# no need to exec bash
 exit 0
