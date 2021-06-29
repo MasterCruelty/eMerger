@@ -2,14 +2,12 @@
 
 source src/utils/global.sh
 
+printProgress "Uninstall: starting"
 sed -i "/alias up=/d" ~/.bashrc
-printf "${RED}Alias 'up' removed\n"
+printf "${RED}Alias 'up' removed\n${NORMAL}"
+printProgress "Uninstall: completed"
 
-printf "\nUninstallation completed\n${NORMAL}"
-
-if [[ $1 == "fetch" ]]; then
-    exit 0	
-else
+if [[ $1 != "fetch" ]]; then
     exec bash
     exit 0
 fi
