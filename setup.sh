@@ -22,6 +22,16 @@ if [[ $1 != "fetch" ]]; then
     chmod 775 src/utils/.cache
     chmod 775 src/utils/.md5
 
-    exec bash
-    exit 0
+    TERMINAL=$(cat src/utils/.cache | head -n 2 | tail -n 1)
+    if [[ $TERMINAL == "unknown" ]]; then
+        exec bash
+        exit 0
+    else
+        printf "\n${RED}"
+        read -p "Press enter, this process will be killed" answ
+        printf "${NORMAL}"
+        
+        $TERMINAL
+        kill -9 $PPID
+    fi
 fi

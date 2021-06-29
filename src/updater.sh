@@ -21,8 +21,8 @@ if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
 fi
 printf "Running on: $(uname -rs)\n\n$NORMAL"
 
-# `tail -n +2` skips the first line
-for LINE in $(cat $SRC/utils/.cache | tail -n +2); do
+# `tail -n +3` skips the first two lines
+for LINE in $(cat $SRC/utils/.cache | tail -n +3); do
     if [[ "$LINE" != "" ]]; then
         source $SRC/$LINE.sh
     fi
