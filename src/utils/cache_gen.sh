@@ -11,6 +11,8 @@ declare -a TERMINAL
 TERMINAL=(
     "xterm"
     "konsole"
+    "terminator"
+    "lxterminal"
     "gnome-terminal"
 )
 
