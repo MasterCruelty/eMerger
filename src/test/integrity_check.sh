@@ -47,5 +47,5 @@ while read LINE; do
         printProgress "$SRC/package/$LINE.sh is missing: aborting script\n"
         exit 1
     fi
-done < $SRC/utils/.packages
+done < $SRC/package/.packages
 printProgress "check ./src/package/*: completed\n"
