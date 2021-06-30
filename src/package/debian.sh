@@ -25,6 +25,10 @@ printProgress "autoclean: starting"
 $PWR $PKG autoclean
 printProgress "autoclean: completed"
 
+printProgress "clean: starting"
+$PWR $PKG clean
+printProgress "clean: completed"
+
 printProgress "autoremove: starting"
 $PWR $PKG autoremove
 printProgress "autoremove: completed"
