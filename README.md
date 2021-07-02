@@ -6,6 +6,7 @@
 [![image](https://img.shields.io/github/issues/MasterCruelty/Updater)](https://github.com/MasterCruelty/Updater/issues)
 ![image](https://img.shields.io/github/languages/top/MasterCruelty/Updater)
 ![image](https://img.shields.io/github/commit-activity/w/MasterCruelty/Updater)
+![image](https://img.shields.io/github/contributors/MasterCruelty/Updater)
 # Updater
 Simple script to clean update your system!
 
