@@ -5,8 +5,8 @@
 # If the script is executed from '.setup.sh', then it needs to know the PAD
 REF=$(dirname "$(readlink -f ../$0)")
 PAD=""
-if [[ "$REF" != *"/Updater/src" ]]; then
-    PAD="/Updater/src"
+if [[ "$REF" != *"/eMerger/src" ]]; then
+    PAD="/eMerger/src"
 fi
 SRC="$(cat $REF$PAD/utils/.cache | head -n 1)/src"
 
@@ -18,11 +18,11 @@ else
     exit 1
 fi
 
-# check ./src/updater.sh existence
-if [[ -f "$SRC/updater.sh" ]]; then
+# check ./src/emerger.sh existence
+if [[ -f "$SRC/emerger.sh" ]]; then
     true
 else
-    printf "updater.sh is missing: aborting script\n"
+    printf "emerger.sh is missing: aborting script\n"
     exit 1
 fi
 

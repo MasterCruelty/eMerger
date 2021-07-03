@@ -7,13 +7,13 @@
 ![image](https://img.shields.io/github/languages/top/MasterCruelty/Updater)
 ![image](https://img.shields.io/github/commit-activity/w/MasterCruelty/Updater)
 ![image](https://img.shields.io/github/contributors/MasterCruelty/Updater)
-# Updater
+# eMerger
 Simple script to clean update your system!
 
 ## Install
 <ol>
     <li> Run <code>./setup.sh</code> </li>
-    <li> Run <code>up</code> or go to <code>./src/</code> and run <code>updater.sh</code></li>
+    <li> Run <code>up</code> or go to <code>./src/</code> and run <code>emerger.sh</code></li>
 </ol>
 
 ## Uninstall

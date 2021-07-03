@@ -3,15 +3,15 @@
 source src/utils/global.sh
 printProgress "Setup: starting"
 
-EXST=$(cat ~/.bashrc | grep -c "updater.sh")
+EXST=$(cat ~/.bashrc | grep -c "emerger.sh")
 if [[ $EXST -ne 0 ]]; then
-    printProgress "Alias 'up' already exists. Use 'up' or run './src/updater.sh'"
+    printProgress "Alias 'up' already exists. Use 'up' or run './src/emerger.sh'"
     source src/test/integrity_check.sh
     printProgress "Setup: completed."
 else
-    echo "alias up='bash $(pwd)/src/updater.sh'" >> ~/.bashrc
-    chmod +x src/updater.sh
-    printProgress "Alias 'up' added.\nUse 'up' or run './src/updater.sh'"
+    echo "alias up='bash $(pwd)/src/emerger.sh'" >> ~/.bashrc
+    chmod +x src/emerger.sh
+    printProgress "Alias 'up' added.\nUse 'up' or run './src/emerger.sh'"
     source src/test/integrity_check.sh
     printProgress "Setup: completed."
 fi
