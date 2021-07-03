@@ -5,7 +5,7 @@ source src/utils/global.sh
 printProgress "Uninstall: starting"
 sed -i "/alias up=/d" ~/.bashrc
 printf "${RED}Alias 'up' removed\n${NORMAL}"
-printProgress "Uninstall: completed"
+printProgress "Uninstall: completed $SAD"
 
 if [[ $1 != "fetch" ]]; then
     TERMINAL=$(cat src/utils/.cache | head -n 2 | tail -n 1)
