@@ -3,7 +3,7 @@
 ### generates default caches ###
 
 # path
-OUT="$(pwd | awk -F 'Updater/src/utils' '{print $1}')\n"
+OUT="$(pwd | awk -F 'eMerger/src/utils' '{print $1}')\n"
 
 # check for first available terminal
 declare -a TERMINAL
