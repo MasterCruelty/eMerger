@@ -21,4 +21,6 @@ Simple script to clean update your system!
     <li>Run <code>./uninstall.sh</code></li>
 </ol>
 
-### Feel free to contribute to the project. Just explain what you did and why.
+### Feel free to contribute to the project. Just explain what you did and why.<br>
+
+### Is there a problem? Feel free to open an issue to explain whatever isn't working. 🖥️
