@@ -9,6 +9,11 @@ if [[ $EXST -ne 0 ]]; then
     source src/test/integrity_check.sh
     printProgress "Setup: completed."
 else
+    source src/utils/cache_gen.sh > src/utils/.cache
+    md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
+    chmod 775 src/utils/.cache
+    chmod 775 src/utils/.md5
+    
     echo "alias up='bash $(pwd)/src/emerger.sh'" >> ~/.bashrc
     chmod +x src/emerger.sh
     printProgress "Alias 'up' added.\nUse 'up' or run './src/emerger.sh'"
@@ -17,11 +22,6 @@ else
 fi
 
 if [[ $1 != "fetch" ]]; then
-    source src/utils/cache_gen.sh > src/utils/.cache
-    md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
-    chmod 775 src/utils/.cache
-    chmod 775 src/utils/.md5
-
     TERMINAL=$(cat src/utils/.cache | head -n 2 | tail -n 1)
     if [[ $TERMINAL == "unknown" ]]; then
         exec bash
