@@ -6,7 +6,7 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="pacman"
 
-printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG${NORMAL}\n"
+printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG $ARCH${NORMAL}\n"
 
 printProgress "update: starting"
 $PWR $PKG -Syy

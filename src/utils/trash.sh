@@ -3,7 +3,7 @@
 source $(dirname "$(readlink -f "$0")")/utils/global.sh
 
 if [[ -d ~/.local/share/Trash/files ]]; then
-	printf "$RED\nShowing files in .local/share/Trash/files$NORMAL\n"
+	printf "$RED\nShowing files in .local/share/Trash/files $TRASH$NORMAL\n"
 	ls -Ahl ~/.local/share/Trash/files
 	printf "Should I clean Trash? "
 	read -p "[Y/n]: " ANSW

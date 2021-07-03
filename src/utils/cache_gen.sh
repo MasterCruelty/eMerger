@@ -32,7 +32,7 @@ fi
 # package managers dictionary
 declare -A PKG
 PKG=(
-    ["pacman"]="archlinux"
+    ["pacman"]="arch"
     ["apt-get"]="debian"
     ["flatpak"]="flatpak"
     ["emerge"]="gentoo"

@@ -30,9 +30,9 @@ fi
 printProgress "\ncheck ./src/utils/*: starting"
 while read LINE; do
     if [[ -f "$SRC/utils/$LINE.sh" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE.sh\n${NORMAL}"
+        printf "${LOGO}passed\t$LINE.sh $CHECKMARK${NORMAL}\n"
     else
-        printProgress "$SRC/utils/$LINE.sh is missing: aborting script\n"
+        printProgress "$SRC/utils/$LINE.sh is missing: aborting script $CROSSMARK\n"
         exit 1
     fi
 done < $SRC/utils/.utils
@@ -42,9 +42,9 @@ printProgress "check ./src/utils/*: completed"
 printProgress "check ./src/package/*: starting"
 while read LINE; do
     if [[ -f "$SRC/package/$LINE.sh" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE.sh\n${NORMAL}"
+        printf "${LOGO}passed\t$LINE.sh $CHECKMARK${NORMAL}\n"
     else
-        printProgress "$SRC/package/$LINE.sh is missing: aborting script\n"
+        printProgress "$SRC/package/$LINE.sh is missing: aborting script $CROSSMARK\n"
         exit 1
     fi
 done < $SRC/package/.packages

@@ -7,7 +7,7 @@ EXST=$(cat ~/.bashrc | grep -c "emerger.sh")
 if [[ $EXST -ne 0 ]]; then
     printProgress "Alias 'up' already exists. Use 'up' or run './src/emerger.sh'"
     source src/test/integrity_check.sh
-    printProgress "Setup: completed."
+    printProgress "Setup: completed $COOL"
 else
     source src/utils/cache_gen.sh > src/utils/.cache
     md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5
@@ -18,7 +18,7 @@ else
     chmod +x src/emerger.sh
     printProgress "Alias 'up' added.\nUse 'up' or run './src/emerger.sh'"
     source src/test/integrity_check.sh
-    printProgress "Setup: completed."
+    printProgress "Setup: completed $COOL"
 fi
 
 if [[ $1 != "fetch" ]]; then
