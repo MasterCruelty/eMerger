@@ -16,9 +16,10 @@ fi
 chmod 775 $SRC/utils/.md5
 
 printf "$LOGO"
-if [[ $(stty size | awk '{print $2}') -ge 69 ]]; then
+if [[ $(stty size | awk '{print $2}') -ge 70 ]]; then
     cat $SRC/utils/.logo
 fi
+printf "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE\n"
 printf "Running on: $(uname -rs)\n\n$NORMAL"
 
 # `tail -n +3` skips the first two lines

@@ -22,6 +22,7 @@ SAD="\U0001F622"
 SNAP="\U0001F9A2"
 TERMUX="\U0001F916"
 TRASH="\U0001F4A9"
+WHALE="\U0001F40B"
 
 printProgress() {
     if [[ "$1" == *starting ]] || [[ "$1" == *privileges ]] || [[ "$1" == *already* ]] || [[ "$1" == *aborting* ]]; then
