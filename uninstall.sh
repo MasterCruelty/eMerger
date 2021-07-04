@@ -9,6 +9,10 @@ printProgress "Uninstall: completed $SAD"
 
 if [[ $1 != "fetch" ]]; then
     TERMINAL=$(cat src/utils/.cache | head -n 2 | tail -n 1)
+    
+    rm -f src/utils/.cache 2>/dev/null
+    rm -f src/utils/.md5 2>/dev/null
+
     if [[ $TERMINAL == "unknown" ]]; then
         exec bash
         exit 0
