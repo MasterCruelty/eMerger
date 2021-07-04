@@ -10,7 +10,7 @@ if [[ $(command -v apt) ]]; then
     PKG="apt"
 fi
 
-printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG $DEBIAN${NORMAL}\n"
+printf "${BLUE}\nUsing $PKG $DEBIAN${NORMAL}\n"
 
 
 printProgress "update: starting"
