@@ -6,7 +6,7 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="pkg"
 
-printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG $TERMUX${NORMAL}\n"
+printf "${BLUE}\nUsing $PKG $TERMUX${NORMAL}\n"
 
 printProgress "update: starting"
 $PWR $PKG update

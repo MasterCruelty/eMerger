@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Colors
+BLUE="\e[1;34;49m"
 GREEN="\e[1;32;49m"
 LOGO="\e[2;37;49m"
 NORMAL="\e[0m"

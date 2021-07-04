@@ -10,7 +10,7 @@ if [[ $(command -v dnf) ]]; then
     PKG="dnf"
 fi
 
-printf "${GREEN}\nPackage manager detected: ${RED}Using $PKG $RPM${NORMAL}\n"
+printf "${BLUE}\nUsing $PKG $RPM${NORMAL}\n"
 
 printProgress "update: starting"
 $PWR $PKG update
