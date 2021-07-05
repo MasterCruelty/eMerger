@@ -20,7 +20,9 @@ if [[ $(stty size | awk '{print $2}') -ge 74 ]]; then
     cat $SRC/utils/.logo
 fi
 printf "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE\n"
-printf "Running on: $(uname -rs)\n\n$NORMAL"
+printf "Running on: $(uname -rs)\n"
+curl wttr.in/?format="%l:+%c+%t+%w+%m\n"    # wttr.in function
+printf "\n$NORMAL"
 
 # `tail -n +3` skips the first two lines
 for LINE in $(cat $SRC/utils/.cache | tail -n +3); do
