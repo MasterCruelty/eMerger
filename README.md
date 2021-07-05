@@ -16,8 +16,8 @@ Simple script to clean update your system!
     <li> Run <code>up</code> or go to <code>./src/</code> and run <code>emerger.sh</code></li>
 </ol>
 
- Remember that if you cloned using `sudo git clone` and you want to run this script without
- root privileges, you have to enter the cloned folder and run `sudo chown -R yourusername .`
+ _**Remember that if you cloned using `sudo git clone` and you want to run this script without
+ root privileges, you have to enter the cloned folder and run `sudo chown -R yourusername .`**_
 
 ## Uninstall
 <ol>
