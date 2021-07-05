@@ -16,7 +16,7 @@ fi
 chmod 775 $SRC/utils/.md5
 
 printf "$LOGO"
-if [[ $(stty size | awk '{print $2}') -ge 70 ]]; then
+if [[ $(stty size | awk '{print $2}') -ge 74 ]]; then
     cat $SRC/utils/.logo
 fi
 printf "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE\n"
