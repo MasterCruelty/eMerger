@@ -28,9 +28,8 @@ else
     printf "$(uname -rs)\n"
 fi
 
-
-#Here we use wttr.in function to show the weather with the following arguments:
-#%l = location; %c = weather emoji; %t = temperature (actual, not felt); %w = wind km/h; %m = Moon phase
+# Using wttr.in to show the weather using the following arguments:
+# %l = location; %c = weather emoji; %t = actual temp; %w = wind km/h; %m = Moon phase
 printf "$(curl -s wttr.in/?format="%l:+%c+%t+%w+%m")$NORMAL\n\n" 
 
 # `tail -n +3` skips the first two lines
