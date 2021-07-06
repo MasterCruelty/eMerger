@@ -21,7 +21,7 @@ if [[ $(stty size | awk '{print $2}') -ge 74 ]]; then
 fi
 printf "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE\nRunning on: "
 
-if [[ $(uname -s) == "Linux" ]]; then
+if [[ -f "/etc/os-release" ]]; then
     NAME=$(cat /etc/os-release | head -n 7 | tail -n 1 | cut -c 14-)
     printf "${NAME::-1}\n"
 else
