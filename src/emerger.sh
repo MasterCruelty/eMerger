@@ -22,7 +22,7 @@ fi
 printf "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE\nRunning on: "
 
 if [[ -f "/etc/os-release" ]]; then
-    NAME=$(cat /etc/os-release | head -n 7 | tail -n 1 | cut -c 14-)
+    NAME=$(cat /etc/os-release | head -n $(echo $(grep -n "PRETTY_NAME" /etc/os-release) | cut -c 1) | tail -n 1 | cut -c 14-)
     printf "${NAME::-1}\n"
 else
     printf "$(uname -rs)\n"
