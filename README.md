@@ -57,6 +57,7 @@ The project is only used to retrieve weather data.</li>
     <li>dnf</li>
     <li>emerge</li>
     <li>flatpak</li>
+    <lI>nixos</li>
     <li>pacman</li>
     <li>pkg</li>
     <li>snap</li>
