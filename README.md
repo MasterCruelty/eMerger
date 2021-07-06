@@ -1,7 +1,7 @@
 <table>
     <tr>
         <th>Code</th>
-        <th>Other</th>
+        <th>Details</th>
     </tr>
         <td>
             <img src="https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger" alt="code size">
@@ -9,9 +9,12 @@
             <img src="https://img.shields.io/github/languages/top/MasterCruelty/eMerger" alt="top language">
         </td>
         <td>
-            <img src="https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger" alt="commit activity">
+            <img src="https://badgen.net/github/release/MasterCruelty/Updater?label=Latest%20release" alt="latest release">
+            <img src="https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger" alt="commit activity"><br>
             <img src="https://img.shields.io/github/contributors/MasterCruelty/eMerger" alt="contributors">
             <img src="https://img.shields.io/github/license/MasterCruelty/eMerger" alt="license">
+            <img src="https://img.shields.io/github/forks/MasterCruelty/Updater" alt="forks">
+            <img src="https://img.shields.io/github/stars/MasterCruelty/Updater" alt="stars">
         </td>
 </table>
 
@@ -25,8 +28,8 @@ eMerger is a simple script to clean update your system and your packages by just
     <li> Run <code>./setup.sh</code> </li>
     <li> Run <code>up</code> or go to <code>./src/</code> and run <code>emerger.sh</code></li>
 </ol>
-<i>Remember that if you cloned using <code>sudo git clone</code> and you want to run this script without
-root privileges, you have to enter the cloned folder and run <code>sudo chown -R yourusername .</code></i><br><br>
+<i><b>Remember that if you cloned using <code>sudo git clone</code> and you want to run this script without
+root privileges, you have to enter the cloned folder and run <code>sudo chown -R yourusername .</code></i></b><br><br>
 <h2>Uninstall</h2>
 <ol>
     <li>Run <code>./uninstall.sh</code></li>
@@ -64,3 +67,6 @@ The project is only used to retrieve weather data.</li>
     <li>yum</li>
     <li>zypper</li>
 </ul>
+<b><h3>Didn't find yours? Tell us with an issue!</b></h3>
+
+---
