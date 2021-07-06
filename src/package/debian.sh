@@ -12,7 +12,6 @@ fi
 
 printf "${BLUE}\nUsing $PKG $DEBIAN${NORMAL}\n"
 
-
 printProgress "update: starting"
 $PWR $PKG update
 printProgress "update: completed"
