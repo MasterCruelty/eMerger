@@ -22,15 +22,14 @@ fi
 printf "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE\nRunning on: "
 
 if [[ -f "/etc/os-release" ]]; then
-    NAME=$(cat /etc/os-release | head -n 7 | tail -n 1 | cut -c 14-)
+    NAME=$(cat /etc/os-release | head -n $(echo $(grep -n "PRETTY_NAME" /etc/os-release) | cut -c 1) | tail -n 1 | cut -c 14-)
     printf "${NAME::-1}\n"
 else
     printf "$(uname -rs)\n"
 fi
 
-
-#Here we use wttr.in function to show the weather with the following arguments:
-#%l = location; %c = weather emoji; %t = temperature (actual, not felt); %w = wind km/h; %m = Moon phase
+# Using wttr.in to show the weather using the following arguments:
+# %l = location; %c = weather emoji; %t = actual temp; %w = wind km/h; %m = Moon phase
 printf "$(curl -s wttr.in/?format="%l:+%c+%t+%w+%m")$NORMAL\n\n" 
 
 # `tail -n +3` skips the first two lines
