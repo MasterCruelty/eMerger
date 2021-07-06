@@ -20,5 +20,4 @@ printProgress "clean all: starting"
 $PWR $PKG -R $($PKG -Qtdq)
 printProgress "clean all: completed"
 
-
 printf "\n"
