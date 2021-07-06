@@ -20,7 +20,7 @@
 
 <h1>eMerger</h1>
 <h2>What is it?</h2>
-eMerger is a simple script to clean update your system and your packages by just typing `up` in your terminal!<br>
+eMerger is a simple script to clean update your system and your packages by just typing <code>up</code> in your terminal!<br>
 <h2>Install</h2>
 <ol>
     <li> Run <code>./setup.sh</code> </li>
@@ -32,11 +32,9 @@ root privileges, you have to enter the cloned folder and run <code>sudo chown -R
 <ol>
     <li>Run <code>./uninstall.sh</code></li>
 </ol>
-<br>
 
 ---
 
-<br>
 <h2>Contribute</h2>
 Feel free to contribute to the project. Explain what you did and make your code understandable.
 We will not accept contributions containing shady code or any form of discrimination.<br>
