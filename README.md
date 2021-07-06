@@ -9,9 +9,9 @@
             <img src="https://img.shields.io/github/languages/top/MasterCruelty/eMerger" alt="top language">
         </td>
         <td>
-            <img src="https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger" alt="commit activity"><br>
+            <img src="https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger" alt="commit activity">
             <img src="https://img.shields.io/github/contributors/MasterCruelty/eMerger" alt="contributors">
-            <img src="https://img.shields.io/github/forks/MasterCruelty/Updater" alt="forks">
+            <img src="https://img.shields.io/github/forks/MasterCruelty/Updater" alt="forks"><br>
             <img src="https://badgen.net/github/release/MasterCruelty/Updater?label=Latest%20release" alt="latest release">
             <img src="https://img.shields.io/github/license/MasterCruelty/eMerger" alt="license">
             <img src="https://img.shields.io/github/stars/MasterCruelty/Updater" alt="stars">
