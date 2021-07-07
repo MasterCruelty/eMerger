@@ -2,6 +2,7 @@ arch
 debian
 flatpak
 gentoo
+nix
 opensuse
 rpm
 snap

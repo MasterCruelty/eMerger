@@ -36,6 +36,7 @@ PKG=(
     ["apt-get"]="debian"
     ["flatpak"]="flatpak"
     ["emerge"]="gentoo"
+    ["nixos-rebuild"]="nix"
     ["zypper"]="opensuse"
     ["yum"]="rpm"
     ["snap"]="snap"
