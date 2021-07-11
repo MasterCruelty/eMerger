@@ -54,6 +54,6 @@ Contributions to this project are very appreciated, though we require some forma
         </ol>
     </li>
     <li>
-        Last but not the least, no one on this planet is born knowning everything. If you respect all the rules above but your pull request is rejected because of the nature of your code, your contribution will not be vain. Your help may give someone else ideas, or the possibility to refactor your code and make it more readable. This is the meaning of open source. Also remember that even us, the creators, started all of this knowing almost nothing, so don't be afraid to be judged.
+        Last but not least, no one on this planet is born knowning everything. If you respect all the rules above but your pull request is rejected because of the nature of your code, your contribution will not be vain. Your help may give someone else ideas, or the possibility to refactor your code and make it more readable. This is the meaning of open source. Also remember that even us, the creators, started all of this knowing almost nothing, so don't be afraid to be judged.
     </li>
 <ol>
