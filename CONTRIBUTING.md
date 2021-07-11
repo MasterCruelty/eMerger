@@ -34,6 +34,9 @@ Contributions to this project are very appreciated, though we require some forma
         </ul>
     </li>
     <li>
+        It's not mandatory, but try to follow the already existing code indentation.
+    </li>
+    <li>
         Since we believe in a friendly enviroment, memes are permitted in comments. Just don't abuse them and respect rule 4.
     </li>
     <li>
