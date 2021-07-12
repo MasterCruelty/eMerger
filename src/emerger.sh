@@ -4,7 +4,7 @@ SRC=$(dirname "$(readlink -f "$0")")
 source $SRC/utils/global.sh
 
 ARGV=$@
-if [[ $@ =~ "-help" ]]; then
+if [[ $ARGV =~ "-help" ]]; then
     cat $SRC/utils/help
     exit 0
 fi
@@ -21,7 +21,7 @@ else
 fi
 chmod 775 $SRC/utils/.md5
 
-if [[ ! $@ =~ "-nl" ]]; then
+if [[ ! $ARGV =~ "-nl" ]]; then
     printf "$LOGO"
     if [[ $(stty size | awk '{print $2}') -ge 74 ]]; then
         cat $SRC/utils/.logo
@@ -29,7 +29,7 @@ if [[ ! $@ =~ "-nl" ]]; then
     printf "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE\n$NORMAL"
 fi
 
-if [[ ! $@ =~ "-ni" ]]; then
+if [[ ! $ARGV =~ "-ni" ]]; then
     printf "${LOGO}Running on: "
     if [[ -f "/etc/os-release" ]]; then
         NAME=$(cat /etc/os-release | head -n $(echo $(grep -n "PRETTY_NAME" /etc/os-release) | cut -c 1) | tail -n 1 | cut -c 14-)
@@ -39,7 +39,7 @@ if [[ ! $@ =~ "-ni" ]]; then
     fi
 fi
 
-if [[ $@ =~ "-w" ]]; then
+if [[ $ARGV =~ "-w" ]]; then
     # Using wttr.in to show the weather using the following arguments:
     # %l = location; %c = weather emoji; %t = actual temp; %w = wind km/h; %m = Moon phase
     printf "$LOGO$(curl -s wttr.in/?format="%l:+%c+%t+%w+%m")$NORMAL\n"
@@ -47,7 +47,7 @@ fi
 
 # `tail -n +3` skips the first two lines
 for LINE in $(cat $SRC/utils/.cache | tail -n +3); do
-    if [[ $LINE == "utils/trash" && $@ =~ "-nt" ]]; then
+    if [[ $LINE == "utils/trash" && $ARGV =~ "-nt" ]]; then
         continue
     fi
 
