@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # REF looks for where the file has been executed
-# If the script is updated by cronjob, it contains an argument $1
+# If the script is updated by the cronjob, it contains an argument $1
 # If the script is executed from `test/`, then no PAD is added
 # If the script is executed from '.setup.sh', then it needs to know the PAD
 SRC=""
