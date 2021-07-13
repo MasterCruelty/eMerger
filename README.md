@@ -32,6 +32,10 @@ root privileges, you have to enter the cloned folder and run <code>sudo chown -R
 <ol>
     <li>Run <code>./uninstall.sh</code></li>
 </ol>
+<h2>Update eMerger</h2>
+<ol>
+    <li>Run <code>./fetch.sh</code>. This will fetch any changes directly from this repository.</li>
+</ol>
 
 ---
 
