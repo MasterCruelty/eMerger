@@ -36,7 +36,7 @@ root privileges, you have to enter the cloned folder and run <code>sudo chown -R
 You have two options:
 <ol>
     <li>Run <code>./update.sh</code></li>
-    <li>Run <code>.up -au</code> to set a cronjob</li>
+    <li>Run <code>up -au</code> to set a cronjob</li>
 </ol>
 
 ---
