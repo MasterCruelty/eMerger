@@ -33,8 +33,10 @@ root privileges, you have to enter the cloned folder and run <code>sudo chown -R
     <li>Run <code>./uninstall.sh</code></li>
 </ol>
 <h2>Update</h2>
+You have two options:
 <ol>
-    <li>Run <code>./fetch.sh</code></li>
+    <li>Run <code>./update.sh</code></li>
+    <li>Run <code>.up -au</code> to set a cronjob</li>
 </ol>
 
 ---

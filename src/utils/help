@@ -1,6 +1,8 @@
 -help           Shows this help
 
--ni             Skips system informations               (no infos)
--nl             Skips logo                              (no logo)
--nt             Skips trash cleaning                    (no trash)
--w              Shows weather under logo                (weather)
+-au             Enable automatic update.                        (Automatic Update)
+                Repeat the command to disable it.                 
+-ni             Skips system informations.                      (No Infos)
+-nl             Skips logo.                                     (No Logo)
+-nt             Skips trash cleaning.                           (No Trash)
+-w              Shows weather under logo.                       (Weather)

@@ -1,14 +1,20 @@
 #!/bin/bash
 
 # REF looks for where the file has been executed
+# If the script is updated by cronjob, it contains an argument $1
 # If the script is executed from `test/`, then no PAD is added
 # If the script is executed from '.setup.sh', then it needs to know the PAD
-REF=$(dirname "$(readlink -f ../$0)")
-PAD=""
-if [[ "$REF" != *"/eMerger/src" ]]; then
-    PAD="/eMerger/src"
+SRC=""
+if [[ $1 != "" ]]; then
+    SRC="$1src"
+else
+    REF=$(dirname "$(readlink -f ../$0)")
+    PAD=""
+    if [[ $REF != *"/eMerger/src" ]]; then
+        PAD="/eMerger/src"
+    fi
+    SRC="$(cat $REF$PAD/utils/.cache | head -n 1)/src"
 fi
-SRC="$(cat $REF$PAD/utils/.cache | head -n 1)/src"
 
 # check global.sh existence (printProgress is there)
 if [[ -f $SRC/utils/global.sh ]]; then
