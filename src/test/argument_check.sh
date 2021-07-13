@@ -9,6 +9,7 @@ ARGS=(
     "-nt"
     "-up"
     "-w"
+    "-xyzzy"
 )
 
 for ARGU in $@; do
