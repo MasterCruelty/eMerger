@@ -8,6 +8,11 @@ if [[ $(grep -c "utils/privileges" $(dirname "$(readlink -f "$0")")/utils/.cache
     exit 1
 fi
 
+if [[ ! $(command -v crontab) ]]; then
+    printf "${RED}Package crontab is required.\nInstall it and repeat the command.${NORMAL}\n"
+    exit 1
+fi
+
 if [[ $(crontab -l | grep -c "eMerger/update.sh") -gt 0 ]]; then
     sudo crontab -u $USER -l | grep -v "eMerger/update.sh"  | sudo crontab -u $USER -
     printProgress "Cronjob successfully removed $SAD"
