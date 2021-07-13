@@ -5,9 +5,9 @@ source $1src/utils/global.sh
 # git pull from main
 printProgress "Update repository: starting"
 if [[ $1 != "" ]]; then
-    git -C $1 pull https://www.github.com/MasterCruelty/eMerger
+    git -C $1 pull https://github.com/MasterCruelty/eMerger.git/
 else
-    git pull https://www.github.com/MasterCruelty/eMerger
+    git pull https://github.com/MasterCruelty/eMerger.git/
 fi
 
 # Instead of re-installing, use our tests to check if everything is okay
