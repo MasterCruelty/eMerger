@@ -19,7 +19,7 @@ elif [[ $ARGV =~ "-up" ]]; then
     ROOT=${SRC::-3}
     source $ROOT/update.sh $ROOT
 elif [[ $ARGV =~ "-xyzzy" ]]; then
-    printf "Let's keep its memory alive"
+    printf "Let's keep its memory alive\n"
 else
     if [[ -f "$SRC/utils/.cache" ]]; then
         HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
