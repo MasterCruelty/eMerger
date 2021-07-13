@@ -10,14 +10,21 @@ fi
 printProgress "Uninstall: starting"
 sed -i "/alias up=/d" ~/.bashrc 2>>.errors
 printf "${RED}Alias 'up' removed${NORMAL}\n"
-printProgress "Uninstall: completed $SAD"
 
 # Get favourite terminal
 TERMINAL=$(cat src/utils/.cache | head -n 2 | tail -n 1)
 
+# Remove cronjob, if it exists (and if the user can)
+if [[ $(grep -c "utils/privileges" $(dirname "$(readlink -f "$0")")/src/utils/.cache) -gt 0 && $(crontab -l | grep -c "eMerger/update.sh") -gt 0 ]]; then
+    sudo crontab -u $USER -l | grep -v "eMerger/update.sh"  | sudo crontab -u $USER -
+    printProgress "Cronjob successfully removed $SAD"
+fi
+
 # Remove .cache and .md5
 rm -f src/utils/.cache 2>>.errors
 rm -f src/utils/.md5 2>>.errors
+
+printProgress "Uninstall: completed $SAD"
 
 if [[ $TERMINAL == "unknown" ]]; then
     exec bash
