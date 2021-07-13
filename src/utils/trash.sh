@@ -8,7 +8,7 @@ if [[ -d ~/.local/share/Trash/files ]]; then
 	printf "Should I clean Trash? "
 	read -p "[Y/n]: " ANSW
 	if [[ "$ANSW" == "y" ]]; then
-	    sudo rm -rf ~/.local/share/Trash/*
+	    rm -rf ~/.local/share/Trash/*
 	    printProgress "Trash: cleaned"
 	else
 	    printProgress "Trash: not cleaned"

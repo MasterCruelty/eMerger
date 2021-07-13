@@ -36,12 +36,10 @@ root privileges, you have to enter the cloned folder and run <code>sudo chown -R
 ---
 
 <h2>Contribute</h2>
-Feel free to contribute to the project. Explain what you did and make your code understandable.
-We will not accept contributions containing shady code or any form of discrimination.<br>
+<a href="https://github.com/MasterCruelty/eMerger/blob/main/CONTRIBUTING.md">How to contribute</a><br>
 <h2>Issue</h2>
 Is there a problem? 🖥️<br>
-Feel free to open an issue. Try to explain exactly what happens and if possible post errors or outputs
-you managed to retrieve.<br>
+Feel free to open an issue. Try to explain exactly what happens and if possible post errors or outputs you managed to retrieve.<br>
 <h2>License</h2>
 <ul>
     <li>This project license can be found in <code>./LICENSE</code></li>

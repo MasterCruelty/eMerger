@@ -1,0 +1,6 @@
+-help           Shows this help
+
+-ni             Skips system informations               (no infos)
+-nl             Skips logo                              (no logo)
+-nt             Skips trash cleaning                    (no trash)
+-w              Shows weather under logo                (weather)
