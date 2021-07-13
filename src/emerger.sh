@@ -15,6 +15,9 @@ if [[ $ARGV =~ "-help" ]]; then
     cat $SRC/utils/help
 elif [[ $ARGV =~ "-au" ]]; then
     source $SRC/utils/cron.sh
+elif [[ $ARGV =~ "-up" ]]; then
+    ROOT=${SRC::-3}
+    source $ROOT/update.sh $ROOT
 else
     if [[ -f "$SRC/utils/.cache" ]]; then
         HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
