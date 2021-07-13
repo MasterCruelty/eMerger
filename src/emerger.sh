@@ -3,7 +3,13 @@
 SRC=$(dirname "$(readlink -f "$0")")
 source $SRC/utils/global.sh
 
+ARGC=$#
 ARGV=$@
+
+if [[ $ARGC -gt 0 ]]; then
+    source $SRC/test/argument_check.sh $ARGV
+fi
+
 if [[ $ARGV =~ "-help" ]]; then
     cat $SRC/utils/help
     exit 0

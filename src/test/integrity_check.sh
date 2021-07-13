@@ -26,26 +26,40 @@ else
     exit 1
 fi
 
+LIST=$SRC/test/list/
+
 # check existence of ./src/utils/*
 printProgress "\ncheck ./src/utils/*: starting"
 while read LINE; do
-    if [[ -f "$SRC/utils/$LINE.sh" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE.sh $CHECKMARK${NORMAL}\n"
+    if [[ -f "$SRC/utils/$LINE" && $LINE != "" ]]; then
+        printf "${LOGO}passed\t$LINE $CHECKMARK${NORMAL}\n"
     else
-        printProgress "$SRC/utils/$LINE.sh is missing: aborting script $CROSSMARK\n"
+        printProgress "$SRC/utils/$LINE is missing: aborting script $CROSSMARK\n"
         exit 1
     fi
-done < $SRC/utils/.utils
+done < $LIST.utils
 printProgress "check ./src/utils/*: completed"
 
 # check existence of ./src/package/*
 printProgress "check ./src/package/*: starting"
 while read LINE; do
-    if [[ -f "$SRC/package/$LINE.sh" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE.sh $CHECKMARK${NORMAL}\n"
+    if [[ -f "$SRC/package/$LINE" && $LINE != "" ]]; then
+        printf "${LOGO}passed\t$LINE $CHECKMARK${NORMAL}\n"
     else
-        printProgress "$SRC/package/$LINE.sh is missing: aborting script $CROSSMARK\n"
+        printProgress "$SRC/package/$LINE is missing: aborting script $CROSSMARK\n"
         exit 1
     fi
-done < $SRC/package/.packages
-printProgress "check ./src/package/*: completed\n"
+done < $LIST.packages
+printProgress "check ./src/package/*: completed"
+
+# check existence of ./src/test/*
+printProgress "check ./src/test/*: starting"
+while read LINE; do
+    if [[ -f "$SRC/test/$LINE" && $LINE != "" ]]; then
+        printf "${LOGO}passed\t$LINE $CHECKMARK${NORMAL}\n"
+    else
+        printProgress "$LINE is missing: aborting script $CROSSMARK\n"
+        exit 1
+    fi
+done < $LIST.tests
+printProgress "check ./src/test/*: completed\n"
