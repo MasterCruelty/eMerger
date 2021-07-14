@@ -19,7 +19,7 @@ if [[ $(crontab -l | grep -c "eMerger/update.sh") -gt 0 ]]; then
     exit 0
 fi
 
-printf "${RED} press CTRL+C to install the crontab${NORMAL}\n"
+printf "${RED}If you never initialized the crontab, you may need to press CTRL+C or any SIGINT equivalent${NORMAL}\n"
 # Initialize crontab
 sudo crontab 2>/dev/null
 
@@ -27,14 +27,14 @@ sudo crontab 2>/dev/null
 ROOT=${SRC::-3}
 JOB="@reboot source ${ROOT}update.sh $ROOT 2>>$ROOT.errors"
 ( sudo crontab -u $USER -l; echo $JOB ) | sudo crontab -u $USER - 2>/dev/null
-printf "${GREEN}Below you can see details about the crontab installed${BLUE}\n"
-#I initialize a string that contain crontab info and an array to split it for a better view.
-CRON_STRING=$(crontab -l | grep "eMerger/update.sh")
-SEP="(${CRON_STRING// / })"
-for i in ${SEP[@]}; do
-    printf "$i\n"
-done
-printf "${NORMAL}"
+
+# Find the content and print it line by line
+# NR stands for Number of Records in input
+# RS defines how records are separated
+# <<< is the `Here Strings` redirection from the GNU bash manual
+printProgress "Details about your installed cronjob $SCROLL"
+printf "${LOGO}(\n$(awk 'NR>0' RS=' ' <<< $(crontab -l | grep "eMerger/update.sh"))\n)${NORMAL}\n"
+
 printProgress "Cronjob successfully installed $COOL"
 
 exit 0
