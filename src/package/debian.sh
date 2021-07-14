@@ -26,10 +26,6 @@ if [[ $(command -v apt) ]]; then
     printProgress "clean: starting"
     $PWR $PKG clean
     printProgress "clean: completed"
-
-    printProgress "autoremove: starting"
-    $PWR $PKG autoremove
-    printProgress "autoremove: completed"
 else
     printf "${BLUE}\nUsing $PKG $DEBIAN${NORMAL}\n"
 
