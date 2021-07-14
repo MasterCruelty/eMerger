@@ -64,6 +64,7 @@ The project is only used to retrieve weather data.</li>
     <lI>nixos</li>
     <li>pacman</li>
     <li>pkg</li>
+    <li>rpm</li>
     <li>snap</li>
     <li>yum</li>
     <li>zypper</li>
