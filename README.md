@@ -24,7 +24,7 @@ eMerger is a simple script to clean update your system and your packages by just
 <h2>Install</h2>
 <ol>
     <li> Run <code>./setup.sh</code> </li>
-    <li> Run <code>up</code> or go to <code>./src/</code> and run <code>emerger.sh</code></li>
+    <li> Run <code>up</code></li>
 </ol>
 <i><b>Remember that if you cloned using <code>sudo git clone</code> and you want to run this script without
 root privileges, you have to enter the cloned folder and run <code>sudo chown -R yourusername .</code></i></b><br>
@@ -32,9 +32,11 @@ root privileges, you have to enter the cloned folder and run <code>sudo chown -R
 <ol>
     <li>Run <code>./uninstall.sh</code></li>
 </ol>
-<h2>Update eMerger</h2>
+<h2>Update</h2>
+You have two options:
 <ol>
-    <li>Run <code>./fetch.sh</code>. This will fetch any changes directly from this repository.</li>
+    <li>Run <code>./update.sh</code></li>
+    <li>Run <code>up -au</code> to set a cronjob</li>
 </ol>
 
 ---

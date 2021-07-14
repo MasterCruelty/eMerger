@@ -21,17 +21,16 @@ else
     printProgress "Setup: completed $COOL"
 fi
 
-if [[ $1 != "fetch" ]]; then
-    TERMINAL=$(cat src/utils/.cache | head -n 2 | tail -n 1)
-    if [[ $TERMINAL == "unknown" ]]; then
-        exec bash
-        exit 0
-    else
-        printf "\n${RED}"
-        read -p "Press enter, this process will be killed" answ
-        printf "${NORMAL}"
-        
-        $TERMINAL 2>>.errors
-        kill -9 $PPID
-    fi
+# Open a new terminal
+TERMINAL=$(cat src/utils/.cache | head -n 2 | tail -n 1)
+if [[ $TERMINAL == "unknown" ]]; then
+    exec bash
+    exit 0
+else
+    printf "\n${RED}"
+    read -p "Press enter, this process will be killed" answ
+    printf "${NORMAL}"
+    
+    $TERMINAL 2>>.errors
+    kill -9 $PPID
 fi
