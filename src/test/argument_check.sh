@@ -4,6 +4,7 @@ CONTAIN=0
 ARGS=(
     "-help"
     "-au"
+    "-rc"
     "-ni"
     "-nl"
     "-nt"

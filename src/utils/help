@@ -2,6 +2,7 @@
 
 -au             Enable automatic update.                        (Automatic Update)
                 Repeat the command to disable it.                 
+-rc             Recreate caches                                 (Recreate Cache)
 -ni             Skips system informations.                      (No Infos)
 -nl             Skips logo.                                     (No Logo)
 -nt             Skips trash cleaning.                           (No Trash)

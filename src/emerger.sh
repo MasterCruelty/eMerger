@@ -21,7 +21,7 @@ elif [[ $ARGV =~ "-up" ]]; then
 elif [[ $ARGV =~ "-xyzzy" ]]; then
     printf "Let's keep its memory alive\n"
 else
-    if [[ -f "$SRC/utils/.cache" ]]; then
+    if [[ -f "$SRC/utils/.cache" && ! $ARGV =~ "-rc" ]]; then
         HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
         if [[ $HASH != $(cat $SRC/utils/.md5) ]]; then
             md5sum $SRC/utils/.cache | cut -d " " -f1 > $SRC/utils/.md5
