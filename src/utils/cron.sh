@@ -26,6 +26,9 @@ sudo crontab 2>/dev/null
 ROOT=${SRC::-3}
 JOB="@reboot source ${ROOT}update.sh $ROOT 2>>$ROOT.errors"
 ( sudo crontab -u $USER -l; echo $JOB ) | sudo crontab -u $USER - 2>/dev/null
+printf "${GREEN}Below you can see details about the crontab installed${BLUE}\n"
+crontab -l | grep "eMerger/update.sh"
+printf "${NORMAL}"
 printProgress "Cronjob successfully installed $COOL"
 
 exit 0
