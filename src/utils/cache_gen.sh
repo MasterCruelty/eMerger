@@ -38,7 +38,7 @@ PKG=(
     ["emerge"]="gentoo"
     ["nixos-rebuild"]="nix"
     ["zypper"]="opensuse"
-    ["yum"]="rpm"
+    ["rpm"]="rpm"
     ["snap"]="snap"
     ["pkg"]="termux"
 )

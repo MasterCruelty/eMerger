@@ -27,9 +27,7 @@ if [[ $TERMINAL == "unknown" ]]; then
     exec bash
     exit 0
 else
-    printf "\n${RED}"
-    read -p "Press enter, this process will be killed" answ
-    printf "${NORMAL}"
+    read -p "$(echo -e ${RED}Press enter, this process will be killed${NORMAL})"
     
     $TERMINAL 2>>.errors
     kill -9 $PPID
