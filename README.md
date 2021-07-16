@@ -21,6 +21,12 @@
 <h1>eMerger</h1>
 <h2>What is it?</h2>
 eMerger is a simple script to clean update your system and your packages by just typing <code>up</code> in your terminal!<br>
+<h2>Usage</h2>
+eMerger has a few options you can pass as argument when you type <code>up</code>. <br>
+Type <code>up -help</code> to discover which option you wanna use every time you update your system.
+
+---
+
 <h2>Install</h2>
 <ol>
     <li> Run <code>./setup.sh</code> </li>
@@ -38,6 +44,7 @@ You have two options:
     <li>Run <code>./update.sh</code></li>
     <li>Run <code>up -au</code> to set a cronjob</li>
 </ol>
+If you don't wanna use it anymore, you can remove the cronjob by typing again <code>up -au</code>
 
 ---
 
