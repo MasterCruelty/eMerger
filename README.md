@@ -21,9 +21,6 @@
 <h1>eMerger</h1>
 <h2>What is it?</h2>
 eMerger is a simple script to clean update your system and your packages by just typing <code>up</code> in your terminal!<br>
-<h2>Usage</h2>
-eMerger has a few options you can pass as argument when you type <code>up</code>. <br>
-Type <code>up -help</code> to discover which option you wanna use every time you update your system.
 
 ---
 
@@ -32,8 +29,7 @@ Type <code>up -help</code> to discover which option you wanna use every time you
     <li> Run <code>./setup.sh</code> </li>
     <li> Run <code>up</code></li>
 </ol>
-<i><b>Remember that if you cloned using <code>sudo git clone</code> and you want to run this script without
-root privileges, you have to enter the cloned folder and run <code>sudo chown -R yourusername .</code></i></b><br>
+If you cloned using root privileges, and you want to execute without them, remember to run: <code>sudo chown -R yourusername .</code>
 <h2>Uninstall</h2>
 <ol>
     <li>Run <code>./uninstall.sh</code></li>
@@ -44,7 +40,8 @@ You have two options:
     <li>Run <code>./update.sh</code></li>
     <li>Run <code>up -au</code> to set a cronjob</li>
 </ol>
-If you don't wanna use it anymore, you can remove the cronjob by typing again <code>up -au</code>
+<h2>Usage</h2>
+eMerger comes with inline arguments: just type <code>up -help</code> to explore them.<br>
 
 ---
 
@@ -61,7 +58,7 @@ license can be found under <code>./license/WTTR_LICENSE</code> or
 <a href="https://github.com/chubin/wttr.in/blob/master/LICENSE">here</a>.
 The project is only used to retrieve weather data.</li>
 </ul>
-<h2>Supported Package Managers</h2>
+<h2>Supported package managers</h2>
 <ul>
     <li>apt</li>
     <li>apt-get</li>
@@ -76,4 +73,4 @@ The project is only used to retrieve weather data.</li>
     <li>yum</li>
     <li>zypper</li>
 </ul>
-<h3><b>Didn't find yours? Tell us with an issue!</b></h3>
+Didn't find yours? Tell us with an issue!

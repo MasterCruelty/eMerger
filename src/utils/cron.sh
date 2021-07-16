@@ -36,5 +36,6 @@ printProgress "Details about your installed cronjob $SCROLL"
 printf "${LOGO}(\n$(awk 'NR>0' RS=' ' <<< $(crontab -l | grep "eMerger/update.sh"))\n)${NORMAL}\n"
 
 printProgress "Cronjob successfully installed $COOL"
+printProgress "If you want to remove this cronjob, repeat the command"
 
 exit 0
