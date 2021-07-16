@@ -60,6 +60,11 @@ else
         printf "$LOGO$(curl -s wttr.in/?format="%l:+%c+%t+%w+%m")$NORMAL\n"
     fi
 
+    #check size of .errors and show a warning if it's not empty.
+    if [[ -s ".errors" ]]; then
+        printProgress "Warning: .errors contains something. type \"cat .errors\" in eMerger main folder."
+    fi
+
     # `tail -n +3` skips the first two lines
     for LINE in $(cat $SRC/utils/.cache | tail -n +3); do
         if [[ $LINE == "utils/trash" && $ARGV =~ "-nt" ]]; then
