@@ -27,7 +27,7 @@ TRASH="\U0001F4A9"
 WHALE="\U0001F40B"
 
 printProgress() {
-    if [[ $1 == *starting ]] || [[ $1 == *privileges* ]] || [[ $1 == *already* ]] || [[ $1 == *aborting* ]]; then
+    if [[ $1 == *starting ]] || [[ $1 == *privileges* ]] || [[ $1 == *already* ]] || [[ $1 == *aborting* ]] || [[ $1 == *Warning* ]]; then
         printf "$RED$1$NORMAL\n"
     else
         printf "$GREEN$1$NORMAL\n"

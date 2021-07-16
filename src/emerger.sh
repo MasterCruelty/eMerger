@@ -20,6 +20,12 @@ elif [[ $ARGV =~ "-up" ]]; then
     source $ROOT/update.sh $ROOT
 elif [[ $ARGV =~ "-xyzzy" ]]; then
     printf "Let's keep its memory alive\n"
+elif [[ $ARGV =~ "-err" ]]; then
+    if [[ -s ".errors" ]]; then
+        printf "${LOGO}Fetching from .errors:\n${RED}\n$(cat .errors)\n"
+    else
+        printf "${LOGO}Fetching from .errors:\n${GREEN}All clear!\n"
+    fi
 else
     if [[ -f "$SRC/utils/.cache" && ! $ARGV =~ "-rc" ]]; then
         HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
@@ -58,6 +64,11 @@ else
         # Using wttr.in to show the weather using the following arguments:
         # %l = location; %c = weather emoji; %t = actual temp; %w = wind km/h; %m = Moon phase
         printf "$LOGO$(curl -s wttr.in/?format="%l:+%c+%t+%w+%m")$NORMAL\n"
+    fi
+
+    #check size of .errors and show a warning if it's not empty.
+    if [[ -s ".errors" ]]; then
+        printProgress "Warning: .errors contains something. type \"up -err\" to see the content of the error file."
     fi
 
     # `tail -n +3` skips the first two lines
