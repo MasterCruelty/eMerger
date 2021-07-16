@@ -64,7 +64,7 @@ else
 
     #check size of .errors and show a warning if it's not empty.
     if [[ -s ".errors" ]]; then
-        printProgress "Warning: .errors contains something. type \"cat .errors\" in eMerger main folder."
+        printProgress "Warning: .errors contains something. type \"up -err\" to see the content of the error file."
     fi
 
     # `tail -n +3` skips the first two lines
