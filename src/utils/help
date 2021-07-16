@@ -8,3 +8,4 @@
 -nt             Skips trash cleaning.                           (No Trash)
 -up             Updates the updater                             (UPdate)
 -w              Shows weather under logo.                       (Weather)
+-err		Shows .errors content				(Error tracking)
