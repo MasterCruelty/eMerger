@@ -11,6 +11,7 @@ ARGS=(
     "-up"
     "-w"
     "-xyzzy"
+    "-err"
 )
 
 for ARGU in $@; do

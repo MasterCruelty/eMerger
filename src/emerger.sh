@@ -20,6 +20,8 @@ elif [[ $ARGV =~ "-up" ]]; then
     source $ROOT/update.sh $ROOT
 elif [[ $ARGV =~ "-xyzzy" ]]; then
     printf "Let's keep its memory alive\n"
+elif [[ $ARGV =~ "-err" ]]; then
+    printf "${LOGO}fetching from .errors:\n${RED}\n$(cat .errors)\n"
 else
     if [[ -f "$SRC/utils/.cache" && ! $ARGV =~ "-rc" ]]; then
         HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
