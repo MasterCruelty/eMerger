@@ -32,10 +32,9 @@ JOB="@reboot source ${ROOT}update.sh $ROOT 2>>$ROOT.errors"
 # NR stands for Number of Records in input
 # RS defines how records are separated
 # <<< is the `Here Strings` redirection from the GNU bash manual
-printProgress "Details about your installed cronjob $SCROLL"
+printProgress "\nDetails about your installed cronjob $SCROLL"
 printf "${LOGO}(\n$(awk 'NR>0' RS=' ' <<< $(crontab -l | grep "eMerger/update.sh"))\n)${NORMAL}\n"
 
-printProgress "Cronjob successfully installed $COOL"
-printProgress "If you want to remove this cronjob, repeat the command"
+printProgress "\nCronjob successfully installed $COOL"
 
 exit 0

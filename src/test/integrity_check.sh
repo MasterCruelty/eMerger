@@ -38,7 +38,7 @@ LIST=$SRC/test/list/
 printProgress "\ncheck ./src/utils/*: starting"
 while read LINE; do
     if [[ -f "$SRC/utils/$LINE" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE ${GREEN}$CHECKMARK${NORMAL}\n"
+        printf "${LOGO}passed\t$LINE $NORMAL$GREEN$CHECKMARK${NORMAL}\n"
     else
         printProgress "$SRC/utils/$LINE is missing: aborting script $CROSSMARK\n"
         exit 1
@@ -50,7 +50,7 @@ printProgress "check ./src/utils/*: completed"
 printProgress "check ./src/package/*: starting"
 while read LINE; do
     if [[ -f "$SRC/package/$LINE" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE ${GREEN}$CHECKMARK${NORMAL}\n"
+        printf "${LOGO}passed\t$LINE $NORMAL$GREEN$CHECKMARK${NORMAL}\n"
     else
         printProgress "$SRC/package/$LINE is missing: aborting script $CROSSMARK\n"
         exit 1
@@ -62,7 +62,7 @@ printProgress "check ./src/package/*: completed"
 printProgress "check ./src/test/*: starting"
 while read LINE; do
     if [[ -f "$SRC/test/$LINE" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE ${GREEN}$CHECKMARK${NORMAL}\n"
+        printf "${LOGO}passed\t$LINE $NORMAL$GREEN$CHECKMARK${NORMAL}\n"
     else
         printProgress "$LINE is missing: aborting script $CROSSMARK\n"
         exit 1

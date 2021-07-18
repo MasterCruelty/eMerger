@@ -15,17 +15,17 @@ if [[ $ARGV =~ "-help" ]]; then
     cat $SRC/utils/help
 elif [[ $ARGV =~ "-au" ]]; then
     source $SRC/utils/cron.sh
+elif [[ $ARGV =~ "-err" ]]; then
+    if [[ -s ".errors" ]]; then
+        printf "${RED}Errors found:$NORMAL\n${LOGO}$(cat .errors)$NORMAL\n"
+    else
+        printf "${GREEN}No errors found.$NORMAL\n"
+    fi
 elif [[ $ARGV =~ "-up" ]]; then
     ROOT=${SRC::-3}
     source $ROOT/update.sh $ROOT
 elif [[ $ARGV =~ "-xyzzy" ]]; then
     printf "Let's keep its memory alive\n"
-elif [[ $ARGV =~ "-err" ]]; then
-    if [[ -s ".errors" ]]; then
-        printf "${LOGO}Fetching from .errors:\n${RED}\n$(cat .errors)\n"
-    else
-        printf "${LOGO}Fetching from .errors:\n${GREEN}All clear!\n"
-    fi
 else
     if [[ -f "$SRC/utils/.cache" && ! $ARGV =~ "-rc" ]]; then
         HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
@@ -66,11 +66,6 @@ else
         printf "$LOGO$(curl -s wttr.in/?format="%l:+%c+%t+%w+%m")$NORMAL\n"
     fi
 
-    #check size of .errors and show a warning if it's not empty.
-    if [[ -s ".errors" ]]; then
-        printProgress "Warning: .errors contains something. type \"up -err\" to see the content of the error file."
-    fi
-
     # `tail -n +3` skips the first two lines
     for LINE in $(cat $SRC/utils/.cache | tail -n +3); do
         if [[ $LINE == "utils/trash" && $ARGV =~ "-nt" ]]; then
@@ -81,6 +76,11 @@ else
             source $SRC/$LINE.sh
         fi
     done
+
+    # Notify if errors are present
+    if [[ -s ".errors" ]]; then
+        printf "\n\n${LOGO}Something is not working correctly, type \"up -err\" for further informations.$NORMAL\n"
+    fi
 
     printf "\a"
 fi

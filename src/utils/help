@@ -2,10 +2,10 @@
 
 -au             Enable automatic update.                        (Automatic Update)
                 Repeat the command to disable it.                 
--rc             Recreate caches                                 (Recreate Cache)
+-err            Shows errors                                    (ERRors)
 -ni             Skips system informations.                      (No Infos)
 -nl             Skips logo.                                     (No Logo)
 -nt             Skips trash cleaning.                           (No Trash)
+-rc             Recreate caches                                 (Recreate Cache)
 -up             Updates the updater                             (UPdate)
 -w              Shows weather under logo.                       (Weather)
--err		Shows .errors content				(Error tracking)
