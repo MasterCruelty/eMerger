@@ -4,14 +4,14 @@ CONTAIN=0
 ARGS=(
     "-help"
     "-au"
-    "-rc"
+    "-err"
     "-ni"
     "-nl"
     "-nt"
+    "-rc"
     "-up"
     "-w"
     "-xyzzy"
-    "-err"
 )
 
 for ARGU in $@; do
