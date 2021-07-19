@@ -82,7 +82,7 @@ else
         put LOGO "\n\n$Something is not working correctly, type \"up -err\" for further informations"
     fi
 
-    put NC "\a"
+    printf "\a"
 fi
 
 exit 0
