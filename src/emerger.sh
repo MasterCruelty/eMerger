@@ -4,6 +4,11 @@ SRC=$(dirname "$(readlink -f "$0")")
 ROOT=${SRC::-3}
 source $SRC/utils/global.sh
 
+# Create .log if it doesn't exist
+if [[ ! -f $ROOT.log ]]; then
+    printf "" > $ROOT.log
+fi
+
 # Clear .log if it gets too long (keep only the last 256 lines)
 # Given no errors, the max file size is 7KB
 if [[ $(wc -l < $ROOT.log) -gt 256 ]]; then
