@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source src/utils/global.sh 2>>.errors
+source src/utils/global.sh 2>>.log
 
 if [[ $(grep -c "alias up=" ~/.bashrc) -lt 1 ]]; then
     put GREEN "Nothing to uninstall $CHECKMARK"
@@ -8,7 +8,7 @@ if [[ $(grep -c "alias up=" ~/.bashrc) -lt 1 ]]; then
 fi
 
 put RED "Uninstall: starting"
-sed -i "/alias up=/d" ~/.bashrc 2>>.errors
+sed -i "/alias up=/d" ~/.bashrc 2>>.log
 put LOGO "Alias 'up' removed"
 
 # Get favourite terminal
@@ -21,8 +21,8 @@ if [[ $(grep -c "utils/privileges" $(dirname "$(readlink -f "$0")")/src/utils/.c
 fi
 
 # Remove .cache and .md5
-rm -f src/utils/.cache 2>>.errors
-rm -f src/utils/.md5 2>>.errors
+rm -f src/utils/.cache 2>>.log
+rm -f src/utils/.md5 2>>.log
 
 put GREEN "Uninstall: completed $SAD"
 
@@ -32,6 +32,6 @@ if [[ $TERMINAL == "unknown" ]]; then
 else
     read -p "$(echo -e ${RED}Press enter, this process will be killed${NORMAL})"
     
-    $TERMINAL 2>>.errors
+    $TERMINAL 2>>.log
     kill -9 $PPID
 fi

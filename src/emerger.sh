@@ -17,9 +17,8 @@ if [[ $ARGV =~ "-help" ]]; then
 elif [[ $ARGV =~ "-au" ]]; then
     source $SRC/utils/cron.sh
 elif [[ $ARGV =~ "-err" ]]; then
-    if [[ -s $ROOT/.errors ]]; then
-        put RED "Errors found:"
-        put LOGO "$(cat $ROOT/.errors)"
+    if [[ $(grep -v "[0-9]*:[0-9]*:[0-9]*:[0-9]*" $ROOT.log | wc -l) -gt 0 ]]; then
+        put RED "Errors found\nOpen .log to see what's wrong"
     else
         put GREEN "No errors found"
     fi
@@ -78,8 +77,8 @@ else
     done
 
     # Notify if errors are present
-    if [[ -s $ROOT/.errors ]]; then
-        put LOGO "\n\n$Something is not working correctly, type \"up -err\" for further informations"
+    if [[ $(grep -v "[0-9]*:[0-9]*:[0-9]*:[0-9]*" $ROOT.log | wc -l) -gt 0 ]]; then
+        put LOGO "\n\nSomething is not working correctly, type \"up -err\" for further informations"
     fi
 
     printf "\a"

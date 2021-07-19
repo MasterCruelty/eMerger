@@ -23,9 +23,13 @@ put RED "If you never initialized the crontab, you may need to press CTRL+C or a
 # Initialize crontab
 sudo crontab 2>/dev/null
 
-# Add line to crontab
 ROOT=${SRC::-3}
-JOB="@reboot source ${ROOT}update.sh $ROOT 2>>$ROOT.errors"
+
+# Keeping track of exact time
+date "+%T:%N" >> $ROOT.log
+
+# Add line to crontab
+JOB="@reboot source ${ROOT}update.sh $ROOT 2>>$ROOT.log"
 ( sudo crontab -u $USER -l; echo $JOB ) | sudo crontab -u $USER - 2>/dev/null
 
 # Find the content and print it line by line
