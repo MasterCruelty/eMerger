@@ -6,18 +6,16 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="flatpak"
 
-printf "${BLUE}\nUsing $PKG $FLATPAK${NORMAL}\n"
+put BLUE "Using $PKG $FLATPAK"
 
-printProgress "update: starting"
+put RED "update: starting"
 $PWR $PKG update
-printProgress "update: completed"
+put GREEN "update: completed"
 
-printProgress "repair: starting"
+put RED "repair: starting"
 $PWR $PKG repair
-printProgress "repair: completed"
+put GREEN "repair: completed"
 
-printProgress "uninstall unused extensions: starting"
+put RED "uninstall unused extensions: starting"
 $PWR $PKG uninstall --unused
-printProgress "uninstall unused extensions: completed"
-
-printf "\n"
+put GREEN "uninstall unused extensions: completed"

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SRC=$(dirname "$(readlink -f "$0")")
+ROOT=${SRC::-3}
 source $SRC/utils/global.sh
 
 ARGC=$#
@@ -16,16 +17,16 @@ if [[ $ARGV =~ "-help" ]]; then
 elif [[ $ARGV =~ "-au" ]]; then
     source $SRC/utils/cron.sh
 elif [[ $ARGV =~ "-err" ]]; then
-    if [[ -s ".errors" ]]; then
-        printf "${RED}Errors found:$NORMAL\n${LOGO}$(cat .errors)$NORMAL\n"
+    if [[ -s $ROOT/.errors ]]; then
+        put RED "Errors found:"
+        put LOGO "$(cat $ROOT/.errors)"
     else
-        printf "${GREEN}No errors found.$NORMAL\n"
+        put GREEN "No errors found"
     fi
 elif [[ $ARGV =~ "-up" ]]; then
-    ROOT=${SRC::-3}
     source $ROOT/update.sh $ROOT
 elif [[ $ARGV =~ "-xyzzy" ]]; then
-    printf "Let's keep its memory alive\n"
+    put NC "Let's keep its memory alive"
 else
     if [[ -f "$SRC/utils/.cache" && ! $ARGV =~ "-rc" ]]; then
         HASH=$(md5sum "$SRC/utils/.cache" | cut -d " " -f1)
@@ -41,21 +42,19 @@ else
 
     # Logo
     if [[ ! $ARGV =~ "-nl" ]]; then
-        printf "$LOGO"
         if [[ $(stty size | awk '{print $2}') -ge 74 ]]; then
-            cat $SRC/utils/.logo
+            put LOGO "$(cat $SRC/utils/.logo)"
         fi
-        printf "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE$NORMAL\n"
+        put LOGO "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE"
     fi
 
     # System informations
     if [[ ! $ARGV =~ "-ni" ]]; then
-        printf "${LOGO}Running on: "
         if [[ -f "/etc/os-release" ]]; then
             NAME=$(cat /etc/os-release | head -n $(echo $(grep -n "PRETTY_NAME" /etc/os-release) | cut -c 1) | tail -n 1 | cut -c 14-)
-            printf "${NAME::-1}$NORMAL\n"
+            put LOGO "${NAME::-1}"
         else
-            printf "$(uname -rs)$NORMAL\n"
+            put LOGO "$(uname -rs)"
         fi
     fi
 
@@ -63,7 +62,7 @@ else
     if [[ $ARGV =~ "-w" ]]; then
         # Using wttr.in to show the weather using the following arguments:
         # %l = location; %c = weather emoji; %t = actual temp; %w = wind km/h; %m = Moon phase
-        printf "$LOGO$(curl -s wttr.in/?format="%l:+%c+%t+%w+%m")$NORMAL\n"
+        put LOGO "$(curl -s wttr.in/?format="%l:+%c+%t+%w+%m")"
     fi
 
     # `tail -n +3` skips the first two lines
@@ -74,15 +73,16 @@ else
 
         if [[ $LINE != "" ]]; then
             source $SRC/$LINE.sh
+            put NC ""
         fi
     done
 
     # Notify if errors are present
-    if [[ -s ".errors" ]]; then
-        printf "\n\n${LOGO}Something is not working correctly, type \"up -err\" for further informations.$NORMAL\n"
+    if [[ -s $ROOT/.errors ]]; then
+        put LOGO "\n\n$Something is not working correctly, type \"up -err\" for further informations"
     fi
 
-    printf "\a"
+    put NC "\a"
 fi
 
 exit 0

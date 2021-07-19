@@ -26,10 +26,26 @@ TERMUX="\U0001F916"
 TRASH="\U0001F4A9"
 WHALE="\U0001F40B"
 
-printProgress() {
-    if [[ $1 == *starting ]] || [[ $1 == *privileges* ]] || [[ $1 == *already* ]] || [[ $1 == *aborting* ]]; then
-        printf "$RED$1$NORMAL\n"
-    else
-        printf "$GREEN$1$NORMAL\n"
-    fi
+# Argument $1 is color, argument $2 is text
+function put() {
+    case $1 in
+        BLUE)
+            printf "$BLUE$2$NORMAL\n"
+            ;;
+        GREEN)
+            printf "$GREEN$2$NORMAL\n"
+            ;;
+        LOGO)
+            printf "$LOGO$2$NORMAL\n"
+            ;;
+        NC)
+            printf "$2\n"
+            ;;
+        RED)
+            printf "$RED$2$NORMAL\n"
+            ;;
+        *)
+            printf "$2\n"
+            ;;
+    esac
 }

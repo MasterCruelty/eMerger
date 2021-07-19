@@ -1,13 +1,13 @@
 #!/bin/bash
 
 source src/utils/global.sh 2>>.errors
-printProgress "Setup: starting"
+put RED "Setup: starting"
 
 EXST=$(cat ~/.bashrc | grep -c "emerger.sh")
 if [[ $EXST -ne 0 ]]; then
-    printProgress "Alias 'up' already exists. Use 'up' or run './src/emerger.sh'"
+    put GREEN "Alias 'up' already exists. Use 'up' or run './src/emerger.sh'"
     source src/test/integrity_check.sh 2>>.errors
-    printProgress "Setup: completed $COOL"
+    put GREEN "Setup: completed $COOL"
 else
     source src/utils/cache_gen.sh > src/utils/.cache 2>>.errors
     md5sum src/utils/.cache | cut -d " " -f1 > src/utils/.md5 2>>.errors
@@ -16,9 +16,9 @@ else
     
     echo "alias up='bash $(pwd)/src/emerger.sh'" >> ~/.bashrc
     chmod +x src/emerger.sh 2>>.errors
-    printProgress "Alias 'up' added.\nUse 'up' or run './src/emerger.sh'"
+    put GREEN "Alias 'up' added.\nUse 'up' or run './src/emerger.sh'"
     source src/test/integrity_check.sh 2>>.errors
-    printProgress "Setup: completed $COOL"
+    put GREEN "Setup: completed $COOL"
 fi
 
 # Open a new terminal

@@ -2,11 +2,11 @@
 
 source $(dirname "$(readlink -f "$0")")/utils/global.sh
 
-printProgress "\nChecking for sudo privileges $MONOCLE"
+put RED "\nChecking for sudo privileges $MONOCLE"
 sudo -v >/dev/null 2>&1
 if [[ $(echo $?) -eq 0 ]]; then
-    printProgress "Access granted\n"
+    put GREEN "Access granted\n"
 else
-    printProgress "Can't access: aborting script\n"
+    put RED "Can't access: aborting script\n"
     exit 1
 fi
