@@ -26,7 +26,7 @@ sudo crontab 2>/dev/null
 ROOT=${SRC::-3}
 
 # Keeping track of exact time
-date "+%T:%N" >> $ROOT.log
+date "+%D %T:%N" >> $ROOT.log
 
 # Add line to crontab
 JOB="@reboot source ${ROOT}update.sh $ROOT 2>>$ROOT.log"

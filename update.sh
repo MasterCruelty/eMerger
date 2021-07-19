@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Keeping track of exact time
-date "+%T:%N" >> $1.log
+date "+%D %T:%N" >> $1.log
 
 source $1src/utils/global.sh
 

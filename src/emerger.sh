@@ -4,6 +4,12 @@ SRC=$(dirname "$(readlink -f "$0")")
 ROOT=${SRC::-3}
 source $SRC/utils/global.sh
 
+# Clear .log if it gets too long (keep only the last 256 lines)
+# Given no errors, the max file size is 7KB
+if [[ $(wc -l < $ROOT.log) -gt 256 ]]; then
+    printf "$(tail -n 256 $ROOT.log)\n" > $ROOT.log
+fi
+
 ARGC=$#
 ARGV=$@
 
@@ -17,13 +23,13 @@ if [[ $ARGV =~ "-help" ]]; then
 elif [[ $ARGV =~ "-au" ]]; then
     source $SRC/utils/cron.sh
 elif [[ $ARGV =~ "-err" ]]; then
-    if [[ $(grep -v "[0-9]*:[0-9]*:[0-9]*:[0-9]*" $ROOT.log | wc -l) -gt 0 ]]; then
+    if [[ $(grep -cv "[0-9]*/[0-9]*/[0-9]* [0-9]*:[0-9]*:[0-9]*:[0-9]*" $ROOT.log) -gt 0 ]]; then
         put RED "Errors found\nOpen .log to see what's wrong"
     else
         put GREEN "No errors found"
     fi
 elif [[ $ARGV =~ "-up" ]]; then
-    source $ROOT/update.sh $ROOT
+    source ${ROOT}update.sh $ROOT
 elif [[ $ARGV =~ "-xyzzy" ]]; then
     put NC "Let's keep its memory alive"
 else
