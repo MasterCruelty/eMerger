@@ -21,6 +21,21 @@
 <h1>eMerger</h1>
 <h2>What is it?</h2>
 eMerger is a simple script to clean update your system and your packages by just typing <code>up</code> in your terminal!<br>
+<h2>Supported package managers</h2>
+<ul>
+    <li>apt</li>
+    <li>apt-get</li>
+    <li>dnf</li>
+    <li>emerge</li>
+    <li>flatpak</li>
+    <lI>nixos</li>
+    <li>pacman</li>
+    <li>pkg</li>
+    <li>rpm</li>
+    <li>snap</li>
+    <li>yum</li>
+    <li>zypper</li>
+</ul>
 
 ---
 
@@ -41,7 +56,7 @@ You have two options:
     <li>Run <code>up -au</code> to set a cronjob</li>
 </ol>
 <h2>Usage</h2>
-eMerger comes with inline arguments: just type <code>up -help</code> to explore them.<br>
+eMerger comes with inline arguments: just type <code>up -help</code> to explore them.
 
 ---
 
@@ -49,6 +64,7 @@ eMerger comes with inline arguments: just type <code>up -help</code> to explore 
 <a href="https://github.com/MasterCruelty/eMerger/blob/main/CONTRIBUTING.md">How to contribute</a><br>
 <h2>Issue</h2>
 Is there a problem? 🖥️<br>
+Your package manager is not listed? 🖥️<br>
 Feel free to open an issue. Try to explain exactly what happens and if possible post errors or outputs you managed to retrieve.<br>
 <h2>License</h2>
 <ul>
@@ -58,19 +74,3 @@ license can be found under <code>./license/WTTR_LICENSE</code> or
 <a href="https://github.com/chubin/wttr.in/blob/master/LICENSE">here</a>.
 The project is only used to retrieve weather data.</li>
 </ul>
-<h2>Supported package managers</h2>
-<ul>
-    <li>apt</li>
-    <li>apt-get</li>
-    <li>dnf</li>
-    <li>emerge</li>
-    <li>flatpak</li>
-    <lI>nixos</li>
-    <li>pacman</li>
-    <li>pkg</li>
-    <li>rpm</li>
-    <li>snap</li>
-    <li>yum</li>
-    <li>zypper</li>
-</ul>
-Didn't find yours? Tell us with an issue!

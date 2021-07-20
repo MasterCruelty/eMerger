@@ -6,19 +6,17 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="emerge"
 
-printf "${BLUE}\nUsing $PKG $GENTOO${NORMAL}\n"
+put BLUE "Using $PKG $GENTOO"
 
-printProgress "syncing: starting"
+put RED "syncing: starting"
 $PWR $PKG --sync
-printProgress "syncing: completed"
+put GREEN "syncing: completed"
 
-printProgress "update: starting"
+put RED "update: starting"
 $PWR $PKG --update --deep --newuse --with-bdeps y @world --ask
-printProgress "update: completed"
+put GREEN "update: completed"
 
-printProgress "deepclean: starting"
+put RED "deepclean: starting"
 $PWR $PKG --depclean --ask
 revdep-rebuild
-printProgress "deepclean: completed"
-
-printf "\n"
+put GREEN "deepclean: completed"

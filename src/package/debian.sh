@@ -9,41 +9,39 @@ PKG="apt-get"
 if [[ $(command -v apt) ]]; then
     PKG="apt"
 
-    printf "${BLUE}\nUsing $PKG $DEBIAN${NORMAL}\n"
+    put BLUE "Using $PKG $DEBIAN"
 
-    printProgress "update: starting"
+    put RED "update: starting"
     $PWR $PKG update
-    printProgress "update: completed"
+    put GREEN "update: completed"
 
-    printProgress "full-upgrade: starting"
+    put RED "full-upgrade: starting"
     $PWR $PKG full-upgrade
-    printProgress "full-upgrade: completed"
+    put GREEN "full-upgrade: completed"
 
-    printProgress "autoclean: starting"
+    put RED "autoclean: starting"
     $PWR $PKG autoclean
-    printProgress "autoclean: completed"
+    put GREEN "autoclean: completed"
 
-    printProgress "clean: starting"
+    put RED "clean: starting"
     $PWR $PKG clean
-    printProgress "clean: completed"
+    put GREEN "clean: completed"
 else
-    printf "${BLUE}\nUsing $PKG $DEBIAN${NORMAL}\n"
+    put BLUE "Using $PKG $DEBIAN"
 
-    printProgress "update: starting"
+    put RED "update: starting"
     $PWR $PKG update
-    printProgress "update: completed"
+    put GREEN "update: completed"
 
-    printProgress "dist-upgrade: starting"
+    put RED "dist-upgrade: starting"
     $PWR $PKG dist-upgrade
-    printProgress "dist-upgrade: completed"
+    put GREEN "dist-upgrade: completed"
 
-    printProgress "autoclean: starting"
+    put RED "autoclean: starting"
     $PWR $PKG autoclean
-    printProgress "autoclean: completed"
+    put GREEN "autoclean: completed"
 
-    printProgress "clean: starting"
+    put RED "clean: starting"
     $PWR $PKG clean
-    printProgress "clean: completed"
+    put GREEN "clean: completed"
 fi
-
-printf "\n"

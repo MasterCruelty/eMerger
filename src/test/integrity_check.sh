@@ -16,11 +16,11 @@ else
     SRC="$(cat $REF$PAD/utils/.cache | head -n 1)/src"
 fi
 
-# check global.sh existence (printProgress is there)
+# check global.sh existence (put is there)
 if [[ -f $SRC/utils/global.sh ]]; then
     source $SRC/utils/global.sh
 else
-    printProgress "\n$SRC/utils/global.sh is missing: aborting script\n"
+    put RED "\n$SRC/utils/global.sh is missing: aborting script\n"
     exit 1
 fi
 
@@ -28,44 +28,44 @@ fi
 if [[ -f "$SRC/emerger.sh" ]]; then
     true
 else
-    printf "emerger.sh is missing: aborting script\n"
+    put NC "emerger.sh is missing: aborting script\n"
     exit 1
 fi
 
 LIST=$SRC/test/list/
 
 # check existence of ./src/utils/*
-printProgress "\ncheck ./src/utils/*: starting"
+put RED "\ncheck ./src/utils/*: starting"
 while read LINE; do
     if [[ -f "$SRC/utils/$LINE" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE $NORMAL$GREEN$CHECKMARK${NORMAL}\n"
+        put LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
     else
-        printProgress "$SRC/utils/$LINE is missing: aborting script $CROSSMARK\n"
+        put RED "$SRC/utils/$LINE is missing: aborting script $CROSSMARK"
         exit 1
     fi
 done < $LIST.utils
-printProgress "check ./src/utils/*: completed"
+put GREEN "check ./src/utils/*: completed"
 
 # check existence of ./src/package/*
-printProgress "check ./src/package/*: starting"
+put RED "check ./src/package/*: starting"
 while read LINE; do
     if [[ -f "$SRC/package/$LINE" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE $NORMAL$GREEN$CHECKMARK${NORMAL}\n"
+        put LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
     else
-        printProgress "$SRC/package/$LINE is missing: aborting script $CROSSMARK\n"
+        put RED "$SRC/package/$LINE is missing: aborting script $CROSSMARK"
         exit 1
     fi
 done < $LIST.packages
-printProgress "check ./src/package/*: completed"
+put GREEN "check ./src/package/*: completed"
 
 # check existence of ./src/test/*
-printProgress "check ./src/test/*: starting"
+put RED "check ./src/test/*: starting"
 while read LINE; do
     if [[ -f "$SRC/test/$LINE" && $LINE != "" ]]; then
-        printf "${LOGO}passed\t$LINE $NORMAL$GREEN$CHECKMARK${NORMAL}\n"
+        put LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
     else
-        printProgress "$LINE is missing: aborting script $CROSSMARK\n"
+        put RED "$LINE is missing: aborting script $CROSSMARK"
         exit 1
     fi
 done < $LIST.tests
-printProgress "check ./src/test/*: completed\n"
+put GREEN "check ./src/test/*: completed\n"

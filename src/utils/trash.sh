@@ -3,16 +3,16 @@
 source $(dirname "$(readlink -f "$0")")/utils/global.sh
 
 if [[ -d ~/.local/share/Trash/files ]]; then
-	printf "$RED\nShowing files in .local/share/Trash/files $TRASH$NORMAL\n"
+	put RED "Showing files in .local/share/Trash/files $TRASH"
 	ls -Ahl ~/.local/share/Trash/files
-	printf "Should I clean Trash? "
+	put NC "Should I clean Trash? "
 	read -p "[Y/n]: " ANSW
-	if [[ "$ANSW" == "y" ]]; then
+	if [[ $ANSW == "y" ]]; then
 	    rm -rf ~/.local/share/Trash/*
-	    printProgress "Trash: cleaned"
+	    put GREEN "Trash: cleaned"
 	else
-	    printProgress "Trash: not cleaned"
+	    put RED "Trash: not cleaned"
 	fi
 else
-    printProgress "\nTrash is empty, nothing to clean"
+    put GREEN "Trash is empty, nothing to clean"
 fi

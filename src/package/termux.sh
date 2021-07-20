@@ -6,18 +6,16 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="pkg"
 
-printf "${BLUE}\nUsing $PKG $TERMUX${NORMAL}\n"
+put BLUE "Using $PKG $TERMUX"
 
-printProgress "update: starting"
+put RED "update: starting"
 $PWR $PKG update
-printProgress "update: completed"
+put GREEN "update: completed"
 
-printProgress "upgrade: starting"
+put RED "upgrade: starting"
 $PWR $PKG upgrade
-printProgress "upgrade: completed"
+put GREEN "upgrade: completed"
 
-printProgress "autoclean: starting"
+put RED "autoclean: starting"
 $PWR $PKG autoclean
-printProgress "autoclean: completed"
-
-printf "\n"
+put GREEN "autoclean: completed"

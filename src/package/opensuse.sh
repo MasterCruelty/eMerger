@@ -6,22 +6,20 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="zypper"
 
-printf "${BLUE}\nUsing $PKG $OPENSUSE${NORMAL}\n"
+put BLUE "Using $PKG $OPENSUSE"
 
-printProgress "refresh: starting"
+put RED "refresh: starting"
 $PWR $PKG refresh
-printProgress "refresh: completed"
+put GREEN "refresh: completed"
 
-printProgress "update: starting"
+put RED "update: starting"
 $PWR $PKG up 2>/dev/null || $PWR $PKG dup
-printProgress "update: completed"
+put GREEN "update: completed"
 
-printProgress "remove dependencies: starting"
+put RED "remove dependencies: starting"
 $PWR $PKG rm chromium --clean-deps
-printProgress "remove dependencies: completed"
+put GREEN "remove dependencies: completed"
 
-printProgress "list unneeded packages: starting"
+put RED "list unneeded packages: starting"
 $PWR $PKG packages --unneeded
-printProgress "list unneeded packages: completed"
-
-printf "\n"
+put GREEN "list unneeded packages: completed"
