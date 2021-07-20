@@ -1,3 +1,6 @@
 .log
 src/utils/.cache
 src/utils/.md5
+.update
+.errors
+
