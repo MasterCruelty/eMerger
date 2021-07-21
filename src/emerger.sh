@@ -29,7 +29,7 @@ elif [[ $ARGV =~ "-au" ]]; then
     source $SRC/utils/cron.sh
 elif [[ $ARGV =~ "-err" ]]; then
     if [[ $(grep -cv "[0-9]*/[0-9]*/[0-9]* [0-9]*:[0-9]*:[0-9]*:[0-9]*" $ROOT.log) -gt 0 ]]; then
-        put RED "Errors found\nOpen .log to see what's wrong"
+        put RED "Errors found\nOpen .log in $ROOT to see what's wrong"
     else
         put GREEN "No errors found"
     fi
