@@ -29,7 +29,7 @@ ROOT=${SRC::-3}
 date "+%D %T:%N" >> $ROOT.log
 
 # Add line to crontab
-JOB="@reboot source ${ROOT}update.sh $ROOT 2>>$ROOT.log"
+JOB="@reboot source ${ROOT}update.sh $ROOT"
 ( sudo crontab -u $USER -l; echo $JOB ) | sudo crontab -u $USER - 2>/dev/null
 
 # Find the content and print it line by line
