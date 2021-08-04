@@ -76,23 +76,27 @@ else
     fi
 
     # `tail -n +3` skips the first two lines
+    # ITER keeps track of iterations ('tail -n 3', so ITER='3-1')
+    ITER=2
     for LINE in $(cat $SRC/utils/.cache | tail -n +3); do
+        ITER=$(($ITER + 1))
         if [[ $LINE == "utils/trash" && $ARGV =~ "-nt" ]]; then
             continue
         fi
 
         if [[ $LINE != "" ]]; then
             source $SRC/$LINE.sh
+        fi
+
+        if [[ $ITER != $(cat $SRC/utils/.cache | wc -l) ]]; then
             put NC ""
         fi
     done
 
     # Notify if errors are present
     if [[ $(grep -v "[0-9]*:[0-9]*:[0-9]*:[0-9]*" $ROOT.log | wc -l) -gt 0 ]]; then
-        put LOGO "\n\nSomething is not working correctly, type \"up -err\" for further informations"
+        put LOGO "\n\nSomething is not working correctly, type \"up -err\" for further informations\a"
     fi
-
-    printf "\a"
 fi
 
 exit 0
