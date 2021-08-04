@@ -6,8 +6,8 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="snap"
 
-put BLUE "Using $PKG $SNAP"
+puts BLUE "Using $PKG $SNAP"
 
-put RED "refresh: starting"
+puts RED "refresh: starting"
 $PWR $PKG refresh
-put GREEN "refresh: completed"
+puts GREEN "refresh: completed"

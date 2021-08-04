@@ -8,6 +8,7 @@ OUT="$(pwd | awk -F 'eMerger/src/utils' '{print $1}')\n"
 # check for first available terminal
 declare -a TERMINAL
 TERMINAL=(
+    "xfce4-terminal"
     "xterm"
     "konsole"
     "terminator"

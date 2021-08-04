@@ -9,39 +9,39 @@ PKG="apt-get"
 if [[ $(command -v apt) ]]; then
     PKG="apt"
 
-    put BLUE "Using $PKG $DEBIAN"
+    puts BLUE "Using $PKG $DEBIAN"
 
-    put RED "update: starting"
+    puts RED "update: starting"
     $PWR $PKG update
-    put GREEN "update: completed"
+    puts GREEN "update: completed"
 
-    put RED "full-upgrade: starting"
+    puts RED "full-upgrade: starting"
     $PWR $PKG full-upgrade
-    put GREEN "full-upgrade: completed"
+    puts GREEN "full-upgrade: completed"
 
-    put RED "autoclean: starting"
+    puts RED "autoclean: starting"
     $PWR $PKG autoclean
-    put GREEN "autoclean: completed"
+    puts GREEN "autoclean: completed"
 
-    put RED "clean: starting"
+    puts RED "clean: starting"
     $PWR $PKG clean
-    put GREEN "clean: completed"
+    puts GREEN "clean: completed"
 else
-    put BLUE "Using $PKG $DEBIAN"
+    puts BLUE "Using $PKG $DEBIAN"
 
-    put RED "update: starting"
+    puts RED "update: starting"
     $PWR $PKG update
-    put GREEN "update: completed"
+    puts GREEN "update: completed"
 
-    put RED "dist-upgrade: starting"
+    puts RED "dist-upgrade: starting"
     $PWR $PKG dist-upgrade
-    put GREEN "dist-upgrade: completed"
+    puts GREEN "dist-upgrade: completed"
 
-    put RED "autoclean: starting"
+    puts RED "autoclean: starting"
     $PWR $PKG autoclean
-    put GREEN "autoclean: completed"
+    puts GREEN "autoclean: completed"
 
-    put RED "clean: starting"
+    puts RED "clean: starting"
     $PWR $PKG clean
-    put GREEN "clean: completed"
+    puts GREEN "clean: completed"
 fi

@@ -6,16 +6,16 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="pacman"
 
-put BLUE "Using $PKG $ARCH"
+puts BLUE "Using $PKG $ARCH"
 
-put RED "update: starting"
+puts RED "update: starting"
 $PWR $PKG -Syy
-put GREEN "update: completed"
+puts GREEN "update: completed"
 
-put RED "upgrade: starting"
+puts RED "upgrade: starting"
 $PWR $PKG -Syu
-put GREEN "upgrade: completed"
+puts GREEN "upgrade: completed"
 
-put RED "clean all: starting"
+puts RED "clean all: starting"
 $PWR $PKG -R $($PKG -Qtdq)
-put GREEN "clean all: completed"
+puts GREEN "clean all: completed"

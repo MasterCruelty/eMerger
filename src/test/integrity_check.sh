@@ -16,11 +16,11 @@ else
     SRC="$(cat $REF$PAD/utils/.cache | head -n 1)/src"
 fi
 
-# check global.sh existence (put is there)
+# check global.sh existence (puts is there)
 if [[ -f $SRC/utils/global.sh ]]; then
     source $SRC/utils/global.sh
 else
-    put RED "\n$SRC/utils/global.sh is missing: aborting script\n"
+    puts RED "\n$SRC/utils/global.sh is missing: aborting script\n"
     exit 1
 fi
 
@@ -28,44 +28,44 @@ fi
 if [[ -f "$SRC/emerger.sh" ]]; then
     true
 else
-    put NC "emerger.sh is missing: aborting script\n"
+    puts NC "emerger.sh is missing: aborting script\n"
     exit 1
 fi
 
 LIST=$SRC/test/list/
 
 # check existence of ./src/utils/*
-put RED "\ncheck ./src/utils/*: starting"
+puts RED "\ncheck ./src/utils/*: starting"
 while read LINE; do
     if [[ -f "$SRC/utils/$LINE" && $LINE != "" ]]; then
-        put LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
+        puts LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
     else
-        put RED "$SRC/utils/$LINE is missing: aborting script $CROSSMARK"
+        puts RED "$SRC/utils/$LINE is missing: aborting script $CROSSMARK"
         exit 1
     fi
 done < $LIST.utils
-put GREEN "check ./src/utils/*: completed"
+puts GREEN "check ./src/utils/*: completed"
 
 # check existence of ./src/package/*
-put RED "check ./src/package/*: starting"
+puts RED "check ./src/package/*: starting"
 while read LINE; do
     if [[ -f "$SRC/package/$LINE" && $LINE != "" ]]; then
-        put LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
+        puts LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
     else
-        put RED "$SRC/package/$LINE is missing: aborting script $CROSSMARK"
+        puts RED "$SRC/package/$LINE is missing: aborting script $CROSSMARK"
         exit 1
     fi
 done < $LIST.packages
-put GREEN "check ./src/package/*: completed"
+puts GREEN "check ./src/package/*: completed"
 
 # check existence of ./src/test/*
-put RED "check ./src/test/*: starting"
+puts RED "check ./src/test/*: starting"
 while read LINE; do
     if [[ -f "$SRC/test/$LINE" && $LINE != "" ]]; then
-        put LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
+        puts LOGO "passed\t$LINE $NORMAL$GREEN$CHECKMARK"
     else
-        put RED "$LINE is missing: aborting script $CROSSMARK"
+        puts RED "$LINE is missing: aborting script $CROSSMARK"
         exit 1
     fi
 done < $LIST.tests
-put GREEN "check ./src/test/*: completed\n"
+puts GREEN "check ./src/test/*: completed\n"

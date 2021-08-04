@@ -13,27 +13,27 @@ if [[ $(command -v yum) ]]; then
         PKG="dnf"
     fi
 
-    put BLUE "Using $PKG $RPM"
+    puts BLUE "Using $PKG $RPM"
 
-    put RED "update: starting"
+    puts RED "update: starting"
     $PWR $PKG update
-    put GREEN "update: completed"
+    puts GREEN "update: completed"
 
-    put RED "upgrade: starting"
+    puts RED "upgrade: starting"
     $PWR $PKG upgrade
-    put GREEN "upgrade: completed"
+    puts GREEN "upgrade: completed"
 
-    put RED "autoremove: starting"
+    puts RED "autoremove: starting"
     $PWR $PKG autoremove
-    put GREEN "autoremove: completed"
+    puts GREEN "autoremove: completed"
 
-    put RED "clean all: starting"
+    puts RED "clean all: starting"
     $PWR $PKG clean all
-    put GREEN "clean all: completed"
+    puts GREEN "clean all: completed"
 else
-    put BLUE "\nUsing $PKG $RPM"
+    puts BLUE "\nUsing $PKG $RPM"
 
-    put RED "freshen: starting"
+    puts RED "freshen: starting"
     $PWR $PKG -l | xargs -I{} $PWR $PKG -F {}
-    put GREEN "freshen: completed"
+    puts GREEN "freshen: completed"
 fi
