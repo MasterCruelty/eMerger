@@ -50,9 +50,10 @@ If you cloned using root privileges, and you want to execute without them, remem
     <li>Run <code>./uninstall.sh</code></li>
 </ol>
 <h2>Update</h2>
-You have two options:
+You have three options:
 <ol>
     <li>Run <code>./update.sh</code></li>
+    <li>Run <code>up -up</code></li>
     <li>Run <code>up -au</code> to set a cronjob</li>
 </ol>
 <h2>Usage</h2>
