@@ -27,7 +27,7 @@ TRASH="\U0001F4A9"
 WHALE="\U0001F40B"
 
 # Argument $1 is color, argument $2 is text
-function put() {
+function puts() {
     case $1 in
         BLUE)
             printf "$BLUE$2$NORMAL\n"

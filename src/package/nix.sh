@@ -6,12 +6,12 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="nixos-rebuild switch"
 
-put BLUE "Using $PKG $NIX"
+puts BLUE "Using $PKG $NIX"
 
-put RED "upgrade: starting"
+puts RED "upgrade: starting"
 $PWR $PKG --upgrade
-put GREEN "upgrade: completed"
+puts GREEN "upgrade: completed"
 
-put RED "repair: starting"
+puts RED "repair: starting"
 $PWR $PKG --repair
-put GREEN "repair: completed"
+puts GREEN "repair: completed"

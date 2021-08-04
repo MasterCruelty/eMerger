@@ -24,6 +24,6 @@ for ARGU in $@; do
 done
 
 if [[ $CONTAIN != 1 ]]; then
-    put NC "No such command, try \"up -help\"\n"
+    puts NC "No such command, try \"up -help\"\n"
     exit 1
 fi
