@@ -19,6 +19,10 @@ if [[ $(command -v apt) ]]; then
     $PWR $PKG full-upgrade
     puts GREEN "full-upgrade: completed"
 
+    puts RED "autoremove: starting"
+    $PWR $PKG autoremove
+    puts GREEN "autoremove: completed"
+
     puts RED "autoclean: starting"
     $PWR $PKG autoclean
     puts GREEN "autoclean: completed"
@@ -36,6 +40,10 @@ else
     puts RED "dist-upgrade: starting"
     $PWR $PKG dist-upgrade
     puts GREEN "dist-upgrade: completed"
+
+    puts RED "autoremove: starting"
+    $PWR $PKG autoremove
+    puts GREEN "autoremove: completed"
 
     puts RED "autoclean: starting"
     $PWR $PKG autoclean
