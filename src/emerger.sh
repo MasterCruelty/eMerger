@@ -50,12 +50,17 @@ else
     fi
     chmod 775 $SRC/utils/.md5
 
+    # If the script got interrupted, history still exists and has to be cleaned
+    echo -n "" > $SRC/.hist
+
     # Logo
     if [[ ! $ARGV =~ "-nl" ]]; then
         if [[ $(stty size | awk '{print $2}') -ge 74 ]]; then
             puts LOGO "$(cat $SRC/utils/.logo)"
+            echo "$NORMAL$LOGO$(cat $SRC/utils/.logo)$NORMAL\n" >> $SRC/.hist
         fi
         puts LOGO "Contribute @ https://github.com/MasterCruelty/eMerger $WHALE"
+
     fi
 
     # System informations
@@ -86,6 +91,9 @@ else
 
         if [[ $LINE != "" ]]; then
             source $SRC/$LINE.sh
+            if [[ $LINE != "utils/privileges" ]]; then
+                echo "$BLUE$PKG COMPLETED$NORMAL\n" >> $SRC/.hist
+            fi
         fi
 
         if [[ $ITER != $(cat $SRC/utils/.cache | wc -l) ]]; then
@@ -98,5 +106,9 @@ else
         puts LOGO "\n\nSomething is not working correctly, type \"up -err\" for further informations\a"
     fi
 fi
+
+reset
+echo -ne "${BLUE}eMerger COMPLETED$NORMAL\n"
+rm $SRC/.hist
 
 exit 0

@@ -33,7 +33,10 @@ function puts() {
             printf "$BLUE$2$NORMAL\n"
             ;;
         GREEN)
-            printf "$GREEN$2$NORMAL\n"
+            echo "$GREEN$2$NORMAL" >> $SRC/.hist
+            HIST=$(cat $SRC/.hist)
+            clear
+            printf "$GREEN$HIST$NORMAL\n"
             ;;
         LOGO)
             printf "$LOGO$2$NORMAL\n"
