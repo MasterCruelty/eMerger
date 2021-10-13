@@ -19,6 +19,8 @@
 </table>
 
 <h1>eMerger</h1>
+<img src="./src/logo/big_name.png" alt="logo">
+
 <h2>What is it?</h2>
 eMerger is a simple script to clean update your system and your packages by just typing <code>up</code> in your terminal!<br>
 <h2>Supported package managers</h2>
