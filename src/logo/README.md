@@ -1,0 +1,1 @@
+Logos are created using <a href="https://github.com/inkscape/inkscape">inkscape</a> and <a href="https://www.gimp.org/">GIMP</a>.
