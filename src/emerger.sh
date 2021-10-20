@@ -15,6 +15,9 @@ if [[ $(wc -l < $ROOT.log) -gt 256 ]]; then
     printf "$(tail -n 256 $ROOT.log)\n" > $ROOT.log
 fi
 
+# If the script got interrupted, history still exists and has to be cleaned
+echo -n "" > $SRC/.hist
+
 ARGC=$#
 ARGV=$@
 
@@ -49,9 +52,6 @@ else
         chmod 775 $SRC/utils/.cache
     fi
     chmod 775 $SRC/utils/.md5
-
-    # If the script got interrupted, history still exists and has to be cleaned
-    echo -n "" > $SRC/.hist
 
     # Logo
     if [[ ! $ARGV =~ "-nl" ]]; then
@@ -105,10 +105,11 @@ else
     if [[ $(grep -v "[0-9]*:[0-9]*:[0-9]*:[0-9]*" $ROOT.log | wc -l) -gt 0 ]]; then
         puts LOGO "\n\nSomething is not working correctly, type \"up -err\" for further informations\a"
     fi
+
+    reset
+    echo -ne "${BLUE}eMerger COMPLETED$NORMAL\n"
 fi
 
-reset
-echo -ne "${BLUE}eMerger COMPLETED$NORMAL\n"
 rm $SRC/.hist
 
 exit 0
