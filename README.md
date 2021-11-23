@@ -72,10 +72,6 @@ Is there a problem? 🖥️<br>
 Your package manager is not listed? 🖥️<br>
 Feel free to open an issue. Try to explain exactly what happens and if possible post errors or outputs you managed to retrieve.<br>
 <h2>License</h2>
-<ul>
-    <li>This project license can be found in <code>./LICENSE</code></li>
-    <li><a href="https://github.com/chubin/wttr.in">wttr.in</a>
-license can be found under <code>./license/WTTR_LICENSE</code> or
-<a href="https://github.com/chubin/wttr.in/blob/master/LICENSE">here</a>.
-The project is only used to retrieve weather data.</li>
-</ul>
+ This project license can be found in <code>./LICENSE</code>
+<h2>External projects used</h2>
+<a href="https://github.com/chubin/wttr.in">wttr.in</a>
