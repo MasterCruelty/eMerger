@@ -1,3 +1,4 @@
 .log
 src/utils/.cache
 src/utils/.md5
+.hist
