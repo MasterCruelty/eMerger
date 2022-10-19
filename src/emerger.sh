@@ -66,7 +66,7 @@ else
     # System informations
     if [[ ! $ARGV =~ "-ni" ]]; then
         if [[ -f "/etc/os-release" ]]; then
-		NAME=$(cat /etc/os-release | head -n 1 | grep -n "PRETTY_NAME" | cut -d '"' -f2)
+	    NAME=$(cat /etc/os-release | head -n 1 | grep -n "PRETTY_NAME" | cut -d '"' -f2)
             puts LOGO "${NAME}"
         else
             puts LOGO "$(uname -rs)"
