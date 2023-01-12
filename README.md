@@ -17,6 +17,7 @@
             <img src="https://badgen.net/github/release/MasterCruelty/Updater?label=Latest%20release" alt="latest release">
             <img src="https://img.shields.io/github/license/MasterCruelty/eMerger" alt="license">
             <img src="https://img.shields.io/github/stars/MasterCruelty/Updater" alt="stars">
+            <img src="https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square" alt="GitHub commits since latest release (by date)">
         </td>
 </table>
 
