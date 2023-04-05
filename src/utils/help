@@ -1,7 +1,5 @@
 -help           Shows this help
 
--au             Enable automatic update.                        (Automatic Update)
-                Repeat the command to disable it.                 
 -err            Shows errors                                    (ERRors)
 -nc             Skips cache cleaning.                           (No Cache)
 -ni             Skips system informations.                      (No Infos)

@@ -1,7 +1,6 @@
 cache_gen.sh
 cache.sh
 check_pwr.sh
-cron.sh
 global.sh
 help
 privileges.sh
