@@ -96,7 +96,9 @@ else
         if [[ $LINE != "" ]]; then
             source $SRC/$LINE.sh
             if [[ $LINE != "utils/privileges" ]]; then
-                echo "$BLUE$PKG COMPLETED$NORMAL\n" >> $SRC/.hist
+                if [[ $LINE =~ "package/" ]]; then
+                    echo "$BLUE$PKG COMPLETED$NORMAL\n" >> $SRC/.hist
+                fi
             fi
         fi
 
@@ -110,8 +112,7 @@ else
         puts LOGO "\n\nSomething is not working correctly, type \"up -err\" for further informations\a"
     fi
 
-    reset
-    echo -ne "${BLUE}eMerger COMPLETED$NORMAL\n"
+    echo -ne "\n${BLUE}eMerger COMPLETED$NORMAL\n"
 fi
 
 rm $SRC/.hist
