@@ -28,8 +28,6 @@ fi
 
 if [[ $ARGV =~ "-help" ]]; then
     cat $SRC/utils/help
-elif [[ $ARGV =~ "-au" ]]; then
-    source $SRC/utils/cron.sh
 elif [[ $ARGV =~ "-err" ]]; then
     if [[ $(grep -cv "[0-9]*/[0-9]*/[0-9]* [0-9]*:[0-9]*:[0-9]*:[0-9]*" $ROOT.log) -gt 0 ]]; then
         puts RED "Errors found\nOpen .log in $ROOT to see what's wrong"

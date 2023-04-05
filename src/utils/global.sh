@@ -41,6 +41,9 @@ function puts() {
         LOGO)
             printf "$LOGO$2$NORMAL\n"
             ;;
+        NC)
+            printf "$2\n"
+            ;;
         RED)
             printf "$RED$2$NORMAL\n"
             ;;
