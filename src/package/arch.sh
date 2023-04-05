@@ -19,3 +19,7 @@ puts GREEN "upgrade: completed"
 puts RED "clean all: starting"
 $PWR $PKG -R $($PKG -Qtdq)
 puts GREEN "clean all: completed"
+
+puts RED "clean pacman caches: starting"
+$PWR paccache -r
+puts GREEN "clean pacman caches: starting"
