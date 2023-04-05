@@ -9,21 +9,17 @@ PKG="pacman"
 puts BLUE "Using $PKG $ARCH"
 
 puts RED "update: starting"
-$PWR $PKG -Syy
+try $PWR $PKG -Syy
 puts GREEN "update: completed"
 
 puts RED "upgrade: starting"
-$PWR $PKG -Syu
+try $PWR $PKG -Syu
 puts GREEN "upgrade: completed"
 
-puts RED "clean all: starting"
-$PWR $PKG -R $($PKG -Qtdq)
-puts GREEN "clean all: completed"
-
 puts RED "clean pacman caches: starting"
-$PWR paccache -r
+try $PWR paccache -r
 puts GREEN "clean pacman caches: starting"
 
 puts RED "update AUR packages: starting"
-$PWR yay -Syu
+try $PWR yay -Syu
 puts GREEN "update AUR packages: starting"

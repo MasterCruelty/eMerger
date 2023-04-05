@@ -41,9 +41,6 @@ function puts() {
         LOGO)
             printf "$LOGO$2$NORMAL\n"
             ;;
-        NC)
-            printf "$2\n"
-            ;;
         RED)
             printf "$RED$2$NORMAL\n"
             ;;
@@ -51,4 +48,15 @@ function puts() {
             printf "$2\n"
             ;;
     esac
+}
+
+# Execute and stops in case it fails
+# DO NOT ADD [ ... ] brackets
+function try() {
+    if $@; then
+        continue
+    else
+        puts RED "STOPPED AT '$(for i in "$@"; do echo -n "$i "; done)'"
+        exit 1
+    fi
 }
