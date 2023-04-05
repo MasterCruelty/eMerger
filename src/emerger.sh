@@ -110,7 +110,6 @@ else
         puts LOGO "\n\nSomething is not working correctly, type \"up -err\" for further informations\a"
     fi
 
-    reset
     echo -ne "${BLUE}eMerger COMPLETED$NORMAL\n"
 fi
 
