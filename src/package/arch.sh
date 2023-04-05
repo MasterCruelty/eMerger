@@ -26,4 +26,4 @@ puts GREEN "clean pacman caches: starting"
 
 puts RED "update AUR packages: starting"
 $PWR yay -Syu
-puts GREEN "update AUR packagess: starting"
+puts GREEN "update AUR packages: starting"
