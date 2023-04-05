@@ -7,8 +7,8 @@
             <img src="https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger" alt="code size">
             <img src="https://img.shields.io/github/issues/MasterCruelty/eMerger" alt="issues open">
             <img src="https://img.shields.io/github/languages/top/MasterCruelty/eMerger" alt="top language">
-            <img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_emerger&metric=sqale_rating" alt="Maintainability Rating">
-            <img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_emerger&metric=ncloc" alt="Lines of code">
+            <img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating" alt="Maintainability Rating">
+            <img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status" alt ="Quality Gate Pass">
         </td>
         <td>
             <img src="https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger" alt="commit activity">
@@ -17,6 +17,7 @@
             <img src="https://badgen.net/github/release/MasterCruelty/Updater?label=Latest%20release" alt="latest release">
             <img src="https://img.shields.io/github/license/MasterCruelty/eMerger" alt="license">
             <img src="https://img.shields.io/github/stars/MasterCruelty/Updater" alt="stars">
+            <img src="https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square" alt="GitHub commits since latest release (by date)">
         </td>
 </table>
 
