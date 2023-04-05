@@ -66,7 +66,7 @@ else
     # System informations
     if [[ ! $ARGV =~ "-ni" ]]; then
         if [[ -f "/etc/os-release" ]]; then
-	    NAME=$(cat /etc/os-release | head -n 1 | grep -n "PRETTY_NAME" | cut -d '"' -f2)
+            NAME=$(cat /etc/os-release | head -n $(echo $(grep -n "PRETTY_NAME" /etc/os-release) | cut -c 1) | tail -n 1 | cut -c 13-)
             puts LOGO "${NAME}"
         else
             puts LOGO "$(uname -rs)"
@@ -85,6 +85,10 @@ else
     ITER=2
     for LINE in $(cat $SRC/utils/.cache | tail -n +3); do
         ITER=$(($ITER + 1))
+        if [[ $LINE == "utils/cache" && $ARGV =~ "-nc" ]]; then
+            continue
+        fi
+
         if [[ $LINE == "utils/trash" && $ARGV =~ "-nt" ]]; then
             continue
         fi

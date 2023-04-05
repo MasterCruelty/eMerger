@@ -58,6 +58,7 @@ for i in ${!PKG[@]}; do
     fi
 done
 
+OUT+="utils/cache\n"
 OUT+="utils/trash"
 
 echo -e "$OUT"
