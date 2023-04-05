@@ -85,6 +85,10 @@ else
     ITER=2
     for LINE in $(cat $SRC/utils/.cache | tail -n +3); do
         ITER=$(($ITER + 1))
+        if [[ $LINE == "utils/cache" && $ARGV =~ "-nc" ]]; then
+            continue
+        fi
+
         if [[ $LINE == "utils/trash" && $ARGV =~ "-nt" ]]; then
             continue
         fi

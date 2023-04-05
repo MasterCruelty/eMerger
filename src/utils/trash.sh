@@ -4,7 +4,8 @@ source $(dirname "$(readlink -f "$0")")/utils/global.sh
 
 if [[ -d ~/.local/share/Trash/files ]]; then
 	puts RED "Showing files in .local/share/Trash/files $TRASH"
-	ls -Ahl ~/.local/share/Trash/files
+    du -sh ~/.local/share/Trash/files
+	ls -Al ~/.local/share/Trash/files | tail -n +2
 	puts NC "Should I clean Trash? "
 	read -p "[Y/n]: " ANSW
 	if [[ $ANSW == "y" ]]; then
