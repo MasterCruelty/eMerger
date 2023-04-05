@@ -9,14 +9,14 @@ PKG="emerge"
 puts BLUE "Using $PKG $GENTOO"
 
 puts RED "syncing: starting"
-$PWR $PKG --sync
+try $PWR $PKG --sync
 puts GREEN "syncing: completed"
 
 puts RED "update: starting"
-$PWR $PKG --update --deep --newuse --with-bdeps y @world --ask
+try $PWR $PKG --update --deep --newuse --with-bdeps y @world --ask
 puts GREEN "update: completed"
 
 puts RED "deepclean: starting"
-$PWR $PKG --depclean --ask
+try $PWR $PKG --depclean --ask
 revdep-rebuild
 puts GREEN "deepclean: completed"

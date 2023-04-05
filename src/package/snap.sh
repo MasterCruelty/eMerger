@@ -9,5 +9,5 @@ PKG="snap"
 puts BLUE "Using $PKG $SNAP"
 
 puts RED "refresh: starting"
-$PWR $PKG refresh
+try $PWR $PKG refresh
 puts GREEN "refresh: completed"

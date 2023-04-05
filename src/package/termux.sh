@@ -9,13 +9,13 @@ PKG="pkg"
 puts BLUE "Using $PKG $TERMUX"
 
 puts RED "update: starting"
-$PWR $PKG update
+try $PWR $PKG update
 puts GREEN "update: completed"
 
 puts RED "upgrade: starting"
-$PWR $PKG upgrade
+try $PWR $PKG upgrade
 puts GREEN "upgrade: completed"
 
 puts RED "autoclean: starting"
-$PWR $PKG autoclean
+try $PWR $PKG autoclean
 puts GREEN "autoclean: completed"

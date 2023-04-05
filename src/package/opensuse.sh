@@ -9,17 +9,17 @@ PKG="zypper"
 puts BLUE "Using $PKG $OPENSUSE"
 
 puts RED "refresh: starting"
-$PWR $PKG refresh
+try $PWR $PKG refresh
 puts GREEN "refresh: completed"
 
 puts RED "update: starting"
-$PWR $PKG up 2>/dev/null || $PWR $PKG dup
+try $PWR $PKG up 2>/dev/null || $PWR $PKG dup
 puts GREEN "update: completed"
 
 puts RED "remove dependencies: starting"
-$PWR $PKG rm chromium --clean-deps
+try $PWR $PKG rm chromium --clean-deps
 puts GREEN "remove dependencies: completed"
 
 puts RED "list unneeded packages: starting"
-$PWR $PKG packages --unneeded
+try $PWR $PKG packages --unneeded
 puts GREEN "list unneeded packages: completed"

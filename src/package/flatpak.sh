@@ -9,13 +9,13 @@ PKG="flatpak"
 puts BLUE "Using $PKG $FLATPAK"
 
 puts RED "update: starting"
-$PWR $PKG update
+try $PWR $PKG update
 puts GREEN "update: completed"
 
 puts RED "repair: starting"
-$PWR $PKG repair
+try $PWR $PKG repair
 puts GREEN "repair: completed"
 
 puts RED "uninstall unused extensions: starting"
-$PWR $PKG uninstall --unused
+try $PWR $PKG uninstall --unused
 puts GREEN "uninstall unused extensions: completed"

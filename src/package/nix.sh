@@ -9,9 +9,9 @@ PKG="nixos-rebuild switch"
 puts BLUE "Using $PKG $NIX"
 
 puts RED "upgrade: starting"
-$PWR $PKG --upgrade
+try $PWR $PKG --upgrade
 puts GREEN "upgrade: completed"
 
 puts RED "repair: starting"
-$PWR $PKG --repair
+try $PWR $PKG --repair
 puts GREEN "repair: completed"

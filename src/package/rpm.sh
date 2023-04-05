@@ -16,24 +16,24 @@ if [[ $(command -v yum) ]]; then
     puts BLUE "Using $PKG $RPM"
 
     puts RED "update: starting"
-    $PWR $PKG update
+    try $PWR $PKG update
     puts GREEN "update: completed"
 
     puts RED "upgrade: starting"
-    $PWR $PKG upgrade
+    try $PWR $PKG upgrade
     puts GREEN "upgrade: completed"
 
     puts RED "autoremove: starting"
-    $PWR $PKG autoremove
+    try $PWR $PKG autoremove
     puts GREEN "autoremove: completed"
 
     puts RED "clean all: starting"
-    $PWR $PKG clean all
+    try $PWR $PKG clean all
     puts GREEN "clean all: completed"
 else
     puts BLUE "\nUsing $PKG $RPM"
 
     puts RED "freshen: starting"
-    $PWR $PKG -l | xargs -I{} $PWR $PKG -F {}
+    try $PWR $PKG -l | xargs -I{} $PWR $PKG -F {}
     puts GREEN "freshen: completed"
 fi

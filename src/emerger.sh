@@ -101,10 +101,6 @@ else
                 fi
             fi
         fi
-
-        if [[ $ITER != $(cat $SRC/utils/.cache | wc -l) ]]; then
-            puts NC ""
-        fi
     done
 
     # Notify if errors are present
