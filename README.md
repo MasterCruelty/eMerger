@@ -26,6 +26,25 @@
 
 <h2>What is it?</h2>
 eMerger is a simple script to clean update your system and your packages by just typing <code>up</code> in your terminal!<br>
+
+<h2>Systems tested and working</h2>
+<ul>
+    <li>Arch Linux</li>
+    <li>Debian</li>
+    <li>EndeavourOS</li>
+    <li>Fedora</li>
+    <li>Kali</li>
+    <li>Manjaro</li>
+    <li>Raspbian</li>
+    <li>Termux</li>
+    <li>Ubuntu</li>
+</ul>
+
+<h2>Systems tested and not working (help wanted)</h2>
+<ul>
+    <li>CentOS</li>
+</ul>
+
 <h2>Supported package managers</h2>
 <ul>
     <li>apt</li>
@@ -38,6 +57,7 @@ eMerger is a simple script to clean update your system and your packages by just
     <li>pkg</li>
     <li>rpm</li>
     <li>snap</li>
+    <li>yay</li>
     <li>yum</li>
     <li>zypper</li>
 </ul>
