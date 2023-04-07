@@ -1,28 +1,15 @@
-<table>
-    <tr>
-        <th>Code</th>
-        <th>Details</th>
-    </tr>
-        <td>
-            <img src="https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger" alt="code size">
-            <img src="https://img.shields.io/github/issues/MasterCruelty/eMerger" alt="issues open">
-            <img src="https://img.shields.io/github/languages/top/MasterCruelty/eMerger" alt="top language">
-            <img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating" alt="Maintainability Rating">
-            <img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status" alt ="Quality Gate Pass">
-        </td>
-        <td>
-            <img src="https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger" alt="commit activity">
-            <img src="https://img.shields.io/github/contributors/MasterCruelty/eMerger" alt="contributors">
-            <img src="https://img.shields.io/github/forks/MasterCruelty/Updater" alt="forks"><br>
-            <img src="https://badgen.net/github/release/MasterCruelty/Updater?label=Latest%20release" alt="latest release">
-            <img src="https://img.shields.io/github/license/MasterCruelty/eMerger" alt="license">
-            <img src="https://img.shields.io/github/stars/MasterCruelty/Updater" alt="stars">
-            <img src="https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square" alt="GitHub commits since latest release (by date)">
-        </td>
-</table>
+<img src="https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger" alt="code_size">
+<img src="https://img.shields.io/github/issues/MasterCruelty/eMerger" alt="issues_open">
+<img src="https://img.shields.io/github/languages/top/MasterCruelty/eMerger" alt="top_language">
+<img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating" alt="maintainability_r_ating">
+<img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status" alt ="quality_pass">
+<img src="https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger" alt="commit_activity">
+<img src="https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square" alt="commits_since_release">
 
 <h1>eMerger</h1>
-<img src="./src/logo/big_name.png" alt="logo">
+<p align="center">
+    <img src="./src/logo/big_name.png" alt="logo">
+</p>
 
 <h2>What is it?</h2>
 eMerger is a simple script to clean update your system and your packages by just typing <code>up</code> in your terminal!<br>
