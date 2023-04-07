@@ -1,10 +1,10 @@
-<img src="https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger" alt="code_size">
-<img src="https://img.shields.io/github/issues/MasterCruelty/eMerger" alt="issues_open">
-<img src="https://img.shields.io/github/languages/top/MasterCruelty/eMerger" alt="top_language">
-<img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating" alt="maintainability_r_ating">
-<img src="https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status" alt ="quality_pass">
-<img src="https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger" alt="commit_activity">
-<img src="https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square" alt="commits_since_release">
+[![code_size](https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger)](https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger)
+[![issues](https://img.shields.io/github/issues/MasterCruelty/eMerger)](https://img.shields.io/github/issues/MasterCruelty/eMerger)
+[![top_language](https://img.shields.io/github/languages/top/MasterCruelty/eMerger)](https://img.shields.io/github/languages/top/MasterCruelty/eMerger)
+[![maintainability](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating)](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating)
+[![quality_gate](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status)](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status)
+[![commit_activity](https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger)](https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger)
+[![commits_since_release](https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square)](https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square)
 
 <h1>eMerger</h1>
 <p align="center">
