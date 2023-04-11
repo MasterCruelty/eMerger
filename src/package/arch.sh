@@ -21,5 +21,5 @@ try $PWR paccache -r
 puts GREEN "clean pacman caches: starting"
 
 puts RED "update AUR packages: starting"
-try $PWR yay -Syu
+try yay -Syu
 puts GREEN "update AUR packages: starting"
