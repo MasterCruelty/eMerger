@@ -27,6 +27,24 @@
 
 \section{Introduction}
 We start this project for fun without knowing a bit of Bash, but then we have continued to release new features and improve the main script, also learning new stuffs during the development.\\
-The project started with the name of \textit{Updater}, then we changed to \textit{eMerger}(*blink Gentoo dudes).
+The project started with the name of \textit{Updater}, then we changed to \textit{eMerger}(*blink Gentoo dudes).\\
+Probably you already know if you're reading this but let's repeat what is eMerger.\\
+eMerger is a script that allows users to do a clean update for Linux based system with a single command. 
+
+\section{Installation}
+The only thing you need to do to install eMerger is to launch \textit{setup.sh}.\\
+When you launch it for the first time, it just put an alias on your ~/.bashrc named \textit{up} pointed on the source file \textit{emerger.sh}. \\
+After the alias is added correctly  or the alias already exists, it will launch an integrity test by calling the source file \textit{integrity-check.sh}.\\
+During the installation a little cache is also created so eMerger will always remember which system you're using without fetching this data every time.
+
+\subsection{Integrity test}
+In this script there's a check of the existence and stability of the content of source files needed for eMerger correct execution. If it's all ok we continue, otherwise the current operation is aborted.
+
+\subsection{Uninstall}
+The script \textit{uninstall.sh} just removes the alias created during the installation and delete every file related to eMerger.
+\section{Functioning}
+
+
+
 
 \end{document}
