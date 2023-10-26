@@ -6,10 +6,18 @@ source $SRC/utils/global.sh
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="apt-get"
 
+puts RED "configuration: starting"
+try $PWR $PKG --configure -a
+puts GREEN "configuration: completed"
+
 if [[ $(command -v apt) ]]; then
     PKG="apt"
 
     puts BLUE "Using $PKG $DEBIAN"
+
+    puts RED "fix broken: starting"
+    try $PWR $PKG --fix-broken install
+    puts GREEN "fix broken: completed"
 
     puts RED "update: starting"
     try $PWR $PKG update
