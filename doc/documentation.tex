@@ -26,7 +26,7 @@
 \end{center}
 
 \section{Introduction}
-We start this project for fun without knowing a bit of Bash, but then we have continued to release new features and improve the main script, also learning new stuffs during the development.\\
+We started this project for fun without knowing a bit of Bash, but then we have continued to release new features and improve the main script, also learning new stuffs during the development.\\
 The project started with the name of \textit{Updater}, then we changed to \textit{eMerger}(*blink Gentoo dudes).\\
 Probably you already know if you're reading this but let's repeat what is eMerger.\\
 eMerger is a script that allows users to do a clean update for Linux based system with a single command. 
@@ -38,13 +38,80 @@ After the alias is added correctly  or the alias already exists, it will launch 
 During the installation a little cache is also created so eMerger will always remember which system you're using without fetching this data every time.
 
 \subsection{Integrity test}
-In this script there's a check of the existence and stability of the content of source files needed for eMerger correct execution. If it's all ok we continue, otherwise the current operation is aborted.
+In this script there's a check of the existence and stability of the content of source files needed for eMerger correct execution. If it's all ok it continues, otherwise the current operation is aborted.
 
 \subsection{Uninstall}
 The script \textit{uninstall.sh} just removes the alias created during the installation and delete every file related to eMerger.
+
 \section{Functioning}
+At this moment, the main source file is \textit{emerger.sh}. \\
+First of all, eMerger starts checking for subcommand(you can view the list by typing \textit{up -help}). if it's a subcommand that offer an extra feature, eMerger executes it and return to shell.
+Otherwise it starts with the real execution by do these steps:\\
+\begin{itemize}
+\item It generates the cache of system information or it fetch the exising one. \\ \\
+\textit{Essentially if it's the first time, it creates a cache to remember the system the next time. Otherwise it fetch the data from the existing cache and it already start with the correct package manager based on the system we are launching eMerger on.}
+\item update packages repository.
+\item upgrade packages.
+\item autoremove not necessary packages.
+\item update/upgrade of external packages manager such as snap and flatpak if they are used by the user on his system.
+\item clean the trashed.
+\end{itemize}
+\subsection{Updating eMerger}
+Obviously there's a way to update the Updater(\textit{yes, we like to joke...)}. Our basic but functional way is to execute a git pull from the main branch of the project, you can do that by typing \textit{up -up}.
 
+\section{OS supported}
+The list of OS supported is always growing to make it to offer the power of eMerger to as many systems as possible and many people as possible. Our goal is to give an alternative to update the system with a single command without remember every time all the commands are needed for a clean update. \\ \\ \\ 
+\begin{itemize}
+\item Arch Linux
+\item Debian
+\item EndeavourOS
+\item Fedora Project
+\item Kali Linux
+\item Manjaro
+\item Raspbian
+\item Termux
+\item Ubuntu
+\end{itemize}
+\section{Package manager supported}
+And now we list the package managers, not only those which are connected to a os but also those which are dedicated to no-free app external to the main pkg manager of the os.
+\begin{itemize}
+\item rpm
+\item apt-get
+\item apt
+\item pacman
+\item emerge(\textit{I know you already got it about our project name...})
+\item flatpak
+\item nixos
+\item zypper
+\item snap
+\item pkg
+\end{itemize}
 
+\section{Source files organization}
+The organization and how the single source files works is not really clearly. In this chapter we try to describe the most useful one to help understand better the functioning of eMerger.
+\subsection{utils folder}
+Inside the \textbf{utils} folder we can find some source Bash files which helps not to repeat lines of code in the project. The most useful is \textit{global.sh} which saves in variables the ascii code of emojis for every package manager and the definition of \textit{puts} function which is a custom of the printf with different colours based of which type of string we have to show on terminal.\\ \\ 
+Another source file we can describe a little bit is \textit{cache-gen.sh} which is the one that generates the cache file the first time we try to launch eMerger. 
+ 
+\begin{itemize}
+\item It saves the terminal the user is using.(such as xfce terminal or terminator).
+\item It saves the package manager the system is using.
+\item It saves all of these information inside a file.
+\item In emerger.sh this file will be hashed with md5.
+\end{itemize}
 
-
+\subsection{package folder}
+Inside this folder there are all the source files for every package manager with their respective commands and flow of actions.
+\section{use cases}
+Here we list the amount of use cases eMerger have in this project.\\
+\begin{itemize}
+\item The user install eMerger by launching \textit{setup.sh}
+\item The user uninstall eMerger by launching \textit{uninstall.sh}
+\item The user launches a normal update by typing \textit{up}
+\item The user launches an update but he would like to knoe the weather by typing \textit{up -w}
+\item The user updates eMerger by typing \textit{up -up}
+\item There's an error, then the user can revel it by typing \textit{up -err}
+\end{itemize}
+There are a few more cases but here we shared the most commons one.\\
+\textbf{If you still have some questions, you can explore our code on the repository or ask directly to us by creating a new issue!}
 \end{document}
