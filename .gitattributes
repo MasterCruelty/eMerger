@@ -2,3 +2,4 @@
 *.{png,jpg,jpeg,gif,webp,woff,woff2} binary
 doc/*.tex linguist-detectable=true
 doc/*.tex linguist-language=TeX
+doc/* linguist-documentation=false
