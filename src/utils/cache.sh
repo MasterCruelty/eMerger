@@ -8,11 +8,11 @@ if [[ -d ~/.cache ]]; then
     ls -Al ~/.cache | tail -n +2
 	puts NC "Should I clean caches? "
 	read -p "[Y/n]: " ANSW
-	if [[ $ANSW == "y" ]]; then
+	if [[ $ANSW == "n" ]]; then
+	    puts RED "Caches: not cleaned"
+	else
 	    rm -rf ~/.cache*
 	    puts GREEN "Caches: cleaned"
-	else
-	    puts RED "Caches: not cleaned"
 	fi
 else
     puts GREEN "Caches are empty, nothing to clean"

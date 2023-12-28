@@ -8,11 +8,11 @@ if [[ -d ~/.local/share/Trash/files ]]; then
 	ls -Al ~/.local/share/Trash/files | tail -n +2
 	puts NC "Should I clean Trash? "
 	read -p "[Y/n]: " ANSW
-	if [[ $ANSW == "y" ]]; then
+	if [[ $ANSW == "n" ]]; then
+	    puts RED "Trash: not cleaned"
+	else
 	    rm -rf ~/.local/share/Trash/*
 	    puts GREEN "Trash: cleaned"
-	else
-	    puts RED "Trash: not cleaned"
 	fi
 else
     puts GREEN "Trash is empty, nothing to clean"
