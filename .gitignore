@@ -5,3 +5,4 @@ src/utils/.md5
 *.aux
 *.log
 *.synctex.gz
+.idea
