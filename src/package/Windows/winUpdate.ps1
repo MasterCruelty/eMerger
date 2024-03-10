@@ -1,4 +1,5 @@
-# Update Windows OS
+# This script is focused on update Windows OS
+
 # Install PSWindowsUpdate if not installed
 if (!(Get-Module -Name PSWindowsUpdate -ListAvailable)) {
     Write-Host "Installing PSWindowsUpdate..."
@@ -7,6 +8,7 @@ if (!(Get-Module -Name PSWindowsUpdate -ListAvailable)) {
 
 # Windows Update
 Write-Host "Updating Windows..."
+Write-Host "At the end your system will be rebooted..."
 Get-WUInstall -AcceptAll -AutoReboot
 
 
