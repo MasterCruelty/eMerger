@@ -1,8 +1,9 @@
 [![code_size](https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger)](https://img.shields.io/github/languages/code-size/MasterCruelty/eMerger)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=TheMergers_eMerger&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=TheMergers_eMerger)
 [![issues](https://img.shields.io/github/issues/MasterCruelty/eMerger)](https://img.shields.io/github/issues/MasterCruelty/eMerger)
 [![top_language](https://img.shields.io/github/languages/top/MasterCruelty/eMerger)](https://img.shields.io/github/languages/top/MasterCruelty/eMerger)
-[![maintainability](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating)](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating)
-[![quality_gate](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status)](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=TheMergers_eMerger&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=TheMergers_eMerger)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=TheMergers_eMerger&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=TheMergers_eMerger)
 [![commit_activity](https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger)](https://img.shields.io/github/commit-activity/w/MasterCruelty/eMerger)
 [![commits_since_release](https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square)](https://img.shields.io/github/commits-since/MasterCruelty/emerger/latest?color=44CC11&style=flat-square)
 
