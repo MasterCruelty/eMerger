@@ -25,4 +25,5 @@ fullPath="/Applications/$installerPath/Contents/Resources/startosinstall"
 #command which updates system
 softwareupdate --fetch-full-installer –full-installer-version $osVersion
 echo "Inserire la password:"
+#get privileges
 sudo "$fullPath" --agreetolicense --forcequitapps --nointeraction --user "$USER"
