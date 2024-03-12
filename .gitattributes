@@ -4,3 +4,4 @@ doc/*.tex linguist-detectable=true
 doc/*.tex linguist-language=TeX
 doc/* linguist-documentation=false
 *.ps1 linguist-language=PowerShell
+*.ps1 text eol=crlf
