@@ -6,3 +6,4 @@ src/utils/.md5
 *.log
 *.synctex.gz
 .idea
+cache.json
