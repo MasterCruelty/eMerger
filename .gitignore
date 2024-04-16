@@ -7,3 +7,4 @@ src/utils/.md5
 *.synctex.gz
 .idea
 cache.json
+__pycache__/
