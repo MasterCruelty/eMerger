@@ -6,3 +6,9 @@ src/utils/.md5
 *.log
 *.synctex.gz
 .idea
+
+
+
+
+__pycache__/
+cache.json

@@ -19,7 +19,3 @@ puts GREEN "upgrade: completed"
 puts RED "clean pacman caches: starting"
 try $PWR paccache -r
 puts GREEN "clean pacman caches: starting"
-
-puts RED "update AUR packages: starting"
-try yay -Syu
-puts GREEN "update AUR packages: starting"
