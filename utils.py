@@ -45,9 +45,9 @@ def update_cache(kv):
 def check_packages():
     # For each package check if it exists and add it to the cache
     installed_packages = []
-    for k in PACKAGES.keys():
-        path = which(k)
+    for key, value in PACKAGES.items():
+        path = which(key)
         if path:
-            installed_packages.append(k)
+            installed_packages.append(value)
     update_cache({'packages': installed_packages})
     print('{}>{} The following packages were found: {}'.format(Fore.BLUE, Fore.RESET, installed_packages))
