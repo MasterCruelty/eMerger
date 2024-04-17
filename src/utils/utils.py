@@ -3,9 +3,10 @@ from json import dump, load
 from os import path
 from shutil import which
 
+
 class Utils:
     def __init__(self):
-        self.APPLICATION_CACHE = 'application.json'
+        self.APPLICATION_DATA = 'application.json'
         self.APPLICATION_PREFERENCES = 'preferences.json'
         self.LOG = 'src/utils/log'
         self.PACKAGES = {
@@ -25,16 +26,20 @@ class Utils:
             "zypper": "zypper"
         }
     
-    # Check application cache for installed packages
-    def check_packages(self) -> None:
-        # For each package check if it exists and add it to the cache
+    # Check application data for installed packages
+    def check_packages(self, verbose=True) -> list:
+        # For each package check if it exists and add it to the data
         installed_packages = []
         for key, value in self.PACKAGES.items():
             path = which(key)
             if path:
                 installed_packages.append(value)
-        self.update_cache({'packages': installed_packages})
-        print('{}>{} The following packages were found: {}'.format(Fore.BLUE, Fore.RESET, installed_packages))
+        self.update_data({'packages': installed_packages})
+
+        if verbose:
+            print('{}>{} The following packages were found: {}'.format(Fore.BLUE, Fore.RESET, installed_packages))
+
+        return installed_packages
     
     # Initialize application preferences
     def init_preferences(self) -> None:
@@ -45,23 +50,23 @@ class Utils:
                     "logo": True,
                 }, f, indent=4)
 
-    # Add value to caches
-    def update_cache(self, kv) -> None:
+    # Add value to data
+    def update_data(self, kv) -> None:
         try:
             # If the file exists
-            if path.exists(self.APPLICATION_CACHE):
+            if path.exists(self.APPLICATION_DATA):
                 # Load its content
-                with open(self.APPLICATION_CACHE, 'r') as f:
+                with open(self.APPLICATION_DATA, 'r') as f:
                     data = load(f)
             else:
-                # New cache
+                # New data dictionary
                 data = {}
             
-            # Add data to the cache
+            # Add data to the dictionary
             data.update(kv)
             
             # Write the updated data back to the file
-            with open(self.APPLICATION_CACHE, 'w') as f:
+            with open(self.APPLICATION_DATA, 'w') as f:
                 dump(data, f, indent=4)
             self.update_log({"SUCCESS": "UPDATE CACHE -> ADD {}".format(kv)})
         except Exception as e:

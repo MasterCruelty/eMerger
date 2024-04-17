@@ -1,7 +1,8 @@
 from colorama import init, Fore
-from os import path, remove
+from os import getcwd, path, remove
 from platform import system
 from src.utils.utils import Utils
+
 
 class Setup():
     def __init__(self):
@@ -11,29 +12,41 @@ class Setup():
     def run_setup(self) -> None:
         print('{}----- SETUP PROCESS -----{}'.format(Fore.GREEN, Fore.RESET))
         
-        # If the application cache exists then delete it
-        if path.exists(self.utils.APPLICATION_CACHE):
-            remove(self.utils.APPLICATION_CACHE)
+        # If the application data exists then delete it
+        if path.exists(self.utils.APPLICATION_DATA):
+            remove(self.utils.APPLICATION_DATA)
 
         # Initialize preferences
-            self.utils.init_preferences()
+        self.utils.init_preferences()
+        
+        # Get global path
+        cwd = getcwd()
+        self.utils.update_data({'global_path': cwd})
+        print('{}>{} Working directory set to: {}'.format(Fore.BLUE, Fore.RESET, cwd))
+
         # Check system
         match system():
             case 'Darwin':
-                # Update system in cache
-                self.utils.update_cache({'system': 'darwin'})
+                # Update system in data
+                self.utils.update_data({'system': 'darwin'})
+                self.utils.update_data({'file_extension': 'sh'})
+                self.utils.update_data({'path_divisor': '/'})
                 print('{}>{} System set to Darwin'.format(Fore.BLUE, Fore.RESET))
                 # Update packages
                 self.utils.check_packages()
             case 'Linux':
-                # Update system in cache
-                self.utils.update_cache({'system': 'linux'})
+                # Update system in data
+                self.utils.update_data({'system': 'linux'})
+                self.utils.update_data({'file_extension': 'sh'})
+                self.utils.update_data({'path_divisor': '/'})
                 print('{}>{} System set to Linux'.format(Fore.BLUE, Fore.RESET))
                 # Update packages
                 self.utils.check_packages()
             case 'Windows':
-                # Update system in cache
-                self.utils.update_cache({'system': 'windows'})
+                # Update system in data
+                self.utils.update_data({'system': 'windows'})
+                self.utils.update_data({'file_extension': 'ps1'})
+                self.utils.update_data({'path_divisor': '\\'})
                 print('{}>{} System set to Windows'.format(Fore.BLUE, Fore.RESET))
                 # Update packages
                 self.utils.check_packages()

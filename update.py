@@ -2,6 +2,7 @@ from colorama import init, Fore
 from setup import Setup
 from subprocess import PIPE, run
 
+
 if __name__ == "__main__":
     # Initialize colorama
     init()
