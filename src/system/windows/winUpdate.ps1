@@ -1,26 +1,4 @@
 # TODO RIMUOVERE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"winUpdate.ps1`""
 
 # Install PSWindowsUpdate if not installed
