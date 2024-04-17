@@ -26,6 +26,7 @@ eMerger is a simple script to clean update your system and your packages by just
     <li>Raspbian</li>
     <li>Termux</li>
     <li>Ubuntu</li>
+    <li>Windows 11</li>
 </ul>
 
 <h2>Systems tested and not working (help wanted)</h2>
@@ -37,13 +38,16 @@ eMerger is a simple script to clean update your system and your packages by just
 <ul>
     <li>apt</li>
     <li>apt-get</li>
+    <li>choco</li>
     <li>dnf</li>
     <li>emerge</li>
     <li>flatpak</li>
-    <lI>nixos</li>
+    <lI>nixos-rebuild</li>
+    <li>nuget</li>
     <li>pacman</li>
     <li>pkg</li>
     <li>rpm</li>
+    <li>scoop</li>
     <li>snap</li>
     <li>yay</li>
     <li>yum</li>
