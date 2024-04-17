@@ -1,4 +1,3 @@
-.log
 src/utils/.cache
 src/utils/.md5
 .hist
@@ -11,4 +10,6 @@ src/utils/.md5
 
 
 __pycache__/
-cache.json
+application.json
+preferences.json
+src/utils/log
