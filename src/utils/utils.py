@@ -3,7 +3,7 @@ from json import dump, load
 from os import path
 from shutil import which
 
-
+# Class to define json cache files and list of all supported packages.
 class Utils:
     def __init__(self):
         self.APPLICATION_DATA = 'application.json'
