@@ -27,28 +27,28 @@ class Setup():
         # Check system
         match system():
             case 'Darwin':
-                # Update system in data
+                # Update system in data using MacOS info
                 self.utils.update_data({'system': 'darwin'})
                 self.utils.update_data({'file_extension': 'sh'})
                 self.utils.update_data({'path_divisor': '/'})
                 print('{}>{} System set to Darwin'.format(Fore.BLUE, Fore.RESET))
-                # Update packages
+                # Update packages MacOS
                 self.utils.check_packages()
             case 'Linux':
-                # Update system in data
+                # Update system in data using Linux info
                 self.utils.update_data({'system': 'linux'})
                 self.utils.update_data({'file_extension': 'sh'})
                 self.utils.update_data({'path_divisor': '/'})
                 print('{}>{} System set to Linux'.format(Fore.BLUE, Fore.RESET))
-                # Update packages
+                # Update packages Linux
                 self.utils.check_packages()
             case 'Windows':
-                # Update system in data
+                # Update system in data using Windows info
                 self.utils.update_data({'system': 'windows'})
                 self.utils.update_data({'file_extension': 'ps1'})
                 self.utils.update_data({'path_divisor': '\\'})
                 print('{}>{} System set to Windows'.format(Fore.BLUE, Fore.RESET))
-                # Update packages
+                # Update packages Windows
                 self.utils.check_packages()
             case _:
                 print('{}> THE SYSTEM IS NOT SUPPORTED: ABORTING SETUP{}'.format(Fore.RED, Fore.RESET))
