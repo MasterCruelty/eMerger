@@ -1,4 +1,5 @@
-# This script is focused on update Windows OS
+# TODO RIMUOVERE
+Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"winUpdate.ps1`""
 
 # Install PSWindowsUpdate if not installed
 if (!(Get-Module -Name PSWindowsUpdate -ListAvailable)) {
@@ -7,20 +8,16 @@ if (!(Get-Module -Name PSWindowsUpdate -ListAvailable)) {
 }
 
 # Windows Update
-Write-Host "Updating Windows..."
-Write-Host "At the end your system will be rebooted..."
-Get-WUInstall -AcceptAll -AutoReboot
+Write-Host "Updating Windows ..."
+Write-Host "At the end reboot your system"
+Get-WUInstall -AcceptAll
 
 
 ####### Check installation and update of Chocolatey #######
     # If you wanna install Chocolatey, you need this command
     # Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
-    Write-Host "Chocolatey not found. Skipping..."
-} else {
-    Write-Host "Chocolatey is installed..."
-    Write-Host "Updating Chocolatey packages..."
-    choco upgrade all -y
+    #Write-Host "Chocolatey not found. Skipping..."
 }
 
 ######## Check installation and update Nuget #######
@@ -29,10 +26,6 @@ if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
     # Move-Item -Path "$env:temp\nuget.exe" -Destination "$env:ProgramFiles\NuGet" -Force
 if (!(Get-Command nuget -ErrorAction SilentlyContinue)) {
     Write-Host "NuGet not found. Skipping..."
-} else {
-    Write-Host "NuGet is installed..."
-    Write-Host "Updating Nuget packages..."
-    Update-Package -ProjectName YourProjectName -Reinstall
 }
 
 ####### Check installation and update scoop #######
@@ -40,9 +33,6 @@ if (!(Get-Command nuget -ErrorAction SilentlyContinue)) {
     # Set-ExecutionPolicy RemoteSigned -scope Process; iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 if (!(Test-Path $env:USERPROFILE\scoop)) {
     Write-Host "Scoop not found. Skipping..."
-} else {
-    Write-Host "Scoop is installed..."
-    scoop update
 }
 
 Write-Host "Update completed."

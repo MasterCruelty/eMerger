@@ -1,0 +1,9 @@
+{
+    "global_path": "/home/yourabsolutepath/eMerger",
+    "system": "linux",
+    "file_extension": "sh",
+    "path_divisor": "/",
+    "packages": [
+        "apt"
+    ]
+}

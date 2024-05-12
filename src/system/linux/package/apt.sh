@@ -1,20 +1,18 @@
 #!/bin/bash
 
-SRC=$(dirname "$(readlink -f "$0")")
+#SRC=$(dirname "$(readlink -f "$0")")
+SRC="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../../../ && pwd )"
 source $SRC/utils/global.sh
 
 PWR=$(source $SRC/utils/check_pwr.sh)
 PKG="apt-get"
 
-
 if [[ $(command -v apt) ]]; then
     PKG="apt"
-    
-	#These lines works on some systems only, for example I receive an error on a raspberry.
-	#puts RED "configuration: starting"
-	#try $PWR $PKG --configure -a
-	#puts GREEN "configuration: completed"
-	#puts RED "Error on --configure option"
+
+    #puts RED "configuration: starting"
+    #try $PWR $PKG --configure -a
+    #puts GREEN "configuration: completed"
 
     puts BLUE "Using $PKG $DEBIAN"
 

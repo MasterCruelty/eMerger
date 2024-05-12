@@ -1,4 +1,3 @@
-.log
 src/utils/.cache
 src/utils/.md5
 .hist
@@ -6,3 +5,7 @@ src/utils/.md5
 *.log
 *.synctex.gz
 .idea
+__pycache__/
+application.json
+preferences.json
+src/utils/log
