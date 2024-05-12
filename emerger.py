@@ -2,7 +2,8 @@ from colorama import Fore
 from json import load
 from os import path
 from src.utils.utils import Utils
-from subprocess import PIPE, Popen
+from subprocess import PIPE, Popen, STDOUT
+import sys
 
 utils = Utils()
 
@@ -35,7 +36,10 @@ try:
         # The file to execute
         execution_file = '{}{}{}.{}'.format(execution_folder, path_divisor, pkg, file_extension)
         # Create a process
-        process = Popen(['powershell.exe', execution_file], stdout=PIPE, stderr=PIPE, text=True, shell=True)
+        if system == 'windows':
+            process = Popen(['powershell.exe', execution_file], stdout=PIPE, stderr=PIPE, text=True, shell=False,bufsize=1,universal_newlines=True)
+        else:
+            process = Popen(['/bin/bash', execution_file], stdout=PIPE, stderr=STDOUT, text=True, shell=False,bufsize=1,universal_newlines=True)
         # Read stdout
         for line in process.stdout:
             print(line.strip())
