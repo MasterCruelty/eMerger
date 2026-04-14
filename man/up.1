@@ -1,0 +1,85 @@
+.TH UP 1 "2026" "eMerger 2.0" "User Commands"
+.SH NAME
+up \- eMerger, one-command system updater
+.SH SYNOPSIS
+.B up
+[\fIoptions\fR]
+.SH DESCRIPTION
+eMerger detects installed package managers on the host and runs each of them
+in turn to refresh, upgrade and clean the system. It also offers optional
+cleanup of the user cache and trash.
+.SH OPTIONS
+.TP
+.B -h, --help
+Show help and exit.
+.TP
+.B -V, --version
+Show version and exit.
+.TP
+.B -i, --interactive
+Interactive menu (gum, whiptail, or plain fallback).
+.TP
+.B -n, --dry-run
+Print what would be done; do nothing.
+.TP
+.B -v, --verbose
+Stream package manager output live.
+.TP
+.B -q, --quiet
+Minimal output.
+.TP
+.B -y, --yes
+Assume "yes" on prompts.
+.TP
+.B --security
+Only security updates when the manager supports them.
+.TP
+.B --firmware
+Include firmware updates via fwupdmgr.
+.TP
+.B --dev
+Include dev toolchains (rustup, cargo, npm, pnpm, pip, gem).
+.TP
+.B --parallel
+Run independent user-space managers in parallel.
+.TP
+.B -nl, -ni, -nc, -nt
+Skip logo, system info, cache clean, trash clean.
+.TP
+.B -w, --weather
+Show the current weather.
+.TP
+.B -up
+Self-update eMerger via git.
+.TP
+.B -au
+Install a weekly auto-update (systemd user timer or cron).
+.TP
+.B -err
+Print logged errors.
+.TP
+.B --history
+Print a summary of recent runs.
+.SH FILES
+.TP
+.I ~/.config/emerger/config.sh
+Sourced before argument parsing.
+.TP
+.I ~/.config/emerger/hooks/pre.d/*.sh, post.d/*.sh
+User hook scripts.
+.TP
+.I ~/.local/state/emerger/emerger.log
+Log file.
+.TP
+.I ~/.local/state/emerger/history.jsonl
+One JSON record per run.
+.SH EXIT STATUS
+.TP
+0  success
+.TP
+1  runtime failure
+.TP
+2  argument parsing error
+.SH SEE ALSO
+.BR cron (8),
+.BR systemd.timer (5)

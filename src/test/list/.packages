@@ -1,9 +1,0 @@
-arch.sh
-debian.sh
-flatpak.sh
-gentoo.sh
-nix.sh
-opensuse.sh
-rpm.sh
-snap.sh
-termux.sh

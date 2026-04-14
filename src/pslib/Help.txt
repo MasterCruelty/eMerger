@@ -1,0 +1,70 @@
+eMerger (Windows) - one-command system updater
+
+USAGE
+  up [options]
+
+GENERAL
+  -h, --help                Show this help
+  -V, --version             Show version
+      --doctor              Run environment health check
+
+EXECUTION
+  -n, --dry-run             Show what would be done, do nothing
+  -v, --verbose             Stream pkg-manager output live
+  -q / -qq / -qqq           Quieter (titles / summary only / exit code only)
+  -y, --yes                 Assume "yes" on prompts
+      --json                Machine-readable run summary on stdout
+      Short single-letter flags bundle: -nv == -n -v
+
+SELECTION
+      --security            Prefer security-only where supported
+      --dev                 Include dev toolchains (rustup, cargo, npm, pnpm, pip, gem)
+      --profile NAME        Load a profile (share\profiles\<NAME>.ps1)
+      --list-profiles       List available profiles
+      --no-emoji            ASCII glyphs only
+
+DISPLAY
+  -nl, --no-logo            Hide logo
+  -ni, --no-info            Hide system info line
+  -nc, --no-cache           Skip %TEMP% cleaning
+  -nt, --no-trash           Skip recycle bin
+
+INSPECTION
+      --history             Last runs
+  -err, --errors            Tail of logged errors
+      --reboot              Reboot if the system requires it
+      --reboot-exit         Exit 4 instead of 0 when a reboot is required
+      --download-only       Download packages, do not install (where supported)
+      --offline             Alias for --download-only
+      --only LIST           Comma-separated managers to keep
+      --except LIST         Comma-separated managers to skip
+      --metrics FILE        Export last run as Prometheus textfile
+
+MAINTENANCE
+  -up,  --self-update       Update eMerger via git (fast-forward)
+  -au,  --auto-update       Register weekly Task Scheduler entry
+  -rc,  --rebuild-cache     Clear detection cache (no-op stub)
+
+EXAMPLES
+  up                        # normal run (elevates if needed)
+  up -n                     # preview
+  up --security -y          # unattended security
+  up --dev                  # include rustup/npm/pip/gem
+  up --profile work         # named profile
+
+CONFIG
+  %APPDATA%\emerger\config.ps1           Dot-sourced before argument parsing
+  %APPDATA%\emerger\profiles.d\*.ps1     User profiles
+  %APPDATA%\emerger\hooks\pre.d\*.ps1    Pre-update hooks
+  %APPDATA%\emerger\hooks\post.d\*.ps1   Post-update hooks
+
+STATE
+  %LOCALAPPDATA%\emerger\state\emerger.log     Log
+  %LOCALAPPDATA%\emerger\state\history.jsonl   Run history
+
+EXIT CODES
+  0  success
+  1  runtime failure
+  2  argument parsing error
+  3  one or more package managers failed
+  4  reboot required (only with --reboot-exit)

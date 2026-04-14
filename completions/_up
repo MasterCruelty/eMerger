@@ -1,0 +1,74 @@
+#compdef up
+# zsh completion for eMerger
+
+_up() {
+    local -a opts
+    opts=(
+        '-h[show help]'
+        '--help[show help]'
+        '-V[show version]'
+        '--version[show version]'
+        '-i[interactive menu]'
+        '--interactive[interactive menu]'
+        '--doctor[environment health check]'
+        '-n[dry-run]'
+        '--dry-run[dry-run]'
+        '-v[verbose]'
+        '--verbose[verbose]'
+        '-q[quiet (repeat for more)]'
+        '-qq[quieter]'
+        '-qqq[quietest]'
+        '--quiet[quiet]'
+        '-y[assume yes]'
+        '--yes[assume yes]'
+        '--security[security only]'
+        '--firmware[include firmware]'
+        '--no-firmware[skip firmware]'
+        '--dev[include dev toolchains]'
+        '--parallel[parallel user-space managers]'
+        '--no-emoji[ASCII glyphs only]'
+        '--profile[load named profile]:profile:_up_profiles'
+        '--list-profiles[list profiles]'
+        '--snapshot[pre-update snapshot]'
+        '--refresh-mirrors[refresh mirrors]'
+        '--resume[skip completed managers]'
+        '--reboot[reboot if required]'
+        '-nl[no logo]'
+        '--no-logo[no logo]'
+        '-ni[no system info]'
+        '--no-info[no system info]'
+        '-nc[no cache clean]'
+        '--no-cache[no cache clean]'
+        '-nt[no trash clean]'
+        '--no-trash[no trash clean]'
+        '-w[weather]'
+        '--weather[weather]'
+        '--changed[show package diff]'
+        '--changelog[show changelog]:package'
+        '--history[run history]'
+        '--report[export markdown]:file:_files'
+        '-err[show errors]'
+        '--errors[show errors]'
+        '-up[self-update]'
+        '--self-update[self-update]'
+        '-au[install auto-update]'
+        '--auto-update[install auto-update]'
+        '-rc[rebuild cache]'
+        '--rebuild-cache[rebuild cache]'
+    )
+    _arguments -s $opts
+}
+
+_up_profiles() {
+    local -a p
+    local dir
+    for dir in "$HOME/.config/emerger/profiles.d" "${0:A:h}/../share/profiles"; do
+        [[ -d $dir ]] || continue
+        for f in "$dir"/*.sh; do
+            [[ -f $f ]] && p+=(${f:t:r})
+        done
+    done
+    _values profile $p
+}
+
+compdef _up up
