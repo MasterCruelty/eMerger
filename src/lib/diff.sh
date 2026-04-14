@@ -33,7 +33,6 @@ diff_compute() {
     local before="$1" after="$2" out="$3"
     : >"$out"
     [[ -f $before && -f $after ]] || return 0
-    trap 'rm -f "${out}.a" "${out}.b"' RETURN
     # Build maps by "mgr\tname" -> version
     awk -F'\t' '{print $1"\t"$2"\t"$3}' "$before" | sort -u >"${out}.b"
     awk -F'\t' '{print $1"\t"$2"\t"$3}' "$after"  | sort -u >"${out}.a"

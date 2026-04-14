@@ -28,7 +28,6 @@ run_cmd() {
     fi
 
     local tmp; tmp=$(mktemp -t emerger.XXXXXX)
-    trap 'rm -f "$tmp"' RETURN
     local attempt=1
     while :; do
         : >"$tmp"

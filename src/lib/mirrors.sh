@@ -18,7 +18,6 @@ mirrors_refresh() {
     fi
     if sys_has netselect-apt; then
         local tmp; tmp=$(mktemp -t emerger.XXXXXX)
-        trap 'rm -f "$tmp"' RETURN
         if sudo netselect-apt -o "$tmp" >/dev/null 2>&1 && [[ -s $tmp ]]; then
             sudo install -m 0644 "$tmp" /etc/apt/sources.list.d/netselect.list
             ui_ok "netselect-apt: wrote /etc/apt/sources.list.d/netselect.list"
