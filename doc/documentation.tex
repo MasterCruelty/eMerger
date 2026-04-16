@@ -8,6 +8,7 @@
 \usepackage{lmodern}
 \renewcommand{\familydefault}{\sfdefault} % Latin Modern Sans Serif as default
 \usepackage{microtype}
+\usepackage{textcomp}
 
 %-------------------------------------------------------
 % Layout
@@ -19,6 +20,12 @@
 \usepackage{titlesec}
 \titleformat{\section}{\Large\bfseries\sffamily}{\thesection}{0.8em}{}
 \titleformat{\subsection}{\large\bfseries\sffamily}{\thesubsection}{0.7em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\sffamily}{\thesubsubsection}{0.6em}{}
+
+%-------------------------------------------------------
+% Graphics
+%-------------------------------------------------------
+\usepackage{graphicx}
 
 %-------------------------------------------------------
 % Tables, colors, code
@@ -27,12 +34,27 @@
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
 \definecolor{codebg}{HTML}{F4F4F4}
 \definecolor{codefr}{HTML}{DADADA}
 \definecolor{codekw}{HTML}{1F6FEB}
 \definecolor{codest}{HTML}{22863A}
 \definecolor{codecm}{HTML}{6A737D}
 \definecolor{linkcol}{HTML}{0B5FFF}
+\definecolor{tipbg}{HTML}{EAF4FF}
+\definecolor{tipfr}{HTML}{0B5FFF}
+\definecolor{warnbg}{HTML}{FFF4E5}
+\definecolor{warnfr}{HTML}{B07000}
+\definecolor{notebg}{HTML}{F0FFF0}
+\definecolor{notefr}{HTML}{228B22}
+
+\newtcolorbox{tip}{colback=tipbg,colframe=tipfr,boxrule=0.6pt,
+  arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt,breakable}
+\newtcolorbox{warn}{colback=warnbg,colframe=warnfr,boxrule=0.6pt,
+  arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt,breakable}
+\newtcolorbox{note}{colback=notebg,colframe=notefr,boxrule=0.6pt,
+  arc=2pt,left=6pt,right=6pt,top=4pt,bottom=4pt,breakable}
 
 \usepackage{listings}
 \lstset{
@@ -52,10 +74,20 @@
   keepspaces=true
 }
 \lstdefinelanguage{bashplus}{
-  morekeywords={up,sudo,git,bash,alias,source,apt,dnf,pacman,zypper,brew,flatpak,snap,systemctl,cron,export},
+  morekeywords={up,sudo,git,bash,alias,source,apt,dnf,pacman,zypper,brew,flatpak,snap,systemctl,cron,export,case,esac,if,then,fi,elif,for,do,done,while,in,function,return,echo,read,printf,curl,rsync},
   morecomment=[l]{\#},
   morestring=[b]",
   morestring=[b]'
+}
+\lstdefinelanguage{psplus}{
+  morekeywords={function,param,if,else,elseif,switch,return,foreach,for,while,break,continue,Get-ScheduledTask,Register-ScheduledTask,Install-Module,Set-Clipboard,Write-Host,Set-ExecutionPolicy,Join-Path},
+  morecomment=[l]{\#},
+  morestring=[b]",
+  morestring=[b]'
+}
+\lstdefinelanguage{jsonplus}{
+  morestring=[b]",
+  morecomment=[l]{//}
 }
 
 %-------------------------------------------------------
@@ -73,14 +105,24 @@
 \begin{document}
 \maketitle
 
+\begin{center}
+\includegraphics[width=0.55\linewidth]{../src/logo/big_name.png}
+\end{center}
+
 \begin{abstract}
 \noindent
-eMerger is a cross-platform command line tool that refreshes, upgrades and
-cleans a computer with a single command: \texttt{up}. It runs on Linux,
-macOS and Windows, auto-detects every package manager present on the host
-and invokes them in the right order, returning one unified summary at the
-end. This document describes the architecture, features, configuration and
-integration points of the current release.
+\textbf{eMerger} is a cross-platform command line tool that refreshes,
+upgrades and cleans a computer with a single command: \texttt{up}. It runs
+on \textbf{Linux}, \textbf{macOS} and \textbf{Windows}, auto-detects every
+package manager present on the host and invokes them in the right order,
+returning one unified summary at the end. No daemon. No YAML. No embedded
+DSL. Just a small, auditable script that drives the tools you already have.
+
+This document is written to be readable by anyone: newcomers will find an
+explanation of what a package manager is, what \texttt{up} actually does on
+your machine and how to try it safely; experienced users will find a
+complete reference for every flag, profile, hook, plugin and integration
+point, plus a cookbook of real-world recipes.
 \end{abstract}
 
 \tableofcontents
@@ -89,21 +131,124 @@ integration points of the current release.
 \vspace{1em}
 
 %-------------------------------------------------------
-\section{Overview}
+\section{How to read this document}
 %-------------------------------------------------------
-eMerger began as a small Bash experiment and has grown into a portable
-updater with a shared feature set across the three major desktop and server
-platforms. The design follows three principles:
+The document is organised in layers:
 
+\begin{itemize}
+  \item \textbf{Getting started} (sections \ref{sec:why}\,--\,\ref{sec:firstrun}):
+        what eMerger does, why you might want it, and a guided first run
+        that takes less than five minutes.
+  \item \textbf{User manual} (sections \ref{sec:flow}\,--\,\ref{sec:features}):
+        the execution flow, every command line flag with an example, and a
+        feature-by-feature walkthrough.
+  \item \textbf{Configuration} (sections \ref{sec:config}\,--\,\ref{sec:plugins}):
+        config file, profiles, hooks and user plugins, all with
+        copy-pasteable snippets.
+  \item \textbf{Integration} (sections \ref{sec:integration}\,--\,\ref{sec:auto}):
+        JSON, Prometheus, exit codes, CI, cron and systemd timers.
+  \item \textbf{Cookbook} (section \ref{sec:cookbook}): ready-to-use
+        recipes for laptops, servers, developer workstations, presentation
+        machines, CI runners and metered connections.
+  \item \textbf{Reference} (sections \ref{sec:files}\,--\,\ref{sec:glossary}):
+        file locations, supported managers, exit codes, troubleshooting,
+        FAQ and a glossary of terms.
+  \item \textbf{Development} (section \ref{sec:dev}): repo layout, module
+        responsibilities, running tests, adding a package manager.
+\end{itemize}
+
+Throughout the document you will see three kinds of call-outs:
+
+\begin{tip}
+\textbf{Tip} - a useful shortcut or a better way of doing something.
+\end{tip}
+\begin{note}
+\textbf{Note} - background information or a clarification that is worth
+remembering but not strictly required to move on.
+\end{note}
+\begin{warn}
+\textbf{Warning} - something that can surprise you or cost you data if
+ignored. Read these carefully.
+\end{warn}
+
+\clearpage
+
+%-------------------------------------------------------
+\section{Why eMerger?}\label{sec:why}
+%-------------------------------------------------------
+
+\subsection{The problem}
+A modern desktop or laptop runs software that comes from many different
+sources at once:
+
+\begin{itemize}
+  \item the operating system distributor (\texttt{apt}, \texttt{dnf},
+        \texttt{pacman}, \texttt{zypper}, \texttt{softwareupdate},
+        \texttt{winget}\,\dots);
+  \item a cross-distro app store (\texttt{flatpak}, \texttt{snap},
+        \texttt{brew --cask}, \texttt{choco}, \texttt{scoop});
+  \item a user-level store (\texttt{brew}, \texttt{mas});
+  \item language-specific ecosystems (\texttt{npm}, \texttt{pip},
+        \texttt{cargo}, \texttt{gem}, \texttt{pnpm}\,\dots);
+  \item vendor firmware (\texttt{fwupdmgr} on Linux, \texttt{softwareupdate}
+        on macOS, Dell/Lenovo utilities on Windows).
+\end{itemize}
+
+Each uses a slightly different command, has its own cache, its own notion
+of ``security update'' and its own definition of ``clean''. Keeping all of
+them up to date by hand is either tedious or error-prone, and writing a
+personal wrapper that does the right thing on three operating systems is
+a weekend project most people never finish.
+
+\subsection{The solution}
+eMerger is that wrapper, generalised. Typing \texttt{up} on any supported
+platform will:
+
+\begin{enumerate}
+  \item detect every package manager installed on the host;
+  \item ask for \texttt{sudo} (or trigger a UAC elevation on Windows) only
+        if one of the detected managers actually needs it;
+  \item take an optional filesystem snapshot or a package list snapshot
+        so you can audit the run afterwards;
+  \item run refresh / upgrade / clean, in the right order, serially or in
+        parallel where safe;
+  \item clean user caches and the trash, optionally;
+  \item print a boxed summary with per-manager result, disk freed, run
+        duration and a reboot advisory;
+  \item export the same summary as JSON, Markdown or Prometheus textfile
+        if you ask.
+\end{enumerate}
+
+It does this with no daemon, no YAML, no Python runtime and no Ruby
+runtime: just a Bash script on Unix and a PowerShell script on Windows.
+
+\subsection{Design principles}
 \begin{itemize}
   \item \textbf{One command.} The user types \texttt{up}; everything else
         is automatic detection, ordering and reporting.
-  \item \textbf{No runtime bloat.} No daemon, no YAML, no embedded DSL.
-        Configuration is a plain shell or PowerShell file that is sourced
-        at startup.
+  \item \textbf{No runtime bloat.} Configuration is a plain shell or
+        PowerShell file that is sourced at startup.
   \item \textbf{Use what is there.} eMerger never installs a package
         manager on your behalf; it detects the ones already installed and
         delegates work to them.
+  \item \textbf{Safe by default.} Dry-run, retries, filesystem snapshots,
+        resume after interruption and a pre-flight health check are all
+        first-class options.
+  \item \textbf{Cross-platform parity.} The core flow (detect, upgrade,
+        clean, summarise) is identical on Linux, macOS and Windows.
+        Platform-specific features are gated and labelled.
+\end{itemize}
+
+\subsection{What eMerger is \emph{not}}
+\begin{itemize}
+  \item It is \textbf{not} a package manager itself. It does not download
+        or install software directly: it asks the native tools to do it.
+  \item It is \textbf{not} a configuration management system. There is no
+        desired-state manifest, no idempotent resource graph. If you want
+        that, use Ansible, Salt or NixOS.
+  \item It is \textbf{not} a scheduler. It can install a weekly systemd
+        timer, cron job or Windows scheduled task, but it does not run as
+        a service.
 \end{itemize}
 
 The project name is a wink at Gentoo's \texttt{emerge}: the tool started
@@ -112,7 +257,7 @@ to reflect its goal of merging the quirks of every supported package
 manager behind a uniform interface.
 
 %-------------------------------------------------------
-\section{Platforms}
+\section{Platforms at a glance}\label{sec:platforms}
 %-------------------------------------------------------
 
 \begin{center}
@@ -126,19 +271,82 @@ Setup             & \texttt{./setup.sh}       & \texttt{./setup.sh}          & \
 Uninstall         & \texttt{./uninstall.sh}   & \texttt{./uninstall.sh}      & \texttt{.\textbackslash uninstall.ps1}\\
 Auto-update       & systemd timer / cron      & cron                         & Task Scheduler          \\
 Elevation         & \texttt{sudo}             & \texttt{sudo}                & UAC relaunch            \\
+TUI menu          & yes (\texttt{-i})         & yes (\texttt{-i})            & no                      \\
+Parallel mode     & yes                       & yes                          & no (always serial)      \\
+Snapshots         & snapper/timeshift/btrfs   & no                           & no (System Restore manual)\\
 Config dir        & \verb|~/.config/emerger/| & \verb|~/.config/emerger/|    & \verb|%APPDATA%\emerger\|\\
 State dir         & \verb|~/.local/state/emerger/| & \verb|~/.local/state/emerger/| & \verb|%LOCALAPPDATA%\emerger\state\|\\
 \bottomrule
 \end{tabular}
 \end{center}
 
-The core flow (detect, upgrade, clean, summarise) is kept at parity across
-platforms. Features that depend on operating system primitives, such as
-firmware updates or filesystem snapshots, are gated to the platforms that
-support them and are marked as such throughout this document.
+The core flow is identical across platforms. Features that depend on
+operating system primitives (firmware updates, filesystem snapshots, TUI)
+are gated to the platforms that support them and labelled as such
+throughout this document.
 
 %-------------------------------------------------------
-\section{Installation}
+\section{Requirements}\label{sec:requirements}
+%-------------------------------------------------------
+
+eMerger never installs dependencies for you. The list below is what
+``works out of the box'' vs. what unlocks optional features.
+
+\subsection{Linux}
+\textbf{Required:} \texttt{bash} 3.2+, \texttt{coreutils}, \texttt{git},
+\texttt{sudo}.
+
+\textbf{Optional:}
+\begin{itemize}
+  \item \texttt{gum} or \texttt{whiptail} for a nicer interactive menu.
+  \item \texttt{notify-send} for desktop notifications.
+  \item \texttt{curl} for the weather widget (\texttt{-w}) and
+        \texttt{--self-update} checks.
+  \item \texttt{flock} for the global lock (pre-installed on every
+        mainstream distribution).
+  \item \texttt{reflector} (Arch) or \texttt{netselect-apt} (Debian /
+        Ubuntu) for \texttt{--refresh-mirrors}.
+  \item \texttt{snapper}, \texttt{timeshift} or \texttt{btrfs-progs} for
+        \texttt{--snapshot} and \texttt{--rollback}.
+  \item \texttt{fwupdmgr} for \texttt{--firmware}.
+\end{itemize}
+
+\subsection{macOS}
+\textbf{Required:} the system \texttt{bash} at \texttt{/bin/bash} (3.2+
+is enough; no Homebrew Bash needed), and Xcode Command Line Tools for
+\texttt{git}.
+
+\textbf{Optional:}
+\begin{itemize}
+  \item Homebrew (\texttt{brew}), which in turn enables \texttt{brew --cask}.
+  \item \texttt{mas} (\texttt{brew install mas}) for Mac App Store
+        upgrades.
+\end{itemize}
+
+\subsection{Windows}
+\textbf{Required:} PowerShell 5.1 (built-in on Windows 10 and later) or 7+,
+Git for Windows (needed by \texttt{up --self-update}).
+
+\textbf{Optional:}
+\begin{itemize}
+  \item \texttt{winget}, \texttt{scoop}, \texttt{choco}: any combination
+        is auto-detected.
+  \item \texttt{PSWindowsUpdate}
+        (\texttt{Install-Module PSWindowsUpdate -Scope CurrentUser}) for
+        Windows Update integration.
+  \item \texttt{BurntToast}
+        (\texttt{Install-Module BurntToast -Scope CurrentUser}) for
+        native toast notifications.
+\end{itemize}
+
+\begin{note}
+eMerger never installs these for you - it only uses what is already
+installed. This is deliberate: \texttt{up} must never put software on
+your machine that you didn't ask for.
+\end{note}
+
+%-------------------------------------------------------
+\section{Installation}\label{sec:install}
 %-------------------------------------------------------
 
 \subsection{Linux and macOS}
@@ -147,396 +355,1162 @@ support them and are marked as such throughout this document.
 git clone https://github.com/MasterCruelty/eMerger
 cd eMerger
 ./setup.sh
-# open a new shell (or: source ~/.bashrc)
+# open a new shell, or: source ~/.bashrc
 up --help
 \end{lstlisting}
 
-\texttt{setup.sh} performs the following actions:
+\texttt{setup.sh} performs the following actions, in order:
 
 \begin{enumerate}
-  \item Adds \texttt{alias up='bash /path/to/eMerger/src/emerger.sh'}
-        to the appropriate shell rc file (bash, zsh or fish).
+  \item Adds \verb|alias up='bash /path/to/eMerger/src/emerger.sh'| to
+        the appropriate shell rc file (\texttt{.bashrc}, \texttt{.zshrc},
+        \texttt{config.fish}). If you use multiple shells it writes the
+        alias in all of them.
   \item Marks \texttt{src/emerger.sh} as executable.
-  \item Installs shell completions for bash, zsh and fish.
+  \item Installs shell completions for \texttt{bash}, \texttt{zsh} and
+        \texttt{fish}:
+        \begin{itemize}
+          \item \verb|~/.local/share/bash-completion/completions/up|
+          \item \verb|~/.zsh/completions/_up|
+          \item \verb|~/.config/fish/completions/up.fish|
+        \end{itemize}
   \item Scaffolds \verb|~/.config/emerger/| with the default
         \texttt{config.sh}, \texttt{ignore.list}, \texttt{hooks/} and
         \texttt{profiles.d/} layout.
 \end{enumerate}
 
-On macOS the alias is written to \texttt{\string~/.zshrc} first, since zsh
-is the default interactive shell from Catalina onwards. When Homebrew is
-present, completions are installed into the Homebrew prefix so they are
-loaded by the brew-managed shell environment.
+On macOS the alias is written to \texttt{\string~/.zshrc} first, since
+\texttt{zsh} is the default interactive shell from Catalina onwards. When
+Homebrew is present, completions are installed under the Homebrew prefix
+so that they are loaded by the \texttt{brew}-managed shell environment.
 
 \subsection{Windows}
 
-\begin{lstlisting}[language=bashplus]
+\begin{lstlisting}[language=psplus]
 git clone https://github.com/MasterCruelty/eMerger
 cd eMerger
 .\setup.ps1
-# open a new PowerShell window (or: . $PROFILE)
+# open a new PowerShell window, or: . $PROFILE
 up --help
 \end{lstlisting}
 
-\texttt{setup.ps1} does not require administrator privileges. It lifts
-the execution policy for the current user to \texttt{RemoteSigned} when
-needed, defines a \texttt{function up} inside
-\texttt{\$PROFILE.CurrentUserAllHosts} so that the command is available
-from every PowerShell host, and scaffolds \verb|%APPDATA%\emerger\|. When a
-package manager invocation later needs elevation, eMerger relaunches
-itself under UAC.
+\texttt{setup.ps1} does \emph{not} require administrator privileges:
+
+\begin{enumerate}
+  \item Lifts \texttt{ExecutionPolicy} for \texttt{CurrentUser} to
+        \texttt{RemoteSigned} when it was \texttt{Restricted} or
+        \texttt{Undefined}.
+  \item Defines \verb|function up { & "...\emerger.ps1" @args }| inside
+        \verb|$PROFILE.CurrentUserAllHosts|, so \texttt{up} works from
+        every PowerShell host (cmd-hosted PS, ISE, Windows Terminal,
+        VS Code integrated terminal).
+  \item Scaffolds \verb|%APPDATA%\emerger\| with
+        \texttt{config.ps1}, \texttt{hooks\textbackslash pre.d\textbackslash},
+        \texttt{hooks\textbackslash post.d\textbackslash},
+        \texttt{profiles.d\textbackslash}.
+\end{enumerate}
+
+When a package manager run later needs elevation, eMerger relaunches
+itself under UAC. The relaunch is logged, so you always know when it
+happened.
 
 \subsection{Manual install}
 
-When a packaged setup is undesirable, pointing an alias at the entry point
-is enough:
+When a packaged setup is undesirable (read-only home, corporate lockdown,
+portable installation), pointing an alias at the entry point is enough:
 
 \begin{lstlisting}[language=bashplus]
+# bash, zsh, fish - Linux or macOS
 alias up='bash /absolute/path/to/eMerger/src/emerger.sh'
 \end{lstlisting}
 
-\begin{lstlisting}[language=bashplus]
+\begin{lstlisting}[language=psplus]
+# PowerShell - Windows
 function up { & "C:\path\to\eMerger\src\emerger.ps1" @args }
 \end{lstlisting}
 
 \subsection{Uninstall}
 
-Running \texttt{./uninstall.sh} (Unix) or \texttt{.\textbackslash uninstall.ps1}
-(Windows) removes the shell alias, the cron job or systemd timer, and the
-scheduled task. Configuration and state directories are preserved so that
-logs, profiles and hooks survive a reinstall; remove them manually to
-start from a clean slate.
+\begin{lstlisting}[language=bashplus]
+./uninstall.sh     # Linux / macOS
+.\uninstall.ps1    # Windows
+\end{lstlisting}
+
+The uninstaller removes the shell alias, the cron job or systemd timer,
+and the scheduled task. Configuration and state directories are
+\textbf{kept} so that logs, profiles and hooks survive a reinstall; remove
+them manually to start from a clean slate:
+
+\begin{lstlisting}[language=bashplus]
+rm -rf ~/.config/emerger ~/.local/state/emerger ~/.cache/emerger
+\end{lstlisting}
+
+The repository itself is not removed: \texttt{rm -rf} the directory when
+you are done.
 
 %-------------------------------------------------------
-\section{Self-update}
+\section{Self-update}\label{sec:selfupdate}
 %-------------------------------------------------------
 Three equivalent forms are accepted:
 
 \begin{lstlisting}[language=bashplus]
-up -up
-up --self-update
-./update.sh        # .\update.ps1 on Windows
+up -up                # short flag
+up --self-update      # long flag
+./update.sh           # out-of-band script (.\update.ps1 on Windows)
 \end{lstlisting}
 
-Internally a \texttt{git pull --ff-only} is performed inside the clone and
-the new commit range is printed. Non fast-forward updates are refused to
-guarantee that local changes cannot silently disappear.
+Internally a \texttt{git pull --ff-only} is performed inside the clone
+and the new commit range is printed. Non fast-forward updates are refused
+so that local changes never silently disappear. If you want the
+self-update to also run every time you update your system, add it to a
+\texttt{post.d} hook (see section \ref{sec:hooks}).
 
 %-------------------------------------------------------
-\section{Execution flow}
+\section{Quickstart}\label{sec:quickstart}
+%-------------------------------------------------------
+
+Five minutes. No commitment. Nothing gets upgraded until you say so.
+
+\subsection{Step 1 - dry-run}
+\begin{lstlisting}[language=bashplus]
+up -n
+\end{lstlisting}
+This is the safe preview. It shows which managers were detected and what
+commands \emph{would} be invoked. No \texttt{sudo}, no downloads, no
+changes on disk.
+
+\subsection{Step 2 - real run}
+\begin{lstlisting}[language=bashplus]
+up
+\end{lstlisting}
+Refresh, upgrade, clean, one manager at a time. You will be asked for
+\texttt{sudo} once (Unix) or get a UAC prompt (Windows) only if a detected
+manager needs it.
+
+\subsection{Step 3 - see what changed}
+\begin{lstlisting}[language=bashplus]
+up --changed
+\end{lstlisting}
+Prints the package diff for the last run with \texttt{+} for added,
+\texttt{-} for removed and \texttt{\~} for upgraded.
+
+\subsection{Step 4 - export a report}
+\begin{lstlisting}[language=bashplus]
+up --report last-run.md
+\end{lstlisting}
+Produces a Markdown file with the JSON summary, per-manager results,
+reboot advisory and the full package diff as a table.
+
+\subsection{Step 5 (optional) - weekly unattended update}
+\begin{lstlisting}[language=bashplus]
+up -au
+\end{lstlisting}
+Installs a systemd user timer on Linux, a cron job on macOS or a
+scheduled task on Windows. The trigger fires every Sunday at 10:00
+(local time) with $\pm$1h randomised delay, and always uses
+\texttt{-y -q -nl -ni}.
+
+%-------------------------------------------------------
+\section{Your first real run}\label{sec:firstrun}
+%-------------------------------------------------------
+
+The very first time you run \texttt{up}, you should expect something like
+this on a Debian/Ubuntu desktop with Flatpak and a couple of dev
+toolchains:
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+$ up
+  _____    __  __
+ |  ___|  |  \/  |  eMerger v2.0.0
+ | |__    | |\/| |  one command for the whole system
+ |____|   |_|  |_|
+ Ubuntu 24.04  o  x86_64  o  2026-04-16 10:12
+ eMerger v2.0.0  o  github.com/MasterCruelty/eMerger
+ [1/3] apt        OK     (38 upgraded, 0 removed, 0 new)
+ [2/3] flatpak    OK     (5 refreshed)
+ [3/3] fwupd      SKIP   (--firmware not set)
+ +---------------------------------------------+
+ |  eMerger - summary                          |
+ |  duration  42s                              |
+ |  freed     15 MiB                           |
+ |  reboot    not required                     |
+ |  errors    0                                |
+ +---------------------------------------------+
+\end{lstlisting}
+
+\begin{tip}
+If the colours or the box look wrong, your terminal may not support
+Unicode glyphs. Run \texttt{up --no-emoji} once, or add
+\verb|ARG_NO_EMOJI=1| to your \texttt{config.sh}.
+\end{tip}
+
+\begin{warn}
+\textbf{Do not} run \texttt{up} with \texttt{sudo} at the top level. eMerger
+will ask for \texttt{sudo} itself, only for the managers that need it, and
+will run user-level managers (\texttt{brew}, \texttt{flatpak} user
+remotes, \texttt{npm} user globals, \texttt{pip --user}\,\dots) \emph{as
+you}, not as root. Calling \verb|sudo up| will install user-level packages
+into root's home.
+\end{warn}
+
+%-------------------------------------------------------
+\section{Execution flow}\label{sec:flow}
 %-------------------------------------------------------
 A full run of \texttt{up} performs, in order:
 
 \begin{enumerate}
-  \item Load \texttt{config.sh} (or \texttt{config.ps1}) and any
-        \texttt{-\/-profile}.
-  \item Parse CLI flags; CLI always wins over config and profile defaults.
-  \item Acquire an exclusive lock (\verb|/tmp/emerger.lock| on Unix).
-  \item Print the logo, OS info line and timestamp.
-  \item Warn on low battery and on low free disk space.
-  \item Cache \texttt{sudo} credentials on Unix, or relaunch elevated on
-        Windows, only when a detected manager actually needs it.
-  \item Snapshot the list of installed packages for the post-run diff.
-  \item Execute \texttt{pre.d} hooks.
+  \item Load \texttt{config.sh} (or \texttt{config.ps1}) if present.
+  \item If \texttt{-{}-profile NAME} is on the command line, pre-load
+        \verb|share/profiles/NAME.sh| (or the user override from
+        \verb|~/.config/emerger/profiles.d/|).
+  \item Parse CLI flags. CLI always wins over config and profile defaults.
+  \item If \texttt{QUIET\_HOURS} is set and we are inside the window
+        \emph{and} \texttt{-y} is set, exit immediately (this shields
+        scheduled runs from night-time activity without blocking
+        interactive ones).
+  \item Acquire the global exclusive lock (\verb|/tmp/emerger.lock| via
+        \texttt{flock} on Unix). If another \texttt{up} is already
+        running, abort with exit code 1.
+  \item Print the logo, OS info line and the current timestamp.
+  \item Warn on low battery (<20\% on a laptop) and on low free disk
+        space (default: less than 1024\,MiB on \texttt{/} or \texttt{C:}).
+  \item Cache \texttt{sudo} credentials on Unix - or relaunch elevated on
+        Windows - only when a detected manager actually needs it.
+  \item Snapshot the installed-packages list into \texttt{pkgs.before} for
+        the post-run diff.
+  \item Execute \texttt{pre.d} hooks in alphabetical order.
   \item For each detected manager, run \textit{refresh}, \textit{upgrade},
-        \textit{clean}.
-  \item Optionally clear user cache and trash.
+        \textit{clean}; serial for system managers, concurrent for safe
+        user-space ones when \texttt{--parallel} is active.
+  \item Optionally clear user cache and trash (skippable with
+        \texttt{-nc} and \texttt{-nt}).
   \item Execute \texttt{post.d} hooks.
-  \item Compute the installed-packages diff.
-  \item Render the summary, the reboot advisory and an optional desktop
-        notification.
+  \item Snapshot the installed-packages list into \texttt{pkgs.after} and
+        compute \texttt{pkgs.diff}.
+  \item Render the boxed summary, the reboot advisory and an optional
+        desktop notification.
+  \item Exit 0 on success, 3 if any manager failed, 4 if a reboot is
+        required and \texttt{--reboot-exit} was passed.
 \end{enumerate}
 
 %-------------------------------------------------------
-\section{Command line reference}
+\section{Command line reference}\label{sec:cli}
 %-------------------------------------------------------
 
-The authoritative reference is \texttt{up -\/-help}. The most frequently
-used flags are summarised below.
+The authoritative reference is \texttt{up -\/-help}; the table below
+summarises every flag and is annotated with the most common uses.
+
+\subsection{Full flag catalogue}
 
 \begin{center}
-\begin{longtable}{@{}p{0.28\linewidth} p{0.52\linewidth} p{0.14\linewidth}@{}}
+\begin{longtable}{@{}p{0.26\linewidth} p{0.50\linewidth} p{0.18\linewidth}@{}}
 \toprule
 \textbf{Flag} & \textbf{Meaning} & \textbf{Platforms} \\
 \midrule \endhead
-\texttt{-n}, \texttt{-\/-dry-run}        & Preview without running       & all \\
-\texttt{-v}, \texttt{-\/-verbose}        & Stream manager output live    & all \\
-\texttt{-q} / \texttt{-qq} / \texttt{-qqq} & Progressive quiet levels   & all \\
-\texttt{-y}, \texttt{-\/-yes}            & Assume yes on prompts         & all \\
-\texttt{-i}, \texttt{-\/-interactive}    & TUI menu (gum / whiptail)     & Unix \\
-\texttt{-\/-security}                    & Security-only updates         & supported managers \\
-\texttt{-\/-dev}                         & Include dev toolchains        & all \\
-\texttt{-\/-firmware}                    & \texttt{fwupdmgr} refresh+upd & Linux \\
-\texttt{-\/-parallel}                    & Run user-space in parallel    & Unix \\
-\texttt{-\/-profile NAME}                & Load profile                  & all \\
-\texttt{-\/-snapshot}                    & snapper / timeshift / btrfs   & Linux \\
-\texttt{-\/-refresh-mirrors}             & Re-rank distribution mirrors  & Linux \\
-\texttt{-\/-resume}                      & Skip completed managers       & Unix \\
-\texttt{-\/-reboot}                      & Reboot if required            & all \\
-\texttt{-\/-changed}                     & Show package diff             & Unix \\
-\texttt{-\/-changelog PKG}               & Upstream changelog for PKG    & Unix \\
-\texttt{-\/-report FILE}                 & Export Markdown report        & Unix \\
-\texttt{-\/-doctor}                      & Health check                  & all \\
-\texttt{-\/-history}                     & Recent runs                   & all \\
-\texttt{-\/-errors}, \texttt{-err}       & Tail of logged errors         & all \\
-\texttt{-\/-json}                        & Machine-readable summary      & all \\
-\texttt{-\/-reboot-exit}                 & Exit 4 if reboot is required  & all \\
-\texttt{-\/-rollback}                    & Revert last snapshot          & Linux \\
-\texttt{-\/-download-only}, \texttt{-\/-offline} & Prefetch, don't install & Unix \\
-\texttt{-\/-only LIST}                   & Only these managers           & all \\
-\texttt{-\/-except LIST}                 & Skip these managers           & all \\
-\texttt{-\/-metrics FILE}                & Prometheus textfile export    & all \\
-\texttt{-up}                             & Self-update eMerger           & all \\
-\texttt{-au}                             & Install weekly auto-update    & all \\
+\texttt{-h}, \texttt{--help}             & Print help text and exit       & all \\
+\texttt{-V}, \texttt{--version}          & Print \texttt{eMerger X.Y.Z}   & all \\
+\texttt{-n}, \texttt{--dry-run}          & Preview without running        & all \\
+\texttt{-v}, \texttt{--verbose}          & Stream manager output live     & all \\
+\texttt{-q} / \texttt{-qq} / \texttt{-qqq} & Progressive quiet levels     & all \\
+\texttt{-y}, \texttt{--yes}              & Assume yes on prompts          & all \\
+\texttt{-i}, \texttt{--interactive}      & TUI menu (gum / whiptail)      & Unix \\
+\texttt{-w}, \texttt{--weather}          & Show weather line via wttr.in  & all \\
+\texttt{--no-emoji}                      & Force ASCII glyphs only        & all \\
+\texttt{-nl}, \texttt{--no-logo}         & Hide logo                      & all \\
+\texttt{-ni}, \texttt{--no-info}         & Hide system info line          & all \\
+\texttt{-nc}, \texttt{--no-cache}        & Skip user cache cleaning       & all \\
+\texttt{-nt}, \texttt{--no-trash}        & Skip trash cleaning            & all \\
+\texttt{--security}                      & Security-only updates          & supported managers \\
+\texttt{--firmware}                      & Include \texttt{fwupdmgr}      & Linux \\
+\texttt{--no-firmware}                   & Force-skip firmware            & Linux \\
+\texttt{--dev}                           & Include dev toolchains         & all \\
+\texttt{--parallel}                      & Run user-space in parallel     & Unix \\
+\texttt{--profile NAME}                  & Load a profile                 & all \\
+\texttt{--list-profiles}                 & List available profiles        & all \\
+\texttt{--only LIST}                     & Only these managers            & all \\
+\texttt{--except LIST}                   & Skip these managers            & all \\
+\texttt{--snapshot}                      & snapper / timeshift / btrfs    & Linux \\
+\texttt{--rollback}                      & Revert last eMerger snapshot   & Linux \\
+\texttt{--refresh-mirrors}               & Re-rank distro mirrors         & Linux \\
+\texttt{--resume}                        & Skip completed managers        & Unix \\
+\texttt{--reboot}                        & Reboot if required             & all \\
+\texttt{--reboot-exit}                   & Exit 4 if reboot required      & all \\
+\texttt{--download-only}, \texttt{--offline} & Prefetch, don't install    & Unix \\
+\texttt{--changed}                       & Show package diff              & Unix \\
+\texttt{--changelog PKG}                 & Upstream changelog for PKG     & Unix \\
+\texttt{--report [FILE]}                 & Export Markdown report         & Unix \\
+\texttt{--history}                       & Recent runs                    & all \\
+\texttt{-err}, \texttt{--errors}         & Tail of logged errors          & all \\
+\texttt{--doctor}                        & Health check                   & all \\
+\texttt{--json}                          & Machine-readable summary       & all \\
+\texttt{--metrics FILE}                  & Prometheus textfile export     & all \\
+\texttt{-up}, \texttt{--self-update}     & Self-update eMerger            & all \\
+\texttt{-au}, \texttt{--auto-update}     & Install weekly auto-update     & all \\
+\texttt{-rc}, \texttt{--rebuild-cache}   & Clear detection cache          & all \\
 \bottomrule
 \end{longtable}
 \end{center}
 
 \subsection{Combining flags}
-Flags are independent tokens and can be combined freely:
+Flags are independent tokens and can be combined freely, in any order.
+Single-letter short flags in the set \texttt{\{h V n v q y i w\}} bundle
+(\texttt{up -nv} equals \texttt{up -n -v}; \texttt{up -ynv} equals
+\texttt{up -y -n -v}). Compound short flags (\texttt{-nl}, \texttt{-ni},
+\texttt{-qq}, \texttt{-up}, \texttt{-err}\,\dots) and long flags are never
+bundled.
 
 \begin{lstlisting}[language=bashplus]
-up -n -v                    # preview a full run, live stream
-up -y -q --security         # unattended security-only, minimal output
-up --dev --parallel -v      # include dev toolchains, parallel user-space
-up --snapshot --reboot -y   # snapshot first, reboot at the end if needed
-up --profile server --resume
+up -n -v                       # dry-run with live stream
+up -y -q --security            # unattended security-only, minimal output
+up --dev --parallel -v         # dev toolchains + user-space concurrency
+up --snapshot --reboot -y      # snapshot first, reboot at the end if needed
+up --profile server --resume   # resume an interrupted headless run
+up -n --dev --firmware         # preview a full run, no side effects
+up -qq -y -nl -ni --security   # exactly what the scheduled timer runs
+up --refresh-mirrors -y -v     # re-rank mirrors then upgrade, live
+up --changed --report out.md   # show diff and export in one shot
 \end{lstlisting}
 
-Single-letter short flags in the set \texttt{\{h V n v q y i w\}} also
-bundle: \texttt{up -nv} equals \texttt{up -n -v}. Compound short flags
-(\texttt{-nl}, \texttt{-ni}, \texttt{-qq}, \texttt{-up}, \texttt{-err},
-\dots) and long flags are never bundled.
+Flags that take a value (\texttt{--profile NAME}, \texttt{--changelog PKG},
+\texttt{--report FILE}, \texttt{--metrics FILE}, \texttt{--only LIST},
+\texttt{--except LIST}) must keep their argument adjacent; every other
+flag is position-free. CLI flags always win over config file and profile
+defaults, so you can override a profile on the fly:
+
+\begin{lstlisting}[language=bashplus]
+up --profile work --dev        # work profile, but force --dev this time
+\end{lstlisting}
 
 %-------------------------------------------------------
-\section{Features in depth}
+\section{Features in depth}\label{sec:features}
 %-------------------------------------------------------
 
 \subsection{Dry-run and verbose}
-\texttt{-n} prints every command that would be executed without actually
-running it or asking for elevation, which makes it safe to run in a
-terminal that does not own sudo credentials. \texttt{-v} streams the
-output of each package manager live instead of buffering it into the
-summary. The two combine naturally.
+\texttt{-n} prints every command that \emph{would} be executed without
+actually running it or asking for elevation, which makes it safe to run
+in a terminal that does not own \texttt{sudo} credentials. Example
+output:
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+$ up -n
+ [dry] sudo apt update
+ [dry] sudo apt upgrade -y
+ [dry] sudo apt autoremove -y
+ [dry] sudo apt clean
+ [dry] flatpak update -y
+ [dry] flatpak uninstall --unused -y
+\end{lstlisting}
+
+\texttt{-v} streams the output of each package manager live instead of
+buffering it into the summary. The two combine naturally:
+\texttt{up -n -v}.
 
 \subsection{Quiet levels}
-\texttt{-q} hides informational output, \texttt{-qq} keeps only the step
-titles and the final one-line summary, \texttt{-qqq} produces no output
-at all and communicates only through the exit code.
+\begin{itemize}
+  \item \textbf{default} - full UI with logo, info line, step headers,
+        spinner, summary box.
+  \item \texttt{-q} - hides muted and informational lines but keeps the
+        per-manager result and the summary.
+  \item \texttt{-qq} - only step titles and the one-line summary; suitable
+        for cron/systemd logs.
+  \item \texttt{-qqq} - no output at all; the exit code is the only
+        signal. Suitable for embedding in shell pipelines.
+\end{itemize}
 
 \subsection{Security-only updates}
-When \texttt{-\/-security} is passed, each supporting manager is asked to
-limit the upgrade set to security advisories: \texttt{apt} via
-\texttt{unattended-upgrade}, \texttt{dnf} with \texttt{-\/-security},
-\texttt{zypper patch -\/-category security}, macOS via
-\texttt{softwareupdate -\/-recommended} and Windows via
-\texttt{PSWindowsUpdate} severity filtering. Managers that do not
-distinguish between security and non-security updates ignore the flag.
+When \texttt{--security} is passed, each supporting manager is asked to
+limit the upgrade set to security advisories:
+
+\begin{itemize}
+  \item \textbf{apt} via \texttt{unattended-upgrade --security} (falls
+        back to \texttt{apt upgrade} for packages that are not in the
+        unattended security tree).
+  \item \textbf{dnf} with \texttt{upgrade --security}.
+  \item \textbf{zypper} with \texttt{patch --category security}.
+  \item \textbf{softwareupdate} (macOS) with \texttt{--recommended}.
+  \item \textbf{PSWindowsUpdate} (Windows) with severity filtering.
+\end{itemize}
+
+Managers that do not distinguish between security and non-security
+updates simply ignore the flag and skip the run.
 
 \subsection{Dev toolchains}
-\texttt{-\/-dev} enables a separate track that runs \texttt{rustup}
-updates, \texttt{cargo install-update -a}, \texttt{npm update -g},
-\texttt{pnpm -g update}, \texttt{pip} user site upgrades and
-\texttt{gem update}. These run under the invoking user, never under
-sudo.
+\texttt{--dev} enables a separate track that runs:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Tool} & \textbf{Command} \\
+\midrule
+\texttt{rustup}  & \texttt{rustup self update \&\& rustup update stable} \\
+\texttt{cargo}   & \texttt{cargo install-update -a} \\
+\texttt{npm}     & \texttt{npm update -g} \\
+\texttt{pnpm}    & \texttt{pnpm -g update} \\
+\texttt{pip}     & \texttt{pip list --outdated}, then user-site upgrade \\
+\texttt{gem}     & \texttt{gem update} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These run under the invoking user, never under \texttt{sudo}. If a
+toolchain isn't installed it is silently skipped.
 
 \subsection{Firmware (Linux)}
-\texttt{-\/-firmware} runs
-\texttt{fwupdmgr refresh \&\& fwupdmgr update -y -\/-no-reboot-check}.
-On macOS firmware is handled by \texttt{softwareupdate}; on Windows it
-is delegated to vendor tooling (Dell Command Update, Lenovo Vantage,
-etc.) and is out of scope.
+\texttt{--firmware} runs
+\texttt{fwupdmgr refresh \&\& fwupdmgr update -y --no-reboot-check}.
+If the LVFS (Linux Vendor Firmware Service) is not reachable the step is
+skipped with a warning. On macOS firmware is handled by
+\texttt{softwareupdate}; on Windows it is delegated to vendor tooling
+(Dell Command Update, Lenovo Vantage\,\dots) and is out of scope.
 
 \subsection{Parallel mode}
-\texttt{-\/-parallel} runs user-space managers that do not touch the root
+\texttt{--parallel} runs user-space managers that do not touch the root
 filesystem concurrently: \texttt{flatpak}, \texttt{snap}, \texttt{brew},
-\texttt{mas} and dev toolchains. System managers stay serial to avoid
-lock contention. The Windows side is currently always serial.
+\texttt{mas}, and the dev toolchains. System managers (\texttt{apt},
+\texttt{dnf}, \texttt{pacman}, \texttt{zypper}\,\dots) stay serial to
+avoid lock contention on \texttt{/var/lib/dpkg}, \texttt{/var/cache/pacman}
+and similar. The Windows side is currently always serial.
 
 \subsection{Snapshots and rollback (Linux)}
-\texttt{-\/-snapshot} tries, in order, \texttt{snapper},
-\texttt{timeshift} and raw \texttt{btrfs subvolume snapshot}.
-\texttt{-\/-rollback} reverts to the most recent eMerger-created snapshot;
-\texttt{timeshift} is always invoked interactively because a silent
-rollback is too destructive to automate.
+\texttt{--snapshot} tries, in order:
+
+\begin{enumerate}
+  \item \texttt{snapper} - creates a pre-update snapshot tagged
+        \texttt{eMerger pre-update} on the root subvolume.
+  \item \texttt{timeshift} - runs \texttt{timeshift --create --tags D}.
+  \item raw \texttt{btrfs subvolume snapshot} - only if neither of the
+        above is installed; the snapshot is placed under
+        \verb|/.snapshots/emerger/|.
+\end{enumerate}
+
+\texttt{--rollback} reverts to the most recent eMerger-created snapshot:
+
+\begin{itemize}
+  \item \textbf{snapper}: native
+        \texttt{snapper -c root rollback <num>}. A reboot is required
+        afterwards (snapper semantics, not ours).
+  \item \textbf{timeshift}: hands off to \texttt{timeshift --restore}
+        \emph{interactively} - silent rollback is too destructive to
+        automate.
+  \item \textbf{raw btrfs}: refuses to swap subvolumes automatically,
+        prints the path of the latest snapshot so you can do it
+        manually.
+\end{itemize}
+
+\begin{tip}
+Combine with a guard to get a safe update cycle:
+
+\begin{lstlisting}[language=bashplus]
+up --snapshot -y || up --rollback
+\end{lstlisting}
+\end{tip}
 
 \subsection{Mirrors refresh (Linux)}
-\texttt{-\/-refresh-mirrors} re-ranks the repository mirrors before the
-upgrade: \texttt{reflector -\/-latest 20 -\/-sort rate} on Arch,
-\texttt{netselect-apt} on Debian and Ubuntu, and a no-op on Fedora
-where \texttt{fastestmirror} already handles ranking at the DNF level.
+\texttt{--refresh-mirrors} re-ranks the repository mirrors before the
+upgrade:
+
+\begin{itemize}
+  \item \textbf{Arch}: \texttt{reflector --latest 20 --sort rate}.
+  \item \textbf{Debian/Ubuntu}: \texttt{netselect-apt} (requires
+        \texttt{netselect-apt} installed).
+  \item \textbf{Fedora}: no-op; the \texttt{fastestmirror} DNF plugin
+        already ranks mirrors at download time.
+\end{itemize}
 
 \subsection{Reboot handling}
 On Unix, eMerger inspects \texttt{/var/run/reboot-required} and
-\texttt{needs-restarting -r}. On Windows it reads the
-\texttt{CBS RebootPending}, \texttt{WindowsUpdate\textbackslash RebootRequired}
-and \texttt{PendingFileRenameOperations} registry entries. The summary
-prints a reboot advisory; \texttt{-\/-reboot} actually reboots and
-\texttt{-\/-reboot-exit} exits with code 4 so that an orchestrator can
-decide.
+\texttt{needs-restarting -r} (if available). On Windows it reads the
+\texttt{CBS RebootPending},
+\texttt{WindowsUpdate\textbackslash RebootRequired} and
+\texttt{PendingFileRenameOperations} registry entries.
+
+\begin{itemize}
+  \item The summary always prints a reboot advisory.
+  \item \texttt{--reboot} actually reboots the machine (requires
+        elevation).
+  \item \texttt{--reboot-exit} exits with code \textbf{4} so that an
+        orchestrator can decide what to do next.
+\end{itemize}
 
 \subsection{Resume}
-When a run is interrupted, a cursor is written to
-\verb|~/.local/state/emerger/resume|. A subsequent \texttt{up -\/-resume}
-skips every manager that completed successfully, so repeated failures do
-not force a full retry. Unix only.
+When a run is interrupted (Ctrl-C, lost network, disk full, laptop
+suspend), a cursor is written to \verb|~/.local/state/emerger/resume|
+after every successful manager. A subsequent \texttt{up --resume} skips
+every manager that completed successfully, so repeated failures do not
+force a full retry. Unix only.
+
+\subsection{Download-only / offline}
+\texttt{--download-only} (alias \texttt{--offline}) refreshes the package
+indexes and \emph{downloads} the pending upgrade set but does not install
+it. Supported natively on \texttt{pacman} (\texttt{-Syuw}), \texttt{apt}
+(\texttt{--download-only}), \texttt{dnf} (\texttt{--downloadonly}) and
+\texttt{zypper} (\texttt{update --download-only}). Typical use cases:
+
+\begin{itemize}
+  \item laptop on a slow or metered connection: prefetch while on good
+        Wi-Fi, install later at the office;
+  \item servers in a maintenance window: prestage the set, flip to
+        install-only when the change ticket opens;
+  \item pre-flight for \texttt{--snapshot}: verify the whole update set
+        is downloaded \emph{before} taking a snapshot.
+\end{itemize}
 
 \subsection{Package diff and changelog}
 Each run records the installed package set before and after. \texttt{up
--\/-changed} prints the diff with \texttt{+}, \texttt{-} and \texttt{\~}
-markers for added, removed and upgraded packages. \texttt{up -\/-changelog
-PKG} dispatches to \texttt{apt changelog}, \texttt{dnf changelog},
+--changed} prints the diff with \texttt{+}, \texttt{-} and \texttt{\~}
+markers:
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+$ up --changed
+ ~ firefox          123.0.1   ->  124.0
+ ~ libc6            2.39-0    ->  2.39-1
+ + flatpak-xdg-utils 1.0.6
+ - old-package      2.1
+\end{lstlisting}
+
+\texttt{up --changelog PKG} dispatches to \texttt{apt changelog},
+\texttt{dnf changelog} (or \texttt{dnf updateinfo} if available),
 \texttt{pacman -Qi} or \texttt{brew log} depending on the host.
 
 \subsection{Reports, history and errors}
-\texttt{-\/-report FILE} exports a Markdown report of the last run.
-\texttt{-\/-history} prints a table of the most recent runs.
-\texttt{-\/-errors} tails \texttt{ERROR} lines from the log.
+\begin{itemize}
+  \item \texttt{--report FILE} exports a Markdown report of the last
+        run. Without a filename it writes to
+        \verb|$PWD/emerger-report.md|.
+  \item \texttt{--history} prints the last 10 runs as a table.
+  \item \texttt{-err} / \texttt{--errors} tails \texttt{ERROR} lines from
+        \verb|~/.local/state/emerger/emerger.log|.
+\end{itemize}
 
 \subsection{Doctor}
-\texttt{-\/-doctor} audits the environment: shell or PowerShell version,
-sudo or admin state, disk space, network reachability, state directory
-writability, per-manager native health checks
-(\texttt{dpkg -\/-audit}, \texttt{pacman -Dk}, \texttt{brew doctor}),
-pending reboot flags and, on Windows, the current execution policy. A
-non-zero exit code is returned when any issue is detected.
+\texttt{--doctor} audits the environment and prints a traffic-light
+report:
+
+\begin{itemize}
+  \item shell / PowerShell version;
+  \item \texttt{sudo} cache / admin status;
+  \item disk space on the state partition;
+  \item network reachability (IPv4 and IPv6);
+  \item state directory writability;
+  \item per-manager native health: \texttt{dpkg --audit},
+        \texttt{pacman -Dk}, \texttt{brew doctor}, \texttt{pip check};
+  \item pending reboot flag;
+  \item (Windows) the current ExecutionPolicy and elevation status.
+\end{itemize}
+
+A non-zero exit code is returned when any issue is detected. Always run
+\texttt{up --doctor} before opening a bug report.
 
 %-------------------------------------------------------
-\section{Configuration}
+\section{Configuration}\label{sec:config}
 %-------------------------------------------------------
 
-\subsection{Config file}
+\subsection{Config file (Unix)}
 
-\textbf{Unix} (\verb|~/.config/emerger/config.sh|, sourced before argument
-parsing):
+\verb|~/.config/emerger/config.sh| is a plain shell file sourced before
+argument parsing. Every flag has a corresponding \texttt{ARG\_*} variable:
 
 \begin{lstlisting}[language=bashplus]
+# ~/.config/emerger/config.sh
+
+# Defaults
 ARG_DEV=1                  # always include dev toolchains
-ARG_WEATHER=1              # show weather widget
-DISK_MIN_FREE_MB=2048      # require at least 2 GB free on /
-QUIET_HOURS="23:00-07:00"  # skip scheduled runs in this window
+ARG_WEATHER=1              # show weather widget via wttr.in
+ARG_PARALLEL=1             # run user-space managers in parallel
+ARG_NO_TRASH=1             # never empty the trash automatically
+
+# Thresholds
+DISK_MIN_FREE_MB=2048      # require at least 2 GiB free on /
+BATTERY_MIN_PCT=25         # warn below 25%
 RETRY_MAX=3                # transient-error retry count
+RETRY_DELAY=5              # seconds between retries
+
+# Scheduling
+QUIET_HOURS="23:00-07:00"  # scheduled runs exit immediately inside this window
+
+# Caching
+EMERGER_CACHE_TTL=3600     # detection cache: 1h (0 = disabled, default 86400)
 \end{lstlisting}
 
-\textbf{Windows} (\verb|%APPDATA%\emerger\config.ps1|, dot-sourced):
+\subsection{Config file (Windows)}
 
-\begin{lstlisting}[language=bashplus]
+\verb|%APPDATA%\emerger\config.ps1| is dot-sourced before argument
+parsing:
+
+\begin{lstlisting}[language=psplus]
+# %APPDATA%\emerger\config.ps1
+
 $script:ArgsGlobal.Dev      = $true
 $script:ArgsGlobal.Security = $true
 $script:ArgsGlobal.NoTrash  = $true
+
+# Thresholds (same semantics as Unix)
+$script:DISK_MIN_FREE_MB = 4096
+$script:RETRY_MAX = 3
 \end{lstlisting}
 
-\subsection{Profiles}
-Profiles are named configuration snippets loaded through
-\texttt{-\/-profile NAME}. The shipped set lives under
-\texttt{share/profiles/} and includes \texttt{work}, \texttt{home},
-\texttt{server} and \texttt{safe}. User overrides live in
-\verb|~/.config/emerger/profiles.d/| on Unix and
-\verb|%APPDATA%\emerger\profiles.d\| on Windows, and always shadow the
-shipped defaults.
+\subsection{Every supported variable}
 
-\subsection{Hooks}
+\begin{center}
+\begin{longtable}{@{}p{0.34\linewidth} p{0.18\linewidth} p{0.40\linewidth}@{}}
+\toprule
+\textbf{Variable} & \textbf{Default} & \textbf{Meaning} \\
+\midrule \endhead
+\texttt{ARG\_DEV}                    & 0        & include dev toolchains by default \\
+\texttt{ARG\_FIRMWARE}               & 0        & include \texttt{fwupdmgr} by default \\
+\texttt{ARG\_NO\_FIRMWARE}           & 0        & force-skip firmware \\
+\texttt{ARG\_SECURITY}               & 0        & security-only by default \\
+\texttt{ARG\_YES}                    & 0        & assume yes by default \\
+\texttt{ARG\_PARALLEL}               & 0        & parallel user-space by default \\
+\texttt{ARG\_WEATHER}                & 0        & show weather widget \\
+\texttt{ARG\_NO\_EMOJI}              & 0        & force ASCII glyphs \\
+\texttt{ARG\_NO\_CACHE}              & 0        & skip user cache cleaning \\
+\texttt{ARG\_NO\_TRASH}              & 0        & skip trash cleaning \\
+\texttt{ARG\_NO\_LOGO}               & 0        & hide logo \\
+\texttt{ARG\_NO\_INFO}               & 0        & hide system info line \\
+\texttt{QUIET\_LEVEL}                & 0        & 0=full UI, 1=\texttt{-q}, 2=\texttt{-qq}, 3=\texttt{-qqq} \\
+\texttt{DISK\_MIN\_FREE\_MB}         & 1024     & abort / warn below this many MiB \\
+\texttt{BATTERY\_MIN\_PCT}           & 20       & warn below this battery percent \\
+\texttt{RETRY\_MAX}                  & 2        & transient-error retries \\
+\texttt{RETRY\_DELAY}                & 3        & seconds between retries \\
+\texttt{QUIET\_HOURS}                & (unset)  & \texttt{"HH:MM-HH:MM"} - skip scheduled runs inside window \\
+\texttt{EMERGER\_CACHE\_TTL}         & 86400    & detection-cache TTL in seconds; 0 disables \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\begin{note}
+The CLI always wins. \verb|ARG_SECURITY=1| in \texttt{config.sh} plus
+\texttt{up --dev} on the CLI will run security updates \emph{and} dev
+toolchains; passing \texttt{--no-firmware} will override
+\verb|ARG_FIRMWARE=1|.
+\end{note}
+
+\subsection{Profiles}\label{sec:profiles}
+Profiles are named configuration snippets loaded through
+\texttt{--profile NAME}. They are ordinary config-file fragments scoped
+to a name.
+
+The shipped set lives under \texttt{share/profiles/} and includes:
+
+\begin{center}
+\begin{tabular}{@{}p{0.16\linewidth} p{0.78\linewidth}@{}}
+\toprule
+\textbf{Profile} & \textbf{Meant for} \\
+\midrule
+\texttt{work}   & laptop at the office - security-only, unattended, no
+                  cache or trash wiping \\
+\texttt{home}   & desktop at home - everything, including dev
+                  toolchains, firmware and parallel mode \\
+\texttt{server} & headless - quiet (\texttt{-qq}), security only, no
+                  prompts, no UI \\
+\texttt{safe}   & before a demo or presentation - security only, no heavy
+                  downloads \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+User profiles go in \verb|~/.config/emerger/profiles.d/| (Unix) or
+\verb|%APPDATA%\emerger\profiles.d\| (Windows). They shadow the shipped
+defaults: a user \texttt{work.sh} wins over \texttt{share/profiles/work.sh}.
+
+Full content of the shipped \texttt{work} profile:
+
+\begin{lstlisting}[language=bashplus]
+# description: laptop at work - security only, no firmware, never reboot
+ARG_SECURITY=1
+ARG_YES=1
+ARG_NO_FIRMWARE=1
+ARG_NO_CACHE=1
+ARG_NO_TRASH=1
+\end{lstlisting}
+
+Writing a custom profile is just a shell fragment:
+
+\begin{lstlisting}[language=bashplus]
+# ~/.config/emerger/profiles.d/train.sh
+# description: on a train, prefetch only, keep the fans quiet
+ARG_DOWNLOAD_ONLY=1
+ARG_YES=1
+ARG_QUIET=1
+QUIET_LEVEL=2
+ARG_NO_TRASH=1
+ARG_NO_CACHE=1
+\end{lstlisting}
+
+Then:
+
+\begin{lstlisting}[language=bashplus]
+up --profile train
+\end{lstlisting}
+
+List what is available:
+
+\begin{lstlisting}[language=bashplus]
+up --list-profiles
+\end{lstlisting}
+
+%-------------------------------------------------------
+\section{Hooks}\label{sec:hooks}
+%-------------------------------------------------------
+
 Executable scripts in \texttt{hooks/pre.d/} and \texttt{hooks/post.d/}
 run before and after the update flow, in alphabetical order. A failing
 hook emits a warning but does not abort the run, so hooks are safe by
 default. Unix hooks are \texttt{*.sh} under bash; Windows hooks are
 \texttt{*.ps1} dot-sourced under PowerShell.
 
+\subsection{Example: backup your dotfiles before every run}
+
 \begin{lstlisting}[language=bashplus]
 # ~/.config/emerger/hooks/pre.d/10-backup-dotfiles.sh
 #!/usr/bin/env bash
-rsync -a ~/.config/ ~/backups/dotfiles/
+set -e
+rsync -a --delete ~/.config/ ~/backups/dotfiles/
 \end{lstlisting}
+
+\subsection{Example: Slack notification after every run}
+
+\begin{lstlisting}[language=bashplus]
+# ~/.config/emerger/hooks/post.d/99-slack-notify.sh
+#!/usr/bin/env bash
+state=~/.local/state/emerger
+tail -1 "$state/history.jsonl" | \
+  curl -sS -X POST -H 'Content-Type: application/json' \
+    --data-binary @- "$SLACK_WEBHOOK_URL" >/dev/null
+\end{lstlisting}
+
+\subsection{Example: copy the last run log to the clipboard (Windows)}
+
+\begin{lstlisting}[language=psplus]
+# %APPDATA%\emerger\hooks\post.d\10-log-to-clipboard.ps1
+$log = Join-Path $env:LOCALAPPDATA 'emerger\state\emerger.log'
+Get-Content $log -Tail 40 | Set-Clipboard
+\end{lstlisting}
+
+\subsection{Example: auto self-update before upgrading}
+
+\begin{lstlisting}[language=bashplus]
+# ~/.config/emerger/hooks/pre.d/00-self-update.sh
+#!/usr/bin/env bash
+( cd "$(dirname "$(readlink -f "$(command -v up | awk '{print $NF}')")")/.." && git pull --ff-only ) || true
+\end{lstlisting}
+
+\begin{warn}
+Hooks run with the privileges that invoked \texttt{up}. A \texttt{pre.d}
+hook that writes outside of \texttt{\$HOME} may silently fail until
+\texttt{sudo} has been cached later in the run. If you need root-owned
+side effects, write them in \texttt{post.d} and guard with
+\texttt{sudo -n} or a \texttt{sudoers} entry.
+\end{warn}
 
 \subsection{Ignore list (Linux)}
 \verb|~/.config/emerger/ignore.list| accepts one package per line, with
-\texttt{\#} comments. \texttt{pacman} honours it natively via
-\texttt{-\/-ignore=}. For \texttt{apt}, \texttt{dnf} and \texttt{zypper}
-the file is advisory: the user must still hold the packages through the
-manager's native command (\texttt{apt-mark hold},
-\texttt{dnf versionlock add}, \texttt{zypper al}).
+\texttt{\#} comments. Behaviour per manager:
+
+\begin{center}
+\begin{tabular}{@{}p{0.15\linewidth} p{0.78\linewidth}@{}}
+\toprule
+\textbf{Manager} & \textbf{Behaviour} \\
+\midrule
+\texttt{pacman} & Honoured natively via \texttt{--ignore=} on the
+                  command line. \\
+\texttt{apt}    & Advisory: you must still \texttt{apt-mark hold PKG}. \\
+\texttt{dnf}    & Advisory: you must \texttt{dnf versionlock add PKG}. \\
+\texttt{zypper} & Advisory: you must \texttt{zypper al PKG}. \\
+\bottomrule
+\end{tabular}
+\end{center}
 
 \subsection{Quiet hours}
 \texttt{QUIET\_HOURS="HH:MM-HH:MM"} in \texttt{config.sh} makes scheduled
 runs that start inside the window exit immediately when \texttt{-y} is
-set, i.e. the ones coming from the timer. Interactive invocations are
-never blocked.
-
-\subsection{Manager plugins}
-Dropping a bash script in \verb|~/.config/emerger/managers.d/<name>.sh|
-registers a custom manager without touching the repository. A minimal
-plugin declares \texttt{pm\_<slug>\_detect} and \texttt{pm\_<slug>\_run};
-optional callbacks expose whether the manager needs sudo, can run in
-parallel, is gated by \texttt{-\/-dev} and which icon to print. Plugins
-honour \texttt{-\/-only}, \texttt{-\/-except}, \texttt{-\/-parallel},
-\texttt{-\/-dev}, the detection cache, hooks and the summary. A
-copy-pasteable template is provided in
-\texttt{share/plugins/example.sh}. Linux and macOS only.
+set (i.e. the ones coming from the timer). Interactive invocations are
+never blocked. The window may cross midnight: \texttt{"23:00-07:00"} is
+valid.
 
 %-------------------------------------------------------
-\section{Integration}
+\section{Manager plugins}\label{sec:plugins}
+%-------------------------------------------------------
+
+Dropping a bash script in \verb|~/.config/emerger/managers.d/<slug>.sh|
+registers a custom manager without touching the repository.
+
+\subsection{Minimal plugin}
+
+\begin{lstlisting}[language=bashplus]
+# ~/.config/emerger/managers.d/mytool.sh
+PM_PLUGIN_SLUG=mytool
+
+pm_mytool_detect()     { command -v mytool >/dev/null 2>&1; }
+pm_mytool_needs_sudo() { return 1; }     # optional, default: no sudo
+pm_mytool_parallel()   { return 0; }     # optional, default: serial
+pm_mytool_dev()        { return 1; }     # optional, default: not --dev gated
+pm_mytool_icon()       { printf '\xf0\x9f\x94\x8c'; }   # optional
+
+pm_mytool_run() {
+    run_cmd "mytool refresh"  mytool refresh  || return 1
+    run_cmd "mytool upgrade"  mytool upgrade -y || return 1
+    return 0
+}
+\end{lstlisting}
+
+\subsection{What you get for free}
+Plugins are registered at the same level as native managers: they honour
+\texttt{--only}, \texttt{--except}, \texttt{--parallel}, \texttt{--dev},
+the detection cache, the hooks and the summary. Because
+\texttt{pm\_<slug>\_run} calls \texttt{run\_cmd}, your plugin
+automatically gets:
+
+\begin{itemize}
+  \item \texttt{--dry-run} support;
+  \item retry on transient failures (\texttt{RETRY\_MAX}, \texttt{RETRY\_DELAY});
+  \item logging to \verb|~/.local/state/emerger/emerger.log|;
+  \item live-log streaming under \texttt{-v}.
+\end{itemize}
+
+A copy-pasteable template lives at \texttt{share/plugins/example.sh}.
+
+\subsection{Detection cache}
+The detection cache is keyed by manager slug and lives at
+\verb|~/.cache/emerger/detected|. TTL defaults to 1 day; override via
+\texttt{EMERGER\_CACHE\_TTL=<seconds>} in \texttt{config.sh} (0 disables
+caching entirely). After installing or removing a package manager run
+\texttt{up -rc} to clear the cache.
+
+\begin{note}
+Plugins are Linux and macOS only. Windows plugins are not yet supported.
+\end{note}
+
+%-------------------------------------------------------
+\section{Integration}\label{sec:integration}
 %-------------------------------------------------------
 
 \subsection{JSON output}
-\texttt{up -\/-json} emits a single-line JSON object on stdout, with the
-logo, info line and summary box suppressed. The same schema is what
-\texttt{history.jsonl} stores one line at a time:
+\texttt{up --json} emits a single-line JSON object on stdout. The logo,
+info line and summary box are all suppressed, so the output is safe to
+pipe into \texttt{jq} or consume from a CI job:
 
-\begin{lstlisting}[language=bashplus]
+\begin{lstlisting}[language=jsonplus]
 {"ts":"2026-04-14T07:24:31Z","duration":42,"freed_kb":15360,
  "errors":0,"reboot":0,
  "managers":[{"name":"apt","result":"ok"},{"name":"flatpak","result":"ok"}]}
 \end{lstlisting}
 
+Every run also appends one such line to
+\verb|~/.local/state/emerger/history.jsonl| (one JSON per line, a.k.a.
+JSONL). Fields:
+
+\begin{center}
+\begin{tabular}{@{}p{0.20\linewidth} p{0.72\linewidth}@{}}
+\toprule
+\textbf{Field}        & \textbf{Meaning} \\
+\midrule
+\texttt{ts}           & ISO 8601 UTC timestamp of the run start \\
+\texttt{duration}     & total wall-clock seconds \\
+\texttt{freed\_kb}    & cache and trash bytes freed, in KiB \\
+\texttt{errors}       & number of managers that returned non-zero \\
+\texttt{reboot}       & 1 if a reboot is required, else 0 \\
+\texttt{managers}     & array of \texttt{\{name, result\}} entries \\
+\bottomrule
+\end{tabular}
+\end{center}
+
 \subsection{Prometheus metrics}
-\texttt{up -\/-metrics FILE} reads the most recent entry of
+\texttt{up --metrics FILE} reads the most recent entry of
 \texttt{history.jsonl} and writes a Prometheus textfile-collector
-snapshot. Exposed gauges include
-\texttt{emerger\_last\_run\_timestamp\_seconds},
-\texttt{emerger\_last\_run\_duration\_seconds},
-\texttt{emerger\_last\_run\_freed\_bytes},
-\texttt{emerger\_last\_run\_errors},
-\texttt{emerger\_reboot\_required} and one
-\texttt{emerger\_manager\_ok\{manager="..."\}} per manager of the last
-run. The flag does not trigger an update run; invoke it from a
-\texttt{post.d} hook or from the scheduler after \texttt{up} completes.
+snapshot. Exposed gauges:
+
+\begin{itemize}
+  \item \texttt{emerger\_last\_run\_timestamp\_seconds}
+  \item \texttt{emerger\_last\_run\_duration\_seconds}
+  \item \texttt{emerger\_last\_run\_freed\_bytes}
+  \item \texttt{emerger\_last\_run\_errors}
+  \item \texttt{emerger\_reboot\_required}
+  \item \texttt{emerger\_manager\_ok\{manager="..."\}} (one per manager)
+\end{itemize}
+
+The flag does \emph{not} trigger an update run. Invoke it from a
+\texttt{post.d} hook or from the scheduler after \texttt{up} has
+completed:
+
+\begin{lstlisting}[language=bashplus]
+# ~/.config/emerger/hooks/post.d/90-prom.sh
+up --metrics /var/lib/node_exporter/textfile_collector/emerger.prom
+\end{lstlisting}
+
+\subsection{Reboot exit code}
+By default \texttt{up} exits 0 on success even when a reboot is pending
+(the summary prints \texttt{REBOOT RECOMMENDED}). Pass
+\texttt{--reboot-exit} to turn that into exit code \textbf{4} instead,
+so an orchestrator can react:
+
+\begin{lstlisting}[language=bashplus]
+up -y --reboot-exit
+case $? in
+    0) ;;                                   # done, no reboot needed
+    3) notify-send "eMerger: some managers failed" ;;
+    4) systemctl reboot ;;                  # clean, reboot required
+esac
+\end{lstlisting}
 
 \subsection{Download-only and offline}
-\texttt{-\/-download-only} (alias \texttt{-\/-offline}) refreshes the
-package indexes and downloads the pending upgrade set but does not
-install it. Supported natively on \texttt{pacman} (\texttt{-Syuw}),
-\texttt{apt} (\texttt{-\/-download-only}), \texttt{dnf}
-(\texttt{-\/-downloadonly}) and \texttt{zypper}
-(\texttt{update -\/-download-only}). This is the safe prefetch option
-for metered connections and for pre-staging maintenance windows.
+\texttt{--download-only} (alias \texttt{--offline}) refreshes the package
+indexes and \emph{downloads} the pending upgrade set but does not install
+it. Supported natively on:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Manager} & \textbf{Command} \\
+\midrule
+\texttt{pacman} & \texttt{pacman -Syuw} \\
+\texttt{apt}    & \texttt{apt-get upgrade --download-only} \\
+\texttt{dnf}    & \texttt{dnf upgrade --downloadonly} \\
+\texttt{zypper} & \texttt{zypper update --download-only} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Other managers ignore the flag.
 
 \subsection{Manager filtering}
-\texttt{-\/-only LIST} restricts the run to the listed comma-separated
-managers; \texttt{-\/-except LIST} excludes them. Filtering is applied
-after detection and after \texttt{-\/-dev} / \texttt{-\/-firmware}
-gating, and \texttt{-\/-except} always wins over \texttt{-\/-only} when
-both mention the same name.
+\begin{itemize}
+  \item \texttt{--only apt,flatpak} restricts the run to the listed
+        managers (comma-separated).
+  \item \texttt{--except snap,fwupd} runs everything that would normally
+        run, minus the listed managers.
+\end{itemize}
+
+Filtering is applied after detection and after \texttt{--dev} /
+\texttt{--firmware} gating, so:
+
+\begin{itemize}
+  \item \texttt{--only X} with \texttt{X} not detected is a no-op
+        (nothing runs).
+  \item \texttt{--except} always wins over \texttt{--only} when both
+        mention the same name.
+\end{itemize}
+
+Compose with profiles (\texttt{up --profile work --only apt}) to restrict
+a profile on the fly.
 
 %-------------------------------------------------------
-\section{Auto-update (unattended)}
+\section{Auto-update (unattended)}\label{sec:auto}
 %-------------------------------------------------------
-\texttt{up -au} installs a weekly unattended run. On Linux the preferred
-backend is a systemd user timer
-(\verb|~/.config/systemd/user/emerger.{service,timer}|); cron is used as
-fallback. On macOS cron is the default and \texttt{launchd} can be used
-manually. On Windows a \texttt{Register-ScheduledTask -TaskName eMerger}
-is created. The trigger fires weekly on Sunday at 10:00 with a
-$\pm$ one-hour randomised delay, and always uses
-\texttt{-y -q -nl -ni}. Pair with \texttt{QUIET\_HOURS} to keep the
-machine quiet at night.
+
+\begin{lstlisting}[language=bashplus]
+up -au             # Linux / macOS
+\end{lstlisting}
+\begin{lstlisting}[language=psplus]
+up -au             # Windows
+\end{lstlisting}
+
+Backends chosen automatically:
+
+\begin{itemize}
+  \item \textbf{Linux}: systemd user timer (preferred) at
+        \verb|~/.config/systemd/user/emerger.{service,timer}|; cron
+        fallback when \texttt{systemctl --user} is not available.
+  \item \textbf{macOS}: cron fallback via \texttt{crontab -l} (you can
+        use \texttt{launchd} manually if you prefer).
+  \item \textbf{Windows}: \texttt{Register-ScheduledTask -TaskName eMerger}.
+\end{itemize}
+
+The trigger fires weekly on Sunday at 10:00 (local time) with $\pm$1h
+randomised delay, and always uses \texttt{-y -q -nl -ni}.
+
+\subsection{Managing the schedule}
+
+\begin{lstlisting}[language=bashplus]
+# Linux
+systemctl --user status emerger.timer
+systemctl --user stop emerger.timer
+systemctl --user disable emerger.timer
+\end{lstlisting}
+
+\begin{lstlisting}[language=psplus]
+# Windows
+Get-ScheduledTask eMerger
+Unregister-ScheduledTask eMerger
+\end{lstlisting}
+
+\begin{tip}
+To avoid night-time runs, pair with \texttt{QUIET\_HOURS} in
+\texttt{config.sh}. Scheduled runs started inside the window exit
+immediately; interactive ones are unaffected.
+\end{tip}
 
 %-------------------------------------------------------
-\section{Files and paths}
+\section{Cookbook}\label{sec:cookbook}
+%-------------------------------------------------------
+
+Concrete, copy-pasteable recipes for common situations.
+
+\subsection{Daily driver (Linux desktop)}
+\begin{lstlisting}[language=bashplus]
+up -v
+\end{lstlisting}
+Simple. Live output, everything updated, cache and trash wiped at the
+end. Add \texttt{--firmware} occasionally.
+
+\subsection{Unattended server}
+Install the schedule once:
+
+\begin{lstlisting}[language=bashplus]
+cat > ~/.config/emerger/config.sh <<'EOF'
+ARG_SECURITY=1
+ARG_YES=1
+ARG_NO_CACHE=1
+ARG_NO_TRASH=1
+QUIET_HOURS="08:00-18:00"
+EOF
+up -au
+\end{lstlisting}
+
+You now get weekly security-only updates outside working hours. Pair
+with Prometheus:
+
+\begin{lstlisting}[language=bashplus]
+# post.d hook
+up --metrics /var/lib/node_exporter/textfile_collector/emerger.prom
+\end{lstlisting}
+
+\subsection{Developer workstation}
+Everything, every time - including dev toolchains and firmware:
+
+\begin{lstlisting}[language=bashplus]
+up --dev --firmware --parallel -v
+\end{lstlisting}
+
+Or as a profile:
+
+\begin{lstlisting}[language=bashplus]
+up --profile home
+\end{lstlisting}
+
+\subsection{Pre-demo machine}
+The day before a presentation you want security patches but no big user
+downloads and definitely no reboots:
+
+\begin{lstlisting}[language=bashplus]
+up --profile safe
+\end{lstlisting}
+
+\subsection{Metered / mobile connection}
+Prefetch when you're on Wi-Fi:
+
+\begin{lstlisting}[language=bashplus]
+up --download-only -y
+\end{lstlisting}
+
+Then, later, without network:
+
+\begin{lstlisting}[language=bashplus]
+up -y
+\end{lstlisting}
+
+Native package managers will use the local cache populated by the
+earlier run.
+
+\subsection{CI runner / container image builder}
+\begin{lstlisting}[language=bashplus]
+up --only apt -y -qq --reboot-exit
+rc=$?
+if (( rc == 4 )); then echo "reboot required"; exit 0; fi
+exit $rc
+\end{lstlisting}
+
+\subsection{Gated maintenance window}
+Snapshot, update, rollback on failure, reboot on success:
+
+\begin{lstlisting}[language=bashplus]
+set -e
+up --snapshot -y || { up --rollback; exit 1; }
+up -y --reboot-exit
+if [[ $? -eq 4 ]]; then systemctl reboot; fi
+\end{lstlisting}
+
+\subsection{Slack-notified runs}
+\begin{lstlisting}[language=bashplus]
+# ~/.config/emerger/hooks/post.d/99-slack.sh
+#!/usr/bin/env bash
+state=~/.local/state/emerger
+payload=$(tail -1 "$state/history.jsonl")
+curl -sS -X POST -H 'Content-Type: application/json' \
+    -d "{\"text\":\"eMerger: $payload\"}" "$SLACK_WEBHOOK_URL"
+\end{lstlisting}
+
+\subsection{macOS with Homebrew only}
+\begin{lstlisting}[language=bashplus]
+up --only brew,mas -v
+\end{lstlisting}
+
+\subsection{Windows without Chocolatey}
+\begin{lstlisting}[language=psplus]
+up --except choco -v
+\end{lstlisting}
+
+\subsection{Audit a single package}
+Is a specific package about to change? Preview the plan and read its
+upstream changelog:
+
+\begin{lstlisting}[language=bashplus]
+up -n | grep -i firefox
+up --changelog firefox
+\end{lstlisting}
+
+\subsection{Pinning a package (Linux)}
+Add to \verb|~/.config/emerger/ignore.list|:
+
+\begin{lstlisting}[language=bashplus]
+# ~/.config/emerger/ignore.list
+nvidia-driver-535
+\end{lstlisting}
+
+Then, for \texttt{apt}:
+
+\begin{lstlisting}[language=bashplus]
+sudo apt-mark hold nvidia-driver-535
+\end{lstlisting}
+
+(pacman respects the file natively.)
+
+%-------------------------------------------------------
+\section{Security model}\label{sec:security}
+%-------------------------------------------------------
+
+\begin{itemize}
+  \item eMerger is a client-side tool. It has no network listener, no
+        daemon, no persistent background process.
+  \item It reads and writes only three locations: its config dir
+        (\verb|~/.config/emerger/|), its cache dir
+        (\verb|~/.cache/emerger/|) and its state dir
+        (\verb|~/.local/state/emerger/|), plus the global lock at
+        \verb|/tmp/emerger.lock| on Unix.
+  \item \texttt{sudo} credentials are cached by \texttt{sudo} itself, not
+        by eMerger. When the run ends, the cached credentials expire on
+        the usual \texttt{sudo} schedule (5 minutes by default).
+  \item On Windows, UAC elevation happens \emph{only} when a detected
+        manager actually needs admin. The elevation is logged.
+  \item Hooks and plugins run as the invoking user. They can do anything
+        the user can do - pin them to inodes you trust.
+  \item The only network calls eMerger itself makes are (a) the optional
+        weather widget via \texttt{wttr.in}, (b) \texttt{git pull} during
+        \texttt{--self-update}, (c) \texttt{fwupdmgr refresh} when
+        \texttt{--firmware} is active. Everything else is delegated to
+        the package manager you asked for.
+  \item There is no telemetry. \texttt{history.jsonl} stays on your
+        machine unless a hook you wrote ships it elsewhere.
+\end{itemize}
+
+%-------------------------------------------------------
+\section{Files and paths}\label{sec:files}
 %-------------------------------------------------------
 
 \paragraph{Linux and macOS}
 \begin{center}
-\begin{tabular}{@{}p{0.45\linewidth} p{0.45\linewidth}@{}}
+\begin{tabular}{@{}p{0.44\linewidth} p{0.50\linewidth}@{}}
 \toprule
 \textbf{Path} & \textbf{Purpose} \\
 \midrule
@@ -544,19 +1518,22 @@ machine quiet at night.
 \verb|~/.config/emerger/profiles.d/|      & User profiles \\
 \verb|~/.config/emerger/hooks/{pre,post}.d/| & Hook scripts \\
 \verb|~/.config/emerger/ignore.list|      & Ignore list (pacman native) \\
-\verb|~/.config/emerger/managers.d/*.sh|  & User-defined manager plugins \\
+\verb|~/.config/emerger/managers.d/*.sh|  & User manager plugins \\
 \verb|~/.cache/emerger/detected|          & Detection cache \\
 \verb|~/.local/state/emerger/emerger.log| & Log (rotated at 2000 lines) \\
 \verb|~/.local/state/emerger/history.jsonl| & One JSON record per run \\
+\verb|~/.local/state/emerger/pkgs.before| & Package list snapshot (pre) \\
+\verb|~/.local/state/emerger/pkgs.after|  & Package list snapshot (post) \\
+\verb|~/.local/state/emerger/pkgs.diff|   & Last-run package diff \\
 \verb|~/.local/state/emerger/resume|      & Resume cursor \\
-\verb|/tmp/emerger.lock|                  & Global lock (\texttt{flock}) \\
+\verb|/tmp/emerger.lock|                  & Global lock (flock) \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \paragraph{Windows}
 \begin{center}
-\begin{tabular}{@{}p{0.45\linewidth} p{0.45\linewidth}@{}}
+\begin{tabular}{@{}p{0.44\linewidth} p{0.50\linewidth}@{}}
 \toprule
 \textbf{Path} & \textbf{Purpose} \\
 \midrule
@@ -571,58 +1548,26 @@ machine quiet at night.
 \end{center}
 
 %-------------------------------------------------------
-\section{Source tree}
-%-------------------------------------------------------
-The Bash and PowerShell implementations share the same layering:
-argument parsing, UI, logging, locking and per-manager dispatch are each
-isolated in their own file.
-
-\paragraph{Bash (\texttt{src/lib/})}
-\texttt{args.sh}, \texttt{changelog.sh}, \texttt{clean.sh},
-\texttt{diff.sh}, \texttt{disk.sh}, \texttt{doctor.sh},
-\texttt{estimate.sh}, \texttt{hooks.sh}, \texttt{ignore.sh},
-\texttt{lock.sh}, \texttt{log.sh}, \texttt{metrics.sh},
-\texttt{mirrors.sh}, \texttt{notify.sh}, \texttt{packages.sh},
-\texttt{plugins.sh}, \texttt{profiles.sh}, \texttt{progress.sh},
-\texttt{reboot.sh}, \texttt{report.sh}, \texttt{resume.sh},
-\texttt{retry.sh}, \texttt{run.sh}, \texttt{snapshot.sh},
-\texttt{summary.sh}, \texttt{sys.sh}, \texttt{tui.sh},
-\texttt{ui.sh}, \texttt{update.sh}, \texttt{wizard.sh},
-\texttt{help.txt}.
-
-\paragraph{PowerShell (\texttt{src/pslib/})}
-\texttt{Args.ps1}, \texttt{Clean.ps1}, \texttt{Doctor.ps1},
-\texttt{Hooks.ps1}, \texttt{Log.ps1}, \texttt{Notify.ps1},
-\texttt{Packages.ps1}, \texttt{Profiles.ps1}, \texttt{Summary.ps1},
-\texttt{Sys.ps1}, \texttt{UI.ps1}, \texttt{Update.ps1},
-\texttt{Help.txt}.
-
-Adding a new package manager means extending
-\texttt{src/lib/packages.sh} on the Unix side or
-\texttt{src/pslib/Packages.ps1} on the Windows side; both are
-table-driven dispatchers.
-
-%-------------------------------------------------------
-\section{Supported package managers}
+\section{Supported package managers}\label{sec:managers}
 %-------------------------------------------------------
 \begin{itemize}
-  \item \textbf{Linux, system (sudo):} \texttt{pacman}, \texttt{apt},
+  \item \textbf{Linux, system (need sudo):} \texttt{pacman}, \texttt{apt},
         \texttt{apt-get}, \texttt{dnf}, \texttt{yum}, \texttt{zypper},
         \texttt{xbps}, \texttt{apk}, \texttt{eopkg}, \texttt{emerge},
         \texttt{nixos-rebuild}, \texttt{fwupdmgr}, \texttt{snap}.
   \item \textbf{Linux, AUR (no sudo):} \texttt{yay}, \texttt{paru}.
   \item \textbf{Linux, user-space:} \texttt{flatpak}, \texttt{nix-env}.
-  \item \textbf{macOS:} \texttt{softwareupdate}, \texttt{brew},
-        \texttt{brew --cask}, \texttt{mas}.
-  \item \textbf{Windows:} \texttt{winget}, \texttt{scoop},
-        \texttt{choco}, \texttt{PSWindowsUpdate}, \texttt{wsl --update}.
-  \item \textbf{Dev toolchains (all platforms, opt-in):} \texttt{rustup},
-        \texttt{cargo install-update}, \texttt{npm}, \texttt{pnpm},
-        \texttt{pip}, \texttt{gem}.
+  \item \textbf{macOS:} \texttt{softwareupdate} (native),
+        \texttt{brew}, \texttt{brew --cask}, \texttt{mas}.
+  \item \textbf{Windows:} \texttt{winget}, \texttt{scoop}, \texttt{choco},
+        \texttt{PSWindowsUpdate}, \texttt{wsl --update}.
+  \item \textbf{Dev toolchains} (all platforms, opt-in with
+        \texttt{--dev}): \texttt{rustup}, \texttt{cargo install-update},
+        \texttt{npm}, \texttt{pnpm}, \texttt{pip}, \texttt{gem}.
 \end{itemize}
 
 %-------------------------------------------------------
-\section{Exit codes}
+\section{Exit codes}\label{sec:exit}
 %-------------------------------------------------------
 \begin{center}
 \begin{tabular}{@{}cl@{}}
@@ -633,38 +1578,319 @@ table-driven dispatchers.
 1 & Runtime failure (sudo, lock, disk, interrupted) \\
 2 & Argument parsing error \\
 3 & One or more package managers returned non-zero \\
-4 & Reboot required (only with \texttt{-\/-reboot-exit}) \\
+4 & Reboot required (only with \texttt{--reboot-exit}) \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-%-------------------------------------------------------
-\section{Troubleshooting}
-%-------------------------------------------------------
-\textbf{Another eMerger run is in progress.} A stale \texttt{flock} on
-\verb|/tmp/emerger.lock|. Inspect \texttt{ps} for stragglers, then
-remove the lock file.
+Useful idioms:
 
-\textbf{A manager fails with exit code 3.} Run \texttt{up -\/-errors}
-to tail the log, then \texttt{up -\/-doctor} to inspect the environment.
-Most failures come from a manager's own health state (for example
-\texttt{dpkg} being interrupted); run the native repair command before
-retrying.
+\begin{lstlisting}[language=bashplus]
+up -y -q || case $? in
+    3) notify-send "eMerger: some managers failed" ;;
+    *) logger -t eMerger "fatal $?" ;;
+esac
+\end{lstlisting}
 
-\textbf{Nothing happens on scheduled runs.} Check
-\texttt{systemctl -\/-user status emerger.timer} or the Windows Task
+\begin{lstlisting}[language=psplus]
+up -y -q
+if ($LASTEXITCODE -eq 3) { Write-Warning "Some managers failed" }
+\end{lstlisting}
+
+%-------------------------------------------------------
+\section{Troubleshooting}\label{sec:trouble}
+%-------------------------------------------------------
+
+\paragraph{``Another eMerger run is in progress''.}
+A stale \texttt{flock} on \verb|/tmp/emerger.lock|. Inspect \texttt{ps}
+for stragglers, then remove the lock file.
+
+\paragraph{A manager fails with exit code 3.}
+Run \texttt{up --errors} to tail the log, then \texttt{up --doctor} to
+inspect the environment. Most failures come from a manager's own health
+state (for example \texttt{dpkg} interrupted); run the native repair
+command (\texttt{sudo dpkg --configure -a}, \texttt{sudo pacman -Dk})
+before retrying.
+
+\paragraph{Nothing happens on scheduled runs.}
+Check \texttt{systemctl --user status emerger.timer} or the Windows Task
 Scheduler entry. On Unix the scheduled run always uses
 \texttt{-y -q -nl -ni}; enable \texttt{-v} in the unit for one cycle to
-see the output.
+see the output. On Linux systemd user timers do not fire if no session is
+open unless \texttt{loginctl enable-linger} has been run for the user.
+
+\paragraph{Emoji renders as boxes or question marks.}
+The terminal font does not include Unicode ranges eMerger uses. Either
+pass \texttt{--no-emoji}, set \texttt{ARG\_NO\_EMOJI=1} in
+\texttt{config.sh}, or switch to a Unicode-capable font.
+
+\paragraph{Spinner disappears on terminal resize.}
+Harmless. The live-log width recomputes every 120\,ms.
+
+\paragraph{\texttt{up --self-update} aborts with ``non fast-forward''.}
+You have local commits on top of \texttt{main}. Rebase or reset them
+manually; eMerger refuses to clobber local work.
+
+\paragraph{\texttt{notify-send} (Linux) never shows a notification.}
+No \texttt{DISPLAY} / \texttt{WAYLAND\_DISPLAY} in the environment
+(typical for cron). Use a systemd user timer instead: it inherits the
+session. Alternatively, write a \texttt{post.d} hook that notifies your
+own channel (Slack, Telegram, Discord, email).
+
+\paragraph{(Windows) ``up : The term `up' is not recognized''.}
+Your PowerShell profile did not load. Run \texttt{. \$PROFILE} or open
+a new window. If still missing, re-run \texttt{.\textbackslash setup.ps1}.
+
+\paragraph{(Windows) ``cannot be loaded because running scripts is disabled''.}
+\texttt{ExecutionPolicy} is \texttt{Restricted}. Lift it for the user:
+
+\begin{lstlisting}[language=psplus]
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+\end{lstlisting}
+
+\paragraph{(Windows) Elevation fails silently.}
+You canceled the UAC prompt. The script logs \texttt{relaunching
+elevated} and exits: the elevated window does the actual work.
+
+\paragraph{Pacman keeps asking about ignored packages.}
+\texttt{ignore.list} is passed as \texttt{--ignore=}; \texttt{pacman}
+still prints the warning line. This is upstream behaviour, not an
+eMerger bug.
+
+\paragraph{``command not found: gum'' or ``whiptail''.}
+The interactive menu (\texttt{-i}) falls back to a plain-read loop when
+neither tool is installed. Install \texttt{gum}
+(\url{https://github.com/charmbracelet/gum}) for a nicer UI, or ignore
+the warning.
 
 %-------------------------------------------------------
-\section{Contributing}
+\section{Frequently asked questions}\label{sec:faq}
 %-------------------------------------------------------
+
+\paragraph{Is eMerger safe for production servers?}
+Yes, but use it in ``security only, unattended'' mode:
+\verb|up --profile server| (or its inlined equivalent). The
+\texttt{--reboot-exit} idiom lets your orchestrator decide when to
+reboot.
+
+\paragraph{Does \texttt{up} install packages I don't already have?}
+No. \texttt{up} only invokes managers that are already installed and
+only asks them to upgrade what is already installed. No new software is
+added unless a package upgrade pulls a new dependency in.
+
+\paragraph{Does \texttt{up} reboot my machine?}
+Only with \texttt{--reboot}. Without it, the summary prints a reboot
+advisory and the run exits normally.
+
+\paragraph{Can I use \texttt{up} without \texttt{sudo}?}
+Yes, in user-only mode: \verb|up --only flatpak,brew,npm,pip,cargo|
+(adjust to what you have). User-level managers never need elevation.
+
+\paragraph{Why is my terminal flashing during the parallel run?}
+Under \texttt{--parallel} each user-space manager streams its own
+output; when \texttt{-v} is not set, output is buffered and flushed at
+the end. If you want a calm terminal, drop \texttt{-v} or narrow the
+parallel set with \texttt{--only}.
+
+\paragraph{Can I use \texttt{up} inside a Docker image build?}
+Yes. Use \verb|up --only apt -y -qq| (or the relevant manager) and
+ignore the reboot advisory. Avoid \texttt{--firmware}, \texttt{--snapshot}
+and interactive flags.
+
+\paragraph{What happens if two \texttt{up} runs start at the same time?}
+The second one aborts with exit code 1 (``Another eMerger run is in
+progress''). The lock is a plain \texttt{flock} on
+\verb|/tmp/emerger.lock|.
+
+\paragraph{How do I completely remove eMerger?}
+Run the uninstaller, then:
+
+\begin{lstlisting}[language=bashplus]
+rm -rf ~/.config/emerger ~/.cache/emerger ~/.local/state/emerger
+rm -rf /path/to/eMerger     # the repo itself
+\end{lstlisting}
+
+\paragraph{Where is my data?}
+All local, all in the paths listed in section \ref{sec:files}. Nothing
+leaves your machine unless a hook you wrote ships it.
+
+\paragraph{Can I contribute a new package manager?}
+Absolutely - see section \ref{sec:dev}. Most contributions are a 20-line
+dispatch branch plus a test case.
+
+%-------------------------------------------------------
+\section{Glossary}\label{sec:glossary}
+%-------------------------------------------------------
+
+\begin{itemize}
+  \item \textbf{Dry-run} - a simulation: the tool prints the commands it
+        would run without actually running them.
+  \item \textbf{Hook} - a user script that runs before (\texttt{pre.d})
+        or after (\texttt{post.d}) the update flow.
+  \item \textbf{Manager (package manager)} - software such as
+        \texttt{apt}, \texttt{pacman}, \texttt{brew}, \texttt{winget}
+        that installs, upgrades and removes programs on your machine.
+  \item \textbf{Parallel mode} - concurrent execution of user-space
+        managers. Safer than it sounds, because user-space managers do
+        not share a lock.
+  \item \textbf{Plugin} - a user-provided manager definition. Registers
+        a new manager without modifying the repository.
+  \item \textbf{Profile} - a named bundle of default flags, loaded via
+        \texttt{--profile NAME}.
+  \item \textbf{Resume cursor} - a file that records which managers
+        completed successfully, consumed by \texttt{--resume}.
+  \item \textbf{Snapshot} - a read-only filesystem checkpoint taken
+        before the upgrade. Linux only
+        (snapper/timeshift/btrfs).
+  \item \textbf{TUI} - Terminal User Interface. The interactive menu
+        (\texttt{-i}) on Unix.
+  \item \textbf{UAC} - User Account Control, the Windows elevation
+        prompt. eMerger relaunches itself elevated when needed.
+\end{itemize}
+
+%-------------------------------------------------------
+\section{Development}\label{sec:dev}
+%-------------------------------------------------------
+
+\subsection{Repository layout}
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+eMerger/
+  src/
+    emerger.sh              # Unix entry (Linux + macOS)
+    emerger.ps1             # Windows entry
+    lib/                    # bash libs
+    pslib/                  # PowerShell libs
+    logo/
+  share/profiles/           # shipped profiles (*.sh + *.ps1)
+  share/plugins/            # example plugins
+  completions/              # bash/zsh/fish completions
+  tests/                    # bats tests
+  man/up.1                  # man page
+  setup.sh  setup.ps1
+  uninstall.sh  uninstall.ps1
+  update.sh  update.ps1
+  VERSION
+  .github/workflows/ci.yml
+\end{lstlisting}
+
+\subsection{Bash library modules (\texttt{src/lib/})}
+
+\begin{center}
+\begin{longtable}{@{}p{0.25\linewidth} p{0.70\linewidth}@{}}
+\toprule
+\textbf{File} & \textbf{Role} \\
+\midrule \endhead
+\texttt{ui.sh}        & Colors, glyphs, spinner, box, live-log monitor \\
+\texttt{log.sh}       & Structured logging (rotated at 2000 lines) \\
+\texttt{sys.sh}       & OS / shell / battery / disk detection \\
+\texttt{run.sh}       & Command runner (dry-run, retry, progress) \\
+\texttt{args.sh}      & Argument parser and short-bundle expander \\
+\texttt{packages.sh}  & Per-manager dispatcher \\
+\texttt{clean.sh}     & Cache and trash cleaners \\
+\texttt{hooks.sh}     & User hook runner \\
+\texttt{update.sh}    & Self-update + cron / timer setup \\
+\texttt{notify.sh}    & Desktop notifications \\
+\texttt{summary.sh}   & Final banner, history persistence \\
+\texttt{tui.sh}       & Interactive menu \\
+\texttt{lock.sh}      & Global \texttt{flock} \\
+\texttt{retry.sh}     & Retry on transient failures \\
+\texttt{reboot.sh}    & Reboot-required detection \\
+\texttt{diff.sh}      & Package snapshots + diff \\
+\texttt{disk.sh}      & Disk-space precheck \\
+\texttt{snapshot.sh}  & snapper / timeshift / btrfs \\
+\texttt{mirrors.sh}   & Mirror rank / refresh \\
+\texttt{resume.sh}    & Resume cursor \\
+\texttt{doctor.sh}    & \texttt{--doctor} \\
+\texttt{changelog.sh} & \texttt{--changelog PKG} \\
+\texttt{report.sh}    & Markdown export \\
+\texttt{wizard.sh}    & First-run wizard \\
+\texttt{profiles.sh}  & Profile loader \\
+\texttt{progress.sh}  & Output summary + highlight \\
+\texttt{estimate.sh}  & Step ETA from history \\
+\texttt{ignore.sh}    & Ignore list loader \\
+\texttt{plugins.sh}   & User plugin loader \\
+\texttt{metrics.sh}   & Prometheus textfile export \\
+\texttt{help.txt}     & \texttt{up --help} content \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\subsection{PowerShell library modules (\texttt{src/pslib/})}
+
+\begin{center}
+\begin{tabular}{@{}p{0.25\linewidth} p{0.70\linewidth}@{}}
+\toprule
+\textbf{File} & \textbf{Role} \\
+\midrule
+\texttt{UI.ps1}         & Colors, glyphs, box, step \\
+\texttt{Log.ps1}        & Structured logging \\
+\texttt{Sys.ps1}        & OS, admin, battery, disk, UAC elevation \\
+\texttt{Args.ps1}       & Arg parser (shift + regex) \\
+\texttt{Packages.ps1}   & Manager dispatcher + \texttt{Run-Cmd} \\
+\texttt{Clean.ps1}      & \texttt{\%TEMP\%} and Recycle Bin \\
+\texttt{Hooks.ps1}      & \texttt{hooks\textbackslash \{pre,post\}.d\textbackslash *.ps1} \\
+\texttt{Update.ps1}     & \texttt{git pull} self-update + Task Scheduler \\
+\texttt{Notify.ps1}     & BurntToast (optional) \\
+\texttt{Summary.ps1}    & Final box, history, reboot detection \\
+\texttt{Doctor.ps1}     & \texttt{--doctor} \\
+\texttt{Profiles.ps1}   & Profile loader \\
+\texttt{Help.txt}       & Help text \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Running tests}
+
+\begin{lstlisting}[language=bashplus]
+sudo apt-get install bats shellcheck
+bats tests/
+shellcheck -S error src/emerger.sh src/lib/*.sh setup.sh uninstall.sh update.sh
+\end{lstlisting}
+
+Both run on push via \texttt{.github/workflows/ci.yml}.
+
+\subsection{Adding a package manager}
+
+\paragraph{Unix} - edit \texttt{src/lib/packages.sh}:
+
+\begin{enumerate}
+  \item Add the name to \texttt{PKG\_MANAGERS}.
+  \item Add a branch in \texttt{\_pkg\_detect\_raw}.
+  \item Add a branch in \texttt{pkg\_run} with \texttt{run\_cmd} calls.
+  \item If the manager does not need sudo, exclude it from
+        \texttt{pkg\_needs\_sudo}.
+  \item Optional: add an emoji in \texttt{pkg\_icon}, a regex in
+        \texttt{progress.sh} to parse its output, a completion entry.
+\end{enumerate}
+
+\paragraph{Windows} - edit \texttt{src/pslib/Packages.ps1}:
+
+\begin{enumerate}
+  \item Add the name to \texttt{\$script:PKG\_MANAGERS} (or
+        \texttt{PKG\_DEV}).
+  \item Add a \texttt{Pkg-Detect} case.
+  \item Add a \texttt{Pkg-Run} case with \texttt{Run-Cmd} calls.
+  \item If it needs admin, add it to \texttt{Pkg-Need-Admin}.
+\end{enumerate}
+
+Both files are table-driven dispatchers; most contributions end up being
+a twenty-line patch plus a test case under \texttt{tests/}.
+
+\subsection{Contributing}
 Pull requests and issues are welcome on
 \href{https://github.com/MasterCruelty/eMerger}{GitHub}. Before opening
-a PR, run the test suite in \texttt{tests/} on the platform you are
-touching, and make sure the feature is covered on both the Bash and the
-PowerShell sides when it makes sense for both platforms.
+a PR:
+
+\begin{itemize}
+  \item Run the test suite in \texttt{tests/} on the platform you
+        touched.
+  \item Attach \texttt{up --doctor} output and the relevant chunk of the
+        log when reporting bugs.
+  \item Keep feature parity in mind: when a feature makes sense on both
+        Bash and PowerShell, please implement it on both sides or flag
+        it for follow-up.
+\end{itemize}
 
 \vspace{1em}
 \hrule
