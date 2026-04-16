@@ -1,0 +1,34 @@
+name: CI
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Lint (errors)
+        run: |
+          shopt -s globstar nullglob
+          shellcheck -S error \
+            setup.sh uninstall.sh update.sh \
+            src/emerger.sh src/lib/*.sh
+      - name: Lint (warnings, non-blocking)
+        run: |
+          shopt -s globstar nullglob
+          shellcheck -S warning \
+            setup.sh uninstall.sh update.sh \
+            src/emerger.sh src/lib/*.sh || true
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bats
+        run: sudo apt-get update && sudo apt-get install -y bats
+      - name: Run bats
+        run: bats tests/
