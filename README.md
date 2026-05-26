@@ -1,8 +1,9 @@
 # eMerger
 
 [![CI](https://github.com/MasterCruelty/eMerger/actions/workflows/ci.yml/badge.svg)](https://github.com/MasterCruelty/eMerger/actions/workflows/ci.yml)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=TheMergers_eMerger&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=TheMergers_eMerger)
-[![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=TheMergers_eMerger&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=TheMergers_eMerger)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=MasterCruelty_eMerger)
+[![Quality Gate Pass](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=alert_status)](https://sonarcloud.io/dashboard?id=MasterCruelty_eMerger)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=MasterCruelty_eMerger&metric=ncloc)](https://sonarcloud.io/dashboard?id=MasterCruelty_eMerger)
 
 <p align="center">
     <img src="./src/logo/big_name.png" alt="eMerger logo">
