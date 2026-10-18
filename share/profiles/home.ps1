@@ -1,2 +1,2 @@
-# description: PC fisso a casa - tutto, dev toolchains incluse
+# description: everything: dev toolchains
 $script:ArgsGlobal.Dev = $true

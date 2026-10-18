@@ -1,85 +1,378 @@
-.TH UP 1 "2026" "eMerger 2.0" "User Commands"
+.TH UP 1 "2026" "eMerger 3.0.0" "User Commands"
 .SH NAME
 up \- eMerger, one-command system updater
 .SH SYNOPSIS
 .B up
-[\fIoptions\fR]
+[\fIoptions\fR] [\fB\-\-\fR]
 .SH DESCRIPTION
-eMerger detects installed package managers on the host and runs each of them
-in turn to refresh, upgrade and clean the system. It also offers optional
-cleanup of the user cache and trash.
-.SH OPTIONS
+This page covers \fBup\fR on Linux and macOS: every flag, environment and
+configuration variable, file, exit status and JSON field. The plugin API and
+the Windows build are in the eMerger manual, \fIdoc/documentation.pdf\fR.
+.PP
+eMerger detects the package managers installed on the host and runs each of
+them in turn to refresh, upgrade and clean the system, then prints a summary.
+It can also clean the user cache, the trash and, with \fB\-\-deep\-clean\fR,
+system leftovers. Every cleaning step asks first unless \fB\-y\fR is given.
+.PP
+Short flags from the set \fBh V n v q y w\fR can be bundled: \fB\-nv\fR is
+\fB\-n \-v\fR. Other short flags (\fB\-nl\fR, \fB\-qq\fR, \fB\-up\fR and so on)
+and long flags stay whole. A flag that takes a value accepts it as the next
+word or as \fB\-\-flag=VALUE\fR (\fB\-\-only=apt,flatpak\fR); an empty value
+exits 2. \fB\-\-\fR marks the end of options: the words after it are ignored.
+.SH GENERAL
 .TP
-.B -h, --help
-Show help and exit.
+.B \-h, \-\-help
+Show the help text.
 .TP
-.B -V, --version
-Show version and exit.
+.B \-V, \-\-version
+Print the version.
 .TP
-.B -i, --interactive
-Interactive menu (gum, whiptail, or plain fallback).
+.B \-\-doctor
+Run the environment health check. Exits non-zero if any check warns or fails.
+.SH EXECUTION
 .TP
-.B -n, --dry-run
-Print what would be done; do nothing.
+.B \-n, \-\-dry\-run
+Print the commands that would run, change nothing.
 .TP
-.B -v, --verbose
-Stream package manager output live.
+.B \-v, \-\-verbose
+Stream package manager output instead of the live progress line.
 .TP
-.B -q, --quiet
-Minimal output.
+.B \-q, \-\-quiet, \-qq, \-qqq
+Quieter output, one level per \fB\-q\fR or \fB\-\-quiet\fR. \fB\-q\fR hides
+informational lines, \fB\-qq\fR prints only the one-line summary,
+\fB\-qqq\fR prints nothing.
 .TP
-.B -y, --yes
-Assume "yes" on prompts.
+.B \-y, \-\-yes
+Answer yes to every prompt.
 .TP
-.B --security
-Only security updates when the manager supports them.
+.B \-\-json
+Print the run summary as one JSON object on stdout, fields as in
+\fBJSON OUTPUT\fR. Implies \fB\-nl \-ni \-qqq\fR. Warnings go to stderr.
+.SH SELECTION
 .TP
-.B --firmware
-Include firmware updates via fwupdmgr.
+.B \-\-security
+Security updates only, where the manager supports it (apt via
+unattended-upgrade, dnf, yum, zypper, softwareupdate). Other managers are
+skipped with a warning.
 .TP
-.B --dev
-Include dev toolchains (rustup, cargo, npm, pnpm, pip, gem).
+.B \-\-firmware
+Include firmware: \fBfwupdmgr\fR, and on a Raspberry Pi with an EEPROM, stage
+the bootloader update (\fBrpi\-eeprom\-update \-a\fR).
 .TP
-.B --parallel
-Run independent user-space managers in parallel.
+.B \-\-no\-firmware
+Skip firmware, including the Raspberry Pi bootloader check. Wins over
+.B ARG_FIRMWARE=1
+set in the config file or a profile.
 .TP
-.B -nl, -ni, -nc, -nt
-Skip logo, system info, cache clean, trash clean.
+.B \-\-dev
+Include dev toolchains: rustup, cargo, npm, pnpm, pip, gem.
 .TP
-.B -w, --weather
-Show the current weather.
+.B \-\-parallel
+Run independent user-space managers at the same time.
 .TP
-.B -up
-Self-update eMerger via git.
+.BI \-\-profile " NAME"
+Load \fI~/.config/emerger/profiles.d/NAME.sh\fR, else the shipped
+\fIshare/profiles/NAME.sh\fR of the checkout, before the command-line flags.
+The last \fB\-\-profile\fR wins.
 .TP
-.B -au
-Install a weekly auto-update (systemd user timer or cron).
+.B \-\-list\-profiles
+List the available profiles.
 .TP
-.B -err
-Print logged errors.
+.BI \-\-only " LIST"
+Comma-separated managers to run (e.g. apt,flatpak).
 .TP
-.B --history
-Print a summary of recent runs.
+.BI \-\-except " LIST"
+Comma-separated managers to skip. Adds to a list set by the config or a
+profile.
+.SH SAFETY AND INTEGRATION
+.TP
+.B \-\-snapshot
+Take a pre-update snapshot (snapper, timeshift or btrfs). Exit 1 before
+any manager runs when none works.
+.TP
+.B \-\-rollback
+Revert to the latest eMerger snapshot and exit.
+.TP
+.B \-\-refresh\-mirrors
+Re-rank mirrors (reflector, netselect-apt) before upgrading.
+.TP
+.B \-\-resume
+Skip managers that completed in the last run. A run without
+\fB\-\-resume\fR starts a fresh cursor.
+.TP
+.B \-\-reboot
+Reboot now if the system requires it.
+.TP
+.B \-\-reboot\-exit
+Exit with status 4 instead of 0 when a reboot is required.
+.TP
+.B \-\-download\-only
+Download packages without installing them (apt, dnf, pacman, zypper,
+softwareupdate).
+Every other manager is skipped with a message.
+.TP
+.B \-\-accept\-licenses
+Let macOS
+.B softwareupdate
+accept licence agreements. Without it, it lists the available updates and
+installs nothing.
+.SH DISPLAY
+.TP
+.B \-nl, \-\-no\-logo
+Hide the logo.
+.TP
+.B \-ni, \-\-no\-info
+Hide the system information line.
+.TP
+.B \-w, \-\-weather
+Show a weather line from wttr.in.
+.TP
+.B \-\-ascii
+ASCII glyphs only. The spinner becomes the ".:" pulse.
+.SH CLEANING
+.TP
+.B \-nc, \-\-keep\-cache
+Skip user cache cleaning.
+.TP
+.B \-nt, \-\-keep\-trash
+Skip trash cleaning.
+.TP
+.B \-\-deep\-clean
+Also clean system leftovers, asking for each: journal above
+\fBJOURNAL_MAX_SIZE\fR, old kernels (dnf, zypper), config files of removed
+packages, disabled snap revisions, dangling docker/podman images and build
+cache, crash dumps, npm and Go caches.
+.SH INSPECTION
+.TP
+.B \-\-changed
+Show packages added, removed or upgraded in the last run.
+.TP
+.BI \-\-changelog " PKG"
+Show the upstream changelog of \fIPKG\fR.
+.TP
+.B \-\-history
+Show the last runs.
+.TP
+.BI \-\-metrics " FILE"
+Export the last run as a Prometheus textfile with the gauges
+\fBemerger_last_run_timestamp_seconds\fR,
+\fBemerger_last_run_duration_seconds\fR, \fBemerger_last_run_errors\fR,
+\fBemerger_last_run_freed_bytes\fR, \fBemerger_reboot_required\fR and one
+\fBemerger_manager_ok\fR per manager.
+.TP
+.B \-err, \-\-errors
+Show logged errors.
+.SH MAINTENANCE
+.TP
+.B \-up, \-\-self\-update
+Update eMerger with git (fast-forward only).
+.TP
+.B \-au, \-\-auto\-update
+Install a weekly run (systemd user timer, or cron).
+.TP
+.B \-rc, \-\-rebuild\-cache
+Clear the package manager detection cache.
+.SH ENVIRONMENT
+Each variable below except the \fBXDG_*\fR ones can also be set in
+\fI~/.config/emerger/config.sh\fR or a profile.
+.TP
+.B EMERGER_EMOJI
+\fBauto\fR (default) uses emoji icons only when fontconfig reports a
+color-emoji font; \fB1\fR or \fB0\fR forces the choice.
+.TP
+.B EMERGER_SPINNER
+Spinner style: \fBbraille\fR, \fBdots\fR, \fBpulse\fR or \fBline\fR. Unset,
+\fBbraille\fR on a UTF-8 terminal and \fBpulse\fR otherwise; without UTF-8
+every style but \fBline\fR falls back to \fBpulse\fR.
+.TP
+.B EMERGER_PROMPT_TIMEOUT
+Seconds a prompt waits before taking its default (60; 0 waits forever).
+.TP
+.B EMERGER_CACHE_TTL
+Seconds the package manager detection cache stays valid (86400; 0 disables it).
+.TP
+.B DISK_MIN_FREE_MB
+Warn and ask below this many MiB free on / (1024).
+.TP
+.B BATTERY_MIN_PCT
+Warn and ask below this battery percentage (20).
+.TP
+.B RETRY_ATTEMPTS
+Attempts for a step that fails with a transient network error (2, one retry).
+.TP
+.B RETRY_DELAY
+Seconds before the first retry; the n-th retry waits n times as long (3).
+.TP
+.B CACHE_EXCLUDE
+~/.cache entries never offered for cleaning (names or globs).
+.TP
+.B CACHE_MENU_ROWS
+Cache entries listed before the rest is grouped as "others" (12).
+.TP
+.B JOURNAL_MAX_SIZE
+Journal size \fB\-\-deep\-clean\fR vacuums down to (200M).
+.TP
+.B DEEP_CLEAN_SKIP
+Deep-clean tasks to skip: journal, kernels, residual, snap, docker, podman,
+coredumps, npm, go.
+.TP
+.B RPI_ABORT_ON_UNDERVOLTAGE
+On a Raspberry Pi, abort even with \-y when the board is under-voltage (0).
+.TP
+.B RPI_TEMP_WARN
+Raspberry Pi SoC temperature, in degrees C, at or above which to warn (80).
+.TP
+.B MANAGER_TIMEOUT
+Seconds one manager command may run before \fBtimeout\fR stops it with
+exit 124 (0, no limit).
+.TP
+.B DRY_RUN
+1 previews every run, as \fB\-n\fR does (0).
+.TP
+.B UI_VERBOSE
+1 streams manager output, as \fB\-v\fR does (0).
+.TP
+.B QUIET_HOURS
+\fIHH:MM\-HH:MM\fR window, may wrap past midnight, in which a run with
+\fB\-y\fR prints "quiet hours, skipping" and exits 0. A malformed value
+warns and is ignored.
+.TP
+.B NO_COLOR
+Any non-empty value disables colors.
+.TP
+.B COLORFGBG
+\fIfg;bg\fR as set by the terminal: a background of 7 or more selects the
+palette for light backgrounds.
+.TP
+.B XDG_CONFIG_HOME, XDG_CACHE_HOME, XDG_STATE_HOME
+Base directories of the config, cache and state directories under
+\fBFILES\fR (\fI~/.config\fR, \fI~/.cache\fR and \fI~/.local/state\fR when unset).
+.PP
+Numeric variables take whole numbers; any other value warns and the
+default is used. The safety switches \fBDRY_RUN\fR and
+\fBRPI_ABORT_ON_UNDERVOLTAGE\fR exit 2 on any other value instead.
+\fBMANAGER_TIMEOUT\fR without a \fBtimeout\fR command warns once and is not applied.
+.SH CONFIGURATION
+\fIconfig.sh\fR and profiles can set the variable of each flag below, to 1
+or to the flag's value. Command-line flags are applied after them and win.
+A profile cannot select a profile. The flags that run an action or a query
+instead of an update (\-h, \-V, \-\-doctor, \-\-list\-profiles,
+\-\-rollback, \-\-reboot, \-\-changed, \-\-changelog, \-\-history,
+\-\-metrics, \-err, \-up, \-au, \-rc) are taken from the command line
+only: setting their variables in a file has no effect.
+.PP
+.nf
+.ft CR
+DRY_RUN              \-n
+UI_VERBOSE           \-v
+QUIET_LEVEL          \-q (0 to 3)
+ARG_YES              \-y
+ARG_JSON             \-\-json
+ARG_SECURITY         \-\-security
+ARG_FIRMWARE         \-\-firmware
+ARG_NO_FIRMWARE      \-\-no\-firmware
+ARG_DEV              \-\-dev
+ARG_PARALLEL         \-\-parallel
+ARG_ONLY             \-\-only LIST
+ARG_EXCEPT           \-\-except LIST
+ARG_SNAPSHOT         \-\-snapshot
+ARG_REFRESH_MIRRORS  \-\-refresh\-mirrors
+ARG_RESUME           \-\-resume
+ARG_REBOOT_EXIT      \-\-reboot\-exit
+ARG_DOWNLOAD_ONLY    \-\-download\-only
+ARG_ACCEPT_LICENSES  \-\-accept\-licenses
+ARG_NO_LOGO          \-nl
+ARG_NO_INFO          \-ni
+ARG_WEATHER          \-w
+ARG_ASCII            \-\-ascii
+ARG_KEEP_CACHE       \-nc
+ARG_KEEP_TRASH       \-nt
+ARG_DEEP_CLEAN       \-\-deep\-clean
+.ft
+.fi
+.PP
+\fB\-\-except\fR adds to \fBARG_EXCEPT\fR; every other flag replaces its
+variable.
+.SH JSON OUTPUT
+\fB\-\-json\fR prints one object, and \fIhistory.jsonl\fR holds one per run:
+.TP
+.B ts
+End time of the run, UTC, ISO 8601 (2026-01-31T09:00:00Z).
+.TP
+.B duration
+Run time in seconds.
+.TP
+.B freed_kb
+KiB freed by cache and trash cleaning.
+.TP
+.B errors
+Number of managers that failed.
+.TP
+.B reboot
+1 when a reboot is pending, else 0.
+.TP
+.B managers
+One object per manager run: \fBname\fR, \fBresult\fR (\fBok\fR or \fBfail\fR)
+and \fBsecs\fR, its run time in seconds.
 .SH FILES
 .TP
 .I ~/.config/emerger/config.sh
-Sourced before argument parsing.
+Sourced before argument parsing. This file, user profiles, plugins and
+hooks are refused unless you own them and no other user can write them.
 .TP
-.I ~/.config/emerger/hooks/pre.d/*.sh, post.d/*.sh
-User hook scripts.
+.I ~/.config/emerger/profiles.d/*.sh
+User profiles.
+.TP
+.I ~/.config/emerger/hooks/pre.d/*.sh, ~/.config/emerger/hooks/post.d/*.sh
+User hook scripts, run in name order before and after the managers.
+.TP
+.I ~/.config/emerger/managers.d/*.sh
+Manager plugins.
+.TP
+.I ~/.config/emerger/ignore.list
+Packages pacman never upgrades, one per line; other managers get an advisory.
+.TP
+.I share/profiles/*.sh
+Shipped profiles, in the eMerger checkout.
+.TP
+.I ~/.cache/emerger/detected
+Detection cache, valid for \fBEMERGER_CACHE_TTL\fR seconds.
 .TP
 .I ~/.local/state/emerger/emerger.log
 Log file.
 .TP
 .I ~/.local/state/emerger/history.jsonl
 One JSON record per run.
+.TP
+.I ~/.local/state/emerger/pkgs.before, pkgs.after, pkgs.diff
+Installed packages before and after the last real run, and the difference
+\fB\-\-changed\fR shows.
+.TP
+.I ~/.local/state/emerger/resume
+Managers that completed in the last run, read by \fB\-\-resume\fR.
+.TP
+.I ~/.local/state/emerger/parallel-*.log
+Output of each manager of a \fB\-\-parallel\fR run.
+.TP
+.I ~/.local/state/emerger/emerger.lock
+Global lock (\fBflock\fR; the directory \fIemerger.lock.d\fR without it).
 .SH EXIT STATUS
 .TP
-0  success
+0
+Success.
 .TP
-1  runtime failure
+1
+Runtime failure (sudo, lock, disk, interrupted) or aborted (a declined
+safety prompt, no snapshot taken with \fB\-\-snapshot\fR).
 .TP
-2  argument parsing error
+2
+Argument parsing error.
+.TP
+3
+One or more package managers failed.
+.TP
+4
+Reboot required (only with \fB\-\-reboot\-exit\fR).
 .SH SEE ALSO
 .BR cron (8),
 .BR systemd.timer (5)

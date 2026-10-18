@@ -2,14 +2,18 @@
 <#
 .SYNOPSIS
   Remove the eMerger Windows integration: `up` function, scheduled task.
-  Config and state under %APPDATA%\emerger and %LOCALAPPDATA%\emerger are kept.
+  Config and state under %APPDATA%\emerger and %LOCALAPPDATA%\emerger go only
+  when the user answers yes.
 #>
 [CmdletBinding()]
 param()
 
 $ErrorActionPreference = 'Stop'
 $REPO = Split-Path -Parent $PSCommandPath
-. "$REPO\src\pslib\UI.ps1"
+. "$REPO\src\pslib\ui\Term.ps1"
+. "$REPO\src\pslib\ui\Text.ps1"
+. "$REPO\src\pslib\ui\Print.ps1"
+. "$REPO\src\pslib\ui\Prompt.ps1"
 
 UI-Title 'eMerger uninstall (Windows)'
 
@@ -31,15 +35,26 @@ if (Test-Path $profilePath) {
 
 # Scheduled task.
 try {
-    $t = Get-ScheduledTask -TaskName 'eMerger' -ErrorAction Stop
-    if ($t) {
+    $task = Get-ScheduledTask -TaskName 'eMerger' -ErrorAction Stop
+    if ($task) {
         Unregister-ScheduledTask -TaskName 'eMerger' -Confirm:$false
         UI-Ok "Removed scheduled task 'eMerger'"
     }
 } catch {}
 
-UI-Muted "Config kept at:  $env:APPDATA\emerger\"
-UI-Muted "State kept at:   $env:LOCALAPPDATA\emerger\"
-UI-Muted "Delete manually if you want a truly clean wipe."
+# Settings, history and cache go only on an explicit yes.
+$configDir = Join-Path $env:APPDATA 'emerger'
+$stateDir = Join-Path $env:LOCALAPPDATA 'emerger'
+if (UI-Confirm 'Delete your settings, history and cache too?' 'n') {
+    foreach ($dir in @($configDir, $stateDir)) {
+        if (Test-Path -LiteralPath $dir) { Remove-Item -LiteralPath $dir -Recurse -Force }
+    }
+    UI-Ok 'Removed settings, history and cache'
+} else {
+    UI-Muted 'Settings, history and cache kept at:'
+    UI-Muted "  $configDir\"
+    UI-Muted "  $stateDir\"
+    UI-Muted 'Remove manually if you want them gone.'
+}
 
 UI-Ok "Uninstall complete. Repo still at $REPO."

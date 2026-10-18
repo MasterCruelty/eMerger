@@ -1,29 +1,34 @@
 eMerger - one-command system updater
+Lists every flag of up on Linux and macOS, the config and state files and
+the exit codes. Config and environment variables: man up.
 
 USAGE
-  up [options]
+  up [options] [--]
 
 GENERAL
   -h, --help                Show this help
   -V, --version             Show version
-  -i, --interactive         Interactive menu (gum / whiptail / plain)
       --doctor              Run environment health check
 
 EXECUTION
   -n, --dry-run             Show what would be done, do nothing
   -v, --verbose             Stream package manager output live
-  -q, --quiet               Quieter output (repeat for more: -q, -qq, -qqq)
+  -q, --quiet               Quieter by one level per use: no info lines
+  -qq, -qqq                 Summary line only, nothing at all
   -y, --yes                 Assume "yes" on prompts
       --json                Machine-readable run summary on stdout
-      Short single-letter flags bundle: -nv == -n -v, -ynv == -y -n -v
+      --                    End of options: the words after it are ignored
+      Short flags from the set h V n v q y w bundle: -nv == -n -v
+      A value flag also takes --flag=VALUE: --only=apt,flatpak
 
 SELECTION
-      --security            Only security updates when supported
+      --security            Only security updates; managers without them are skipped
+      --accept-licenses     Let macOS softwareupdate accept licence agreements
       --firmware            Include firmware via fwupdmgr
-      --no-firmware         Force-skip firmware
-      --dev                 Include dev toolchains (rustup, cargo, npm, pip, gem)
+      --no-firmware         Skip fwupd and the Pi bootloader check, even if config sets --firmware
+      --dev                 Include dev toolchains (rustup, cargo, npm, pnpm, pip, gem)
       --parallel            Run independent user-space managers in parallel
-      --profile NAME        Load a profile from profiles.d/<NAME>.sh
+      --profile NAME        Load profiles.d/NAME.sh, else the shipped share/profiles/NAME.sh
       --list-profiles       List available profiles
       --only LIST           Comma-separated managers to keep (e.g. apt,flatpak)
       --except LIST         Comma-separated managers to skip
@@ -32,25 +37,29 @@ SAFETY / INTEGRATION
       --snapshot            Take a pre-update snapshot (snapper/timeshift/btrfs)
       --rollback            Revert to the latest eMerger snapshot and exit
       --refresh-mirrors     Rank/refresh mirrors (reflector, netselect-apt)
-      --resume              Skip managers that completed in the last interrupted run
+      --resume              Skip managers that completed in the last run
       --reboot              Reboot now if the system requires it
       --reboot-exit         Exit 4 instead of 0 when a reboot is required
-      --download-only       Download packages but do not install (apt/dnf/pacman/zypper)
-      --offline             Alias for --download-only
+      --download-only       Download packages but do not install (apt/dnf/pacman/zypper/softwareupdate,
+                            every other manager is skipped)
 
 DISPLAY
   -nl, --no-logo            Hide logo
   -ni, --no-info            Hide system info line
-  -nc, --no-cache           Skip user cache cleaning
-  -nt, --no-trash           Skip trash cleaning
   -w,  --weather            Show weather line via wttr.in
-      --no-emoji            Force ASCII glyphs only
+      --ascii               Force ASCII glyphs only
+
+CLEANING
+  -nc, --keep-cache         Skip user cache cleaning
+  -nt, --keep-trash         Skip trash cleaning
+      --deep-clean          Also clean journal, old kernels, leftover configs,
+                            snap revisions, docker/podman dangling data,
+                            crash dumps, npm/go caches (asks for each)
 
 INSPECTION
       --changed             Show packages added/removed/upgraded in the last run
       --changelog PKG       Show upstream changelog for PKG
       --history             Show the last runs
-      --report [FILE]       Export the last report to Markdown
       --metrics FILE        Export last run as Prometheus textfile
   -err,  --errors           Show logged errors
 
@@ -66,7 +75,7 @@ EXAMPLES
   up --dev --firmware       # full refresh + toolchains + firmware
   up --snapshot --refresh-mirrors -y
   up --only apt,flatpak     # limit to specific managers
-  up --except snap,firmware # run everything else
+  up --except snap,fwupd    # run everything else
   up --download-only -y     # prefetch while online, install later
   up --rollback             # revert the last pre-update snapshot
   up --json | jq .          # consume in scripts / CI
@@ -80,16 +89,24 @@ CONFIG
   ~/.config/emerger/hooks/post.d/*.sh   Post-update hooks
   ~/.config/emerger/managers.d/*.sh     Third-party package manager plugins
   ~/.config/emerger/ignore.list         Packages to never upgrade (pacman native)
-  EMERGER_CACHE_TTL                     Detection cache TTL in seconds (default 86400, 0 disables)
+  share/profiles/*.sh                   Shipped profiles, in the checkout
 
 STATE
+  ~/.cache/emerger/detected             Detection cache (EMERGER_CACHE_TTL)
   ~/.local/state/emerger/emerger.log    Log
   ~/.local/state/emerger/history.jsonl  Run history (one JSON per line)
+  ~/.local/state/emerger/pkgs.before    Package list before the last run
+  ~/.local/state/emerger/pkgs.after     Package list after the last run
   ~/.local/state/emerger/pkgs.diff      Last run package diff
+  ~/.local/state/emerger/resume         Managers done in the last run (--resume)
+  ~/.local/state/emerger/emerger.lock   Run lock, one run at a time
+  ~/.local/state/emerger/parallel-*.log Per-manager output of a --parallel run
+  XDG_CONFIG_HOME, XDG_CACHE_HOME and XDG_STATE_HOME move these directories.
 
 EXIT CODES
   0  success
-  1  runtime failure (e.g. sudo, disk, lock)
+  1  runtime failure (e.g. sudo, disk, lock, interrupted) or aborted
+     (a declined safety prompt, no snapshot taken with --snapshot)
   2  argument parsing error
   3  one or more package managers failed (script itself ran to completion)
   4  reboot required (only with --reboot-exit)

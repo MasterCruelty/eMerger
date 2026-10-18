@@ -4,6 +4,8 @@
 #   1) $EMERGER_CONFIG/profiles.d/<name>.sh  (user)
 #   2) $EMERGER_ROOT/share/profiles/<name>.sh (shipped)
 
+# Source profile $1 from the first directory that has it. Exit 2 when the
+# name is invalid, no file exists, or the user file fails trust_file.
 profile_load() {
     local name="$1"
     [[ -z $name ]] && return 0
@@ -15,12 +17,16 @@ profile_load() {
         "$EMERGER_CONFIG/profiles.d/${name}.sh"
         "$EMERGER_ROOT/share/profiles/${name}.sh"
     )
-    local f
-    for f in "${candidates[@]}"; do
-        if [[ -f $f ]]; then
+    local file
+    for file in "${candidates[@]}"; do
+        if [[ -f $file ]]; then
+            # Shipped profiles are part of the checkout being run.
+            if [[ $file == "$EMERGER_CONFIG/"* ]] && ! trust_file "$file"; then
+                exit 2
+            fi
             # shellcheck disable=SC1090
-            source "$f"
-            log_info "profile loaded: $name ($f)"
+            source "$file" || true
+            log_info "profile loaded: $name ($file)"
             return 0
         fi
     done
@@ -29,21 +35,23 @@ profile_load() {
     exit 2
 }
 
+# Print every profile name with its "# description:" line, user profiles
+# first and a shipped one only when no user file has its name.
 profile_list() {
     ui_title "Available profiles"
-    local seen=() p n
+    local seen=() file name
     for dir in "$EMERGER_CONFIG/profiles.d" "$EMERGER_ROOT/share/profiles"; do
         [[ -d $dir ]] || continue
-        for p in "$dir"/*.sh; do
-            [[ -f $p ]] || continue
-            n=$(basename "$p" .sh)
-            local dup=0 s
-            for s in "${seen[@]:-}"; do [[ $s == "$n" ]] && dup=1; done
-            (( dup )) && continue
-            seen+=("$n")
+        for file in "$dir"/*.sh; do
+            [[ -f $file ]] || continue
+            name=$(basename "$file" .sh)
+            local is_seen=0 seen_name
+            for seen_name in "${seen[@]:-}"; do [[ $seen_name == "$name" ]] && is_seen=1; done
+            (( is_seen )) && continue
+            seen+=("$name")
             local desc=""
-            desc=$(grep -m1 '^# description:' "$p" 2>/dev/null | sed 's/^# description:[[:space:]]*//' || true)
-            printf '  %s%s%s  %s%s%s\n' "$C_CYAN" "$n" "$C_RESET" "$C_GRAY" "$desc" "$C_RESET"
+            desc=$(grep -m1 '^# description:' "$file" 2>/dev/null | sed 's/^# description:[[:space:]]*//' || true)
+            printf '  %s%s%s  %s%s%s\n' "$C_CYAN" "$name" "$C_RESET" "$C_GRAY" "$desc" "$C_RESET"
         done
     done
 }

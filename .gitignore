@@ -1,8 +1,6 @@
-.log
-src/utils/.cache
-src/utils/.md5
-.hist
+# LaTeX build output beside doc/documentation.tex
 *.aux
 *.log
+*.out
+*.toc
 *.synctex.gz
-.idea

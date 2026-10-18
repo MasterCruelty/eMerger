@@ -1,6 +1,9 @@
 #compdef up
 # zsh completion for eMerger
+# Scope: every flag the Unix parser accepts as its own word, manager names
+# after --only and --except, profile names after --profile.
 
+# Complete the flags of up, with manager and profile names as their values.
 _up() {
     local -a opts
     opts=(
@@ -8,27 +11,32 @@ _up() {
         '--help[show help]'
         '-V[show version]'
         '--version[show version]'
-        '-i[interactive menu]'
-        '--interactive[interactive menu]'
         '--doctor[environment health check]'
         '-n[dry-run]'
         '--dry-run[dry-run]'
         '-v[verbose]'
         '--verbose[verbose]'
-        '-q[quiet (repeat for more)]'
+        '*-q[quiet (repeat for more)]'
         '-qq[quieter]'
         '-qqq[quietest]'
         '--quiet[quiet]'
         '-y[assume yes]'
         '--yes[assume yes]'
+        '--json[JSON summary on stdout]'
         '--security[security only]'
+        '--accept-licenses[accept licence agreements]'
         '--firmware[include firmware]'
         '--no-firmware[skip firmware]'
         '--dev[include dev toolchains]'
         '--parallel[parallel user-space managers]'
-        '--no-emoji[ASCII glyphs only]'
+        '--ascii[ASCII glyphs only]'
         '--profile[load named profile]:profile:_up_profiles'
         '--list-profiles[list profiles]'
+        '--only[only these managers]:managers:_up_managers'
+        '--except[skip these managers]:managers:_up_managers'
+        '--rollback[revert the last snapshot]'
+        '--reboot-exit[exit 4 if a reboot is required]'
+        '--download-only[download, do not install]'
         '--snapshot[pre-update snapshot]'
         '--refresh-mirrors[refresh mirrors]'
         '--resume[skip completed managers]'
@@ -38,15 +46,16 @@ _up() {
         '-ni[no system info]'
         '--no-info[no system info]'
         '-nc[no cache clean]'
-        '--no-cache[no cache clean]'
+        '--keep-cache[no cache clean]'
         '-nt[no trash clean]'
-        '--no-trash[no trash clean]'
+        '--keep-trash[no trash clean]'
+        '--deep-clean[clean journal, old kernels, containers, crash dumps]'
         '-w[weather]'
         '--weather[weather]'
         '--changed[show package diff]'
         '--changelog[show changelog]:package'
         '--history[run history]'
-        '--report[export markdown]:file:_files'
+        '--metrics[export Prometheus textfile]:file:_files'
         '-err[show errors]'
         '--errors[show errors]'
         '-up[self-update]'
@@ -59,16 +68,34 @@ _up() {
     _arguments -s $opts
 }
 
+# Print the checkout root the `up` alias points at, or nothing.
+_up_root() {
+    local alias_def="${aliases[up]:-}"
+    [[ $alias_def == *"/src/emerger.sh"* ]] || return 0
+    alias_def="${alias_def%%/src/emerger.sh*}"
+    alias_def="${alias_def#*bash }"
+    alias_def="${alias_def#[\"\']}"
+    print -r -- "${alias_def//\\ / }"
+}
+
+# Offer the profile names from the user's profiles.d and the shipped ones.
 _up_profiles() {
-    local -a p
-    local dir
-    for dir in "$HOME/.config/emerger/profiles.d" "${0:A:h}/../share/profiles"; do
+    local -a profiles
+    local dir file root
+    root=$(_up_root)
+    for dir in "${XDG_CONFIG_HOME:-$HOME/.config}/emerger/profiles.d" ${root:+"$root/share/profiles"}; do
         [[ -d $dir ]] || continue
-        for f in "$dir"/*.sh; do
-            [[ -f $f ]] && p+=(${f:t:r})
+        for file in "$dir"/*.sh(N); do
+            profiles+=(${file:t:r})
         done
     done
-    _values profile $p
+    # compadd takes names literally, _values would parse them as specs.
+    compadd -- ${(u)profiles}
+}
+
+# Offer the built-in manager names, comma separated.
+_up_managers() {
+    _values -s , manager pacman yay paru apt dnf yum zypper xbps apk eopkg emerge nix softwareupdate brew mas fwupd rpi-eeprom flatpak snap rustup cargo npm pnpm pip gem
 }
 
 compdef _up up

@@ -1,5 +1,5 @@
-# description: laptop al lavoro - security, unattended, niente cache/trash
-$script:ArgsGlobal.Security = $true
-$script:ArgsGlobal.Yes      = $true
-$script:ArgsGlobal.NoCache  = $true
-$script:ArgsGlobal.NoTrash  = $true
+# description: security only, unattended, cache and trash left alone
+$script:ArgsGlobal.Security  = $true
+$script:ArgsGlobal.Yes       = $true
+$script:ArgsGlobal.KeepCache = $true
+$script:ArgsGlobal.KeepTrash = $true
