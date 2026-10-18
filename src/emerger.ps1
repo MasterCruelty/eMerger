@@ -1,9 +1,9 @@
 #Requires -Version 5.1
-[CmdletBinding()]
-param(
-    [Parameter(ValueFromRemainingArguments = $true)]
-    [string[]]$Arguments
-)
+# No param block: an advanced script would bind -v, -V, -w and -err to
+# the common parameters (-Verbose, -WarningAction...). Every word goes to $args.
+# Profile function's @args hands `--only a,b` over as one array: join it
+# back with commas, as the shell spelled it.
+$Arguments = [string[]]@(foreach ($word in $args) { if ($word -is [array]) { @($word) -join ',' } else { $word } })
 
 $ErrorActionPreference = 'Stop'
 
@@ -15,164 +15,193 @@ $versionFile = Join-Path $script:EMERGER_ROOT 'VERSION'
 $script:EMERGER_VERSION = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw).Trim() } else { '0.0.0' }
 
 $script:EMERGER_CONFIG = Join-Path $env:APPDATA       'emerger'
-$script:EMERGER_CACHE  = Join-Path $env:LOCALAPPDATA  'emerger\cache'
 $script:EMERGER_STATE  = Join-Path $env:LOCALAPPDATA  'emerger\state'
-foreach ($d in @($script:EMERGER_CONFIG, $script:EMERGER_CACHE, $script:EMERGER_STATE)) {
-    if (-not (Test-Path $d)) { New-Item -ItemType Directory -Path $d -Force | Out-Null }
+# Elevated child (see Elevated.ps1): admin managers only, it creates no
+# directory and loads no config.ps1, profile or hook.
+$script:IS_ELEVATED_CHILD = ($Arguments.Count -gt 0 -and $Arguments[0] -eq '--elevated-child')
+if (-not $script:IS_ELEVATED_CHILD) {
+    foreach ($dir in @($script:EMERGER_CONFIG, $script:EMERGER_STATE)) {
+        if (-not (Test-Path -LiteralPath $dir)) { [void][IO.Directory]::CreateDirectory($dir) }
+    }
 }
 
 # Load libs.
-. (Join-Path $script:EMERGER_LIB 'UI.ps1')
-. (Join-Path $script:EMERGER_LIB 'Log.ps1')
-. (Join-Path $script:EMERGER_LIB 'Sys.ps1')
-. (Join-Path $script:EMERGER_LIB 'Args.ps1')
-. (Join-Path $script:EMERGER_LIB 'Packages.ps1')
-. (Join-Path $script:EMERGER_LIB 'Clean.ps1')
-. (Join-Path $script:EMERGER_LIB 'Hooks.ps1')
-. (Join-Path $script:EMERGER_LIB 'Update.ps1')
-. (Join-Path $script:EMERGER_LIB 'Notify.ps1')
-. (Join-Path $script:EMERGER_LIB 'Summary.ps1')
-. (Join-Path $script:EMERGER_LIB 'Doctor.ps1')
-. (Join-Path $script:EMERGER_LIB 'Profiles.ps1')
+foreach ($lib in @('ui\Term', 'ui\Text', 'ui\Print', 'ui\Monitor', 'ui\Prompt', 'managers\Progress',
+                   'Log', 'Sys', 'state\Lock', 'system\Preflight', 'Args', 'Run',
+                   'managers\Packages', 'state\Estimate', 'state\Metrics', 'clean\Size',
+                   'clean\Temp', 'clean\RecycleBin', 'Hooks', 'SelfUpdate', 'AutoUpdate',
+                   'system\Notify', 'Summary', 'state\History', 'system\Reboot', 'Doctor',
+                   'Profiles', 'Elevated')) {
+    . (Join-Path $script:EMERGER_LIB "$lib.ps1")
+}
+
+if ($script:IS_ELEVATED_CHILD) {
+    Elevated-Restrict-Env
+    $script:RETRY_ATTEMPTS = 2; $script:RETRY_DELAY = 3; $script:MANAGER_TIMEOUT = 0
+    exit (Elevated-Child $Arguments)
+}
+
+# Defaults first, config.ps1 and profiles write into it.
+$script:ArgsGlobal = Args-Parse @()
+
+# config.ps1 can change them.
+$script:DISK_MIN_FREE_MB = 1024
+$script:BATTERY_MIN_PCT  = 20
+$script:RETRY_ATTEMPTS   = 2
+$script:RETRY_DELAY      = 3
+$script:MANAGER_TIMEOUT  = 0   # seconds per manager step, 0 = no limit
 
 # User config.
-$userCfg = Join-Path $script:EMERGER_CONFIG 'config.ps1'
-if (Test-Path $userCfg) { . $userCfg }
+$userConfig = Join-Path $script:EMERGER_CONFIG 'config.ps1'
+if (Test-Path -LiteralPath $userConfig) { . $userConfig }
 
 # Profile prescan (profile sets defaults, CLI wins).
 $profileName = Args-Prescan-Profile $Arguments
-if ($profileName) { Load-Profile $profileName }
+if ($profileName) { Profiles-Load $profileName }
 
 # Parse CLI flags.
-$script:ArgsGlobal = Parse-Args $Arguments
+$script:ArgsGlobal = Args-Parse $Arguments -Into $script:ArgsGlobal
 $script:Summary    = New-Object System.Collections.Generic.List[PSCustomObject]
+# --ascii changes the glyph table.
+UI-Init
+
+# Numeric knobs from config.ps1 or the profile, validated.
+foreach ($knob in @(@('DISK_MIN_FREE_MB', 1024), @('BATTERY_MIN_PCT', 20), @('RETRY_ATTEMPTS', 2),
+                    @('RETRY_DELAY', 3), @('MANAGER_TIMEOUT', 0))) {
+    Sys-Knob-Int $knob[0] $knob[1]
+}
+
+Args-Warn-Unsupported
 
 Log-Init
 
 # Subcommand-style short-circuits.
 if ($script:ArgsGlobal.Help)    { Get-Content (Join-Path $script:EMERGER_LIB 'Help.txt') ; exit 0 }
 if ($script:ArgsGlobal.Version) { Write-Host "eMerger $script:EMERGER_VERSION"; exit 0 }
-if ($script:ArgsGlobal.Errors)  { Show-Errors; exit 0 }
-if ($script:ArgsGlobal.History) { Show-History; exit 0 }
+if ($script:ArgsGlobal.Errors)  { Log-Show-Errors; exit 0 }
+if ($script:ArgsGlobal.History) { History-Show; exit 0 }
+if ($script:ArgsGlobal.Changed) { UI-Warn '--changed is not supported on Windows, nothing to show.'; exit 0 }
 if ($script:ArgsGlobal.Doctor)  { $rc = Doctor-Run; exit $rc }
-if ($script:ArgsGlobal.SelfUpdate) { $rc = Self-Update $script:EMERGER_ROOT; exit $rc }
-if ($script:ArgsGlobal.AutoUpdate) { $rc = Setup-Task  $script:EMERGER_ROOT; exit $rc }
-if ($script:ArgsGlobal.ListProfiles) { List-Profiles; exit 0 }
-if ($script:ArgsGlobal.Metrics) {
-    $hist = Join-Path $script:EMERGER_STATE 'history.jsonl'
-    if (-not (Test-Path $hist)) { UI-Err 'No history yet'; exit 1 }
-    $last = Get-Content $hist -Tail 1 | ConvertFrom-Json
-    $epoch = [int64](([DateTime]$last.ts).ToUniversalTime() - [DateTime]'1970-01-01').TotalSeconds
-    $tmp = "$($script:ArgsGlobal.Metrics).tmp"
-    $out = @()
-    $out += "# HELP emerger_last_run_timestamp_seconds Unix timestamp of the last eMerger run"
-    $out += "# TYPE emerger_last_run_timestamp_seconds gauge"
-    $out += "emerger_last_run_timestamp_seconds $epoch"
-    $out += "# HELP emerger_last_run_duration_seconds Duration of the last run"
-    $out += "# TYPE emerger_last_run_duration_seconds gauge"
-    $out += "emerger_last_run_duration_seconds $($last.duration)"
-    $out += "# HELP emerger_last_run_errors Manager failures in the last run"
-    $out += "# TYPE emerger_last_run_errors gauge"
-    $out += "emerger_last_run_errors $($last.errors)"
-    $out += "# HELP emerger_reboot_required Whether a reboot is pending (0/1)"
-    $out += "# TYPE emerger_reboot_required gauge"
-    $out += "emerger_reboot_required $($last.reboot)"
-    $out += "# HELP emerger_manager_ok Per-manager success (1=ok,0=fail)"
-    $out += "# TYPE emerger_manager_ok gauge"
-    foreach ($m in $last.managers) {
-        $v = if ($m.result -eq 'ok') { 1 } else { 0 }
-        $out += "emerger_manager_ok{manager=`"$($m.name)`"} $v"
+if ($script:ArgsGlobal.ListProfiles) { Profiles-List; exit 0 }
+if ($script:ArgsGlobal.Changelog) { UI-Warn '--changelog is not supported on Windows, nothing to show.'; exit 0 }
+if ($script:ArgsGlobal.Rollback) { UI-Warn '--rollback is not supported on Windows, nothing to revert.'; exit 0 }
+if ($script:ArgsGlobal.Metrics) { $rc = Metrics-Export $script:ArgsGlobal.Metrics; exit $rc }
+# One run per user at a time, taken before
+# anything that changes the system or eMerger's state. Released in finally,
+# and by the OS if the process dies.
+try { $script:RunLock = Lock-Acquire } catch {
+    UI-Err "Cannot open the run lock $(Lock-Path): $($_.Exception.GetBaseException().Message)"
+    exit 1
+}
+if (-not $script:RunLock) {
+    UI-Err "Another eMerger run is in progress (lock: $(Lock-Path))."
+    UI-Muted 'Wait for it to finish.'
+    exit 1
+}
+# Set before every exit of the run below, so the finally block can tell an
+# interrupted run from one that ended.
+$script:HasRunEnded = $false
+try {
+    if ($script:ArgsGlobal.SelfUpdate) { $rc = SelfUpdate-Run $script:EMERGER_ROOT; $script:HasRunEnded = $true; exit $rc }
+    if ($script:ArgsGlobal.AutoUpdate) { $rc = AutoUpdate-Register  $script:EMERGER_ROOT; $script:HasRunEnded = $true; exit $rc }
+    if ($script:ArgsGlobal.RebuildCache) { UI-Muted 'Windows keeps no detection cache, nothing to clear.' }
+    if ($script:ArgsGlobal.Reboot) {
+        if (Reboot-Pending) {
+            if ($script:ArgsGlobal.DryRun) { UI-Sub '[dry-run] would reboot'; $script:HasRunEnded = $true; exit 0 }
+            UI-Warn 'Rebooting now.'
+            Restart-Computer -Force
+            $script:HasRunEnded = $true
+            exit 0
+        } else { UI-Ok 'No reboot needed.'; $script:HasRunEnded = $true; exit 0 }
     }
-    $out | Set-Content -Path $tmp
-    Move-Item -Force $tmp $script:ArgsGlobal.Metrics
-    UI-Ok "metrics written to $($script:ArgsGlobal.Metrics)"
+
+    if (-not (Preflight-Battery)) { $script:HasRunEnded = $true; exit 1 }
+    if (-not (Preflight-Disk)) { $script:HasRunEnded = $true; exit 1 }
+
+    # Main flow.
+    $start = [DateTime]::UtcNow
+
+    if ($script:ArgsGlobal.Json) {
+        $script:ArgsGlobal.NoLogo = $true; $script:ArgsGlobal.NoInfo = $true; $script:QUIET_LEVEL = 3
+    }
+    if (-not $script:ArgsGlobal.NoLogo -and $script:QUIET_LEVEL -lt 1) {
+        UI-Logo (Join-Path (Join-Path $script:EMERGER_SRC 'logo') 'logo.txt')
+    }
+    if ($script:QUIET_LEVEL -lt 2) {
+        $versionText = UI-Color cyan "eMerger v$script:EMERGER_VERSION"
+        if (-not $script:ArgsGlobal.NoInfo) {
+            UI-Header @((UI-Color bold (Sys-OS)), (Sys-Architecture), (Get-Date -Format 'yyyy-MM-dd HH:mm'), $versionText)
+        } else {
+            UI-Header @($versionText)
+        }
+    }
+
+    if ($script:ArgsGlobal.Weather -and $script:QUIET_LEVEL -lt 1) {
+        $weather = Sys-Fetch-Weather
+        if ($weather) { UI-Muted $weather }
+    }
+
+    Hooks-Run 'pre'
+
+    $detected = Pkg-Detect-All -IncludeDev:$script:ArgsGlobal.Dev
+    $total = $detected.Count
+    if ($total -eq 0) { UI-Warn 'No supported package managers detected.' }
+
+    $detected = Pkg-Select $detected
+    $total = $detected.Count
+
+    # Unelevated: the admin managers run in one elevated child (Elevated.ps1),
+    # everything else, hooks included, stays in this process.
+    $needsElevation = -not $script:ArgsGlobal.DryRun -and -not (Sys-IsAdmin)
+    $adminManagers = @($detected | Where-Object { Pkg-Need-Admin $_ })
+    $elevated = $null
+
+    $step = 0
+    foreach ($manager in $detected) {
+        $step++
+        UI-Step $step $total $manager
+        if ($needsElevation -and (Pkg-Need-Admin $manager)) {
+            if (-not $elevated) {
+                UI-Warn "Admin privileges required by $($adminManagers -join ', '). Starting them elevated..."
+                Log-Info "elevating: $($adminManagers -join ',')"
+                $elevated = Elevated-Run $adminManagers
+            }
+            $result = $elevated[$manager]
+            Elevated-Show $manager $result
+            $script:Summary.Add([pscustomobject]@{ Name = $manager; Result = [string]$result.result; Secs = [int]$result.secs })
+            continue
+        }
+        $started = [DateTime]::UtcNow
+        $isOk = Pkg-Run $manager
+        $seconds = Sys-Elapsed-Seconds $started
+        $script:Summary.Add([pscustomobject]@{ Name = $manager; Result = $(if ($isOk) { 'ok' } else { 'fail' }); Secs = $seconds })
+    }
+
+    if (-not $script:ArgsGlobal.KeepCache) { Clean-Temp }
+    if (-not $script:ArgsGlobal.KeepTrash) { Clean-RecycleBin }
+
+    Hooks-Run 'post'
+
+    $duration = Sys-Elapsed-Seconds $start
+    Summary-Print $duration
+    Notify-Send-Result
+
+    $errors = Summary-Fail-Count
+    $script:HasRunEnded = $true
+    if ($errors -gt 0) { exit 3 }
+    if ($script:ArgsGlobal.RebootExit -and (Reboot-Pending)) { exit 4 }
     exit 0
-}
-if ($script:ArgsGlobal.RebuildCache) {
-    Remove-Item $script:EMERGER_CACHE -Recurse -Force -ErrorAction SilentlyContinue
-    New-Item -ItemType Directory -Path $script:EMERGER_CACHE -Force | Out-Null
-    UI-Ok 'Detection cache cleared'
-}
-if ($script:ArgsGlobal.Reboot) {
-    if (Reboot-Pending) {
-        UI-Warn 'Rebooting now.'
-        Restart-Computer -Force
-        exit 0
-    } else { UI-Ok 'No reboot needed.'; exit 0 }
-}
-
-# Elevation: relaunch elevated if any detected manager needs it.
-if (Pkg-Need-Admin-Any -IncludeDev:$script:ArgsGlobal.Dev) {
-    if (-not (Sys-IsAdmin) -and -not $script:ArgsGlobal.DryRun) {
-        UI-Warn 'Admin privileges required by one of the detected managers. Relaunching elevated…'
-        Log-Info 'relaunching elevated'
-        Sys-Start-Elevated (Join-Path $script:EMERGER_SRC 'emerger.ps1') $Arguments
-        exit 0
+} catch {
+    # Crashes keep their own error and exit code.
+    $script:HasRunEnded = $true
+    throw
+} finally {
+    Lock-Release $script:RunLock
+    # Neither an exit nor an error: Ctrl-C stopped the script, whose finally
+    # blocks still run. Without this exit, pwsh -File reports 0.
+    if (-not $script:HasRunEnded) {
+        try { UI-Err 'Interrupted (SIGINT), stopping.' } catch { [Console]::Error.WriteLine('Interrupted (SIGINT), stopping.') }
+        try { Log-Warn 'interrupted by SIGINT' } catch {}
+        exit 1
     }
 }
-
-# Battery check.
-if (Sys-On-Battery) {
-    $pct = Sys-Battery-Percent
-    if ($pct -lt 20 -and -not $script:ArgsGlobal.Yes) {
-        UI-Warn "On battery at ${pct}%. Updates are I/O heavy."
-        $a = Read-Host '    Continue anyway? [y/N]'
-        if ($a -notmatch '^[Yy]') { UI-Muted 'Aborted.'; exit 0 }
-    }
-}
-
-# Main flow.
-$start = [DateTime]::UtcNow
-
-if ($script:ArgsGlobal.Json) {
-    $script:ArgsGlobal.NoLogo = $true; $script:ArgsGlobal.NoInfo = $true; $script:QUIET_LEVEL = 3
-}
-if (-not $script:ArgsGlobal.NoLogo -and $script:QUIET_LEVEL -lt 1) {
-    UI-Logo (Join-Path $script:EMERGER_SRC 'logo\logo.txt')
-}
-if ($script:QUIET_LEVEL -lt 2) {
-    if (-not $script:ArgsGlobal.NoInfo) {
-        UI-Muted ("{0}  $(UI-Glyph dot)  {1}  $(UI-Glyph dot)  {2}" -f (Sys-OS), (Sys-Arch), (Get-Date -Format 'yyyy-MM-dd HH:mm'))
-    }
-    UI-Muted ("eMerger v$script:EMERGER_VERSION  $(UI-Glyph dot)  github.com/MasterCruelty/eMerger")
-}
-
-Hooks-Run 'pre'
-
-$detected = Pkg-Detect-All -IncludeDev:$script:ArgsGlobal.Dev
-$total = $detected.Count
-if ($total -eq 0) { UI-Warn 'No supported package managers detected.' }
-
-$onlyList   = @(); if ($script:ArgsGlobal.Only)   { $onlyList   = $script:ArgsGlobal.Only -split ',' | ForEach-Object { $_.Trim() } }
-$exceptList = @(); if ($script:ArgsGlobal.Except) { $exceptList = $script:ArgsGlobal.Except -split ',' | ForEach-Object { $_.Trim() } }
-
-$filtered = @()
-foreach ($m in $detected) {
-    if ($onlyList.Count   -gt 0 -and ($onlyList -notcontains $m))   { continue }
-    if ($exceptList.Count -gt 0 -and ($exceptList -contains $m))    { UI-Muted "skip $m (--except)"; continue }
-    $filtered += $m
-}
-$detected = $filtered
-$total = $detected.Count
-
-$i = 0
-foreach ($m in $detected) {
-    $i++
-    UI-Step $i $total $m
-    $ok = Pkg-Run $m
-    $script:Summary.Add([pscustomobject]@{ Name = $m; Result = $(if ($ok) { 'ok' } else { 'fail' }) })
-}
-
-if (-not $script:ArgsGlobal.NoCache) { Clean-Temp }
-if (-not $script:ArgsGlobal.NoTrash) { Clean-RecycleBin }
-
-Hooks-Run 'post'
-
-$duration = [int]([DateTime]::UtcNow - $start).TotalSeconds
-Summary-Print $duration
-Notify-Send-Result
-
-$errors = @($script:Summary | Where-Object { $_.Result -eq 'fail' }).Count
-if ($errors -gt 0) { exit 3 }
-if ($script:ArgsGlobal.RebootExit -and (Reboot-Pending)) { exit 4 }
-exit 0

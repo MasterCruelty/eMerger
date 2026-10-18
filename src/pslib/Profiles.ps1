@@ -3,7 +3,9 @@
 #   1) $EMERGER_CONFIG\profiles.d\<name>.ps1  (user)
 #   2) $EMERGER_ROOT\share\profiles\<name>.ps1 (shipped)
 
-function Load-Profile {
+# Dot-source profile $Name from the user's profiles.d, else the shipped
+# ones. Exit 2 for an invalid name or a profile that does not exist.
+function Profiles-Load {
     param([string]$Name)
     if (-not $Name) { return }
     if ($Name -notmatch '^[A-Za-z0-9._-]+$') {
@@ -14,10 +16,10 @@ function Load-Profile {
         (Join-Path $script:EMERGER_CONFIG "profiles.d\$Name.ps1"),
         (Join-Path $script:EMERGER_ROOT   "share\profiles\$Name.ps1")
     )
-    foreach ($f in $candidates) {
-        if (Test-Path -LiteralPath $f) {
-            . $f
-            Log-Info "profile loaded: $Name ($f)"
+    foreach ($candidate in $candidates) {
+        if (Test-Path -LiteralPath $candidate) {
+            . $candidate
+            Log-Info "profile loaded: $Name ($candidate)"
             return
         }
     }
@@ -26,20 +28,22 @@ function Load-Profile {
     exit 2
 }
 
-function List-Profiles {
+# Print every profile with its description in name order, a user profile
+# hiding a shipped one of the same name (--list-profiles).
+function Profiles-List {
     UI-Title 'Available profiles'
     $seen = @{}
-    foreach ($d in @((Join-Path $script:EMERGER_CONFIG 'profiles.d'),
+    foreach ($dir in @((Join-Path $script:EMERGER_CONFIG 'profiles.d'),
                      (Join-Path $script:EMERGER_ROOT 'share\profiles'))) {
-        if (-not (Test-Path $d)) { continue }
-        Get-ChildItem $d -Filter '*.ps1' -ErrorAction SilentlyContinue | ForEach-Object {
-            $n = $_.BaseName
-            if ($seen.ContainsKey($n)) { return }
-            $seen[$n] = $true
+        if (-not (Test-Path -LiteralPath $dir)) { continue }
+        Get-ChildItem -LiteralPath $dir -Filter '*.ps1' -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object {
+            $name = $_.BaseName
+            if ($seen.ContainsKey($name)) { return }
+            $seen[$name] = $true
             $descLine = Select-String -Path $_.FullName -Pattern '^# description:' -ErrorAction SilentlyContinue | Select-Object -First 1
-            $desc = ''
-            if ($descLine) { $desc = $descLine.Line -replace '^# description:\s*','' }
-            Write-Host "  $(UI-Color cyan $n)  $(UI-Color gray $desc)"
+            $description = ''
+            if ($descLine) { $description = $descLine.Line -replace '^# description:\s*','' }
+            Write-Host "  $(UI-Color cyan $name)  $(UI-Color gray $description)"
         }
     }
 }
