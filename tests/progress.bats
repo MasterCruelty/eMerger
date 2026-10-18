@@ -40,6 +40,19 @@ teardown() {
     [ "${lines[1]}" = "0 45 Unpacking libssl3 (arm64)" ]
 }
 
+@test "progress: apt dlstatus at 100% before the last file shows the file counter, not 100%" {
+    run lib 'progress_feed apt "dlstatus:228:100.0000:Retrieving file 228 of 400 (12s remaining)"
+             echo "$PROGRESS_CURRENT/$PROGRESS_TOTAL $PROGRESS_PERCENT [$PROGRESS_MESSAGE]"
+             progress_feed apt "dlstatus:400:57.1000:Retrieving file 400 of 400"
+             echo "$PROGRESS_CURRENT/$PROGRESS_TOTAL $PROGRESS_PERCENT [$PROGRESS_MESSAGE]"
+             progress_feed apt "dlstatus:1:12.5000:Downloading foo"
+             echo "$PROGRESS_TOTAL $PROGRESS_PERCENT [$PROGRESS_MESSAGE]"'
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "228/400 -1 [download (12s remaining)]" ]
+    [ "${lines[1]}" = "400/400 -1 [download]" ]
+    [ "${lines[2]}" = "0 12 [download: Downloading foo]" ]
+}
+
 @test "progress: (n/N) counters of the other managers set current and total" {
     run lib '
         progress_feed pacman "(3/24) upgrading linux-firmware"; echo "$PROGRESS_CURRENT/$PROGRESS_TOTAL"

@@ -215,7 +215,7 @@ EOF
         stub "$t" "if [ -e /proc/self/fd/9 ]; then echo 1; else echo 0; fi >\"\$HOME/$t.fd\"; exit 0"
     done
     mkdir -p "$HOME/co/.git"
-    run lib "exec 9>>$HOME/l; DRY_RUN=0; ARG_FIRMWARE=0; SUMMARY_ERRORS=0; SUMMARY_MANAGERS=(a); DISPLAY=:0
+    run lib "exec 9>>$HOME/l; sys_is_root() { return 0; }; DRY_RUN=0; ARG_FIRMWARE=0; SUMMARY_ERRORS=0; SUMMARY_MANAGERS=(a); DISPLAY=:0
              diff_snapshot $HOME/snap
              self_update $HOME/co
              sys_as_root sh -c '$FD9_PROBE >$HOME/root.fd'

@@ -80,7 +80,7 @@ teardown() {
 
 @test "deep clean: journal size in plain bytes is compared" {
     stub journalctl 'echo "Archived and active journals take up 512B in the file system."'
-    run sys_lib 'DRY_RUN=1; ARG_YES=1; JOURNAL_MAX_SIZE=100; clean_deep; echo "rc=$?"'
+    run sys_lib 'sys_is_root() { return 0; }; DRY_RUN=1; ARG_YES=1; JOURNAL_MAX_SIZE=100; clean_deep; echo "rc=$?"'
     [ "$status" -eq 0 ]
     [[ "$output" == *"[dry-run] journalctl --vacuum-size=100"* ]]
 }

@@ -65,11 +65,16 @@ progress_feed() {
             # From -o APT::Status-Fd=1 (see pkg_run).
             if [[ $line =~ ^(dl|pm)status:[^:]*:([0-9.]+):(.*)$ ]]; then
                 local kind=${BASH_REMATCH[1]} percent=${BASH_REMATCH[2]} message=${BASH_REMATCH[3]}
-                if [[ $message =~ ^Retrieving\ file\ ([0-9]+)\ of\ ([0-9]+) ]] && [[ ${percent%%.*} == 0 ]]; then
+                # apt's byte percent can read 100 before the last file arrives.
+                # The file counter cannot overshoot, so it drives the bar and
+                # the message keeps only the text after it.
+                if [[ $message =~ ^Retrieving\ file\ ([0-9]+)\ of\ ([0-9]+)\ *(.*)$ ]]; then
                     _progress_set_count "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
-                else
-                    _progress_set_percent "$percent"
+                    message=${BASH_REMATCH[3]}
+                    PROGRESS_MESSAGE="download${message:+ $message}"
+                    return 0
                 fi
+                _progress_set_percent "$percent"
                 if [[ $kind == dl ]]; then PROGRESS_MESSAGE="download: $message"; else PROGRESS_MESSAGE="$message"; fi
                 return 0
             fi
