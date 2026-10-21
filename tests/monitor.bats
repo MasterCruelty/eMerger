@@ -122,3 +122,45 @@ teardown() {
     run bash -c 'export LANG=C LC_ALL= LC_CTYPE=en_US.UTF-8; source "$LIB/load.sh" ui >/dev/null; echo "$UI_HAS_UNICODE"'
     [ "$output" = "1" ]
 }
+
+# Print the code that sets the locals ui_monitor_start's subshell gives
+# _ui_monitor_frame, for label $1, hint $2 and last line $3 on a terminal $4
+# columns wide.
+_frame_env() {
+    printf '_ui_spinner_frames; frames=("${_UI_FRAMES[@]}"); frame_count=${#frames[@]}
+            wave=(........); wave_count=1; gradient_count=0; tick=0; ellipsis=...
+            label=%q; hint=%q; last=%q; width=%q; hint_colored=""
+            [[ -n $hint ]] && hint_colored=" ($hint)"\n' "$@"
+}
+
+@test "monitor: a frame with hint, long counter and clock past 10 minutes stays one column short of the width" {
+    run lib "$(_frame_env "Updating apt packages" sudo "$(printf 'x%.0s' $(seq 200))" 80)
+             PROGRESS_CURRENT=1234 PROGRESS_TOTAL=12345; elapsed=754
+             _ui_monitor_frame"
+    local frame=${output#*$'\e[K'}
+    [ "${#frame}" -eq 79 ]
+    [[ $frame == *"1234/12345"*"12:34"*"x..." ]]
+}
+
+@test "monitor: a line that fits is shown whole, without an ellipsis" {
+    run lib "$(_frame_env "Updating apt packages" "" "Unpacking foo" 80)
+             PROGRESS_PERCENT=42; elapsed=3
+             _ui_monitor_frame"
+    [[ $output == *"Unpacking foo" ]]
+    [[ $output != *"..."* ]]
+}
+
+@test "monitor: the width comes from the terminal, not the 80-column fallback" {
+    script -qec true /dev/null >/dev/null 2>&1 || skip "util-linux script not available"
+    cat >"$HOME/w.sh" <<SCRIPT
+unset NO_COLOR; export TERM=xterm LANG=C
+source "$LIB/load.sh" ui log sys progress
+f=\$(mktemp); printf 'y%.0s' \$(seq 300) >"\$f"; echo >>"\$f"
+ui_monitor_start lbl "\$f"; sleep 0.5; ui_monitor_stop
+SCRIPT
+    run script -qec "stty cols 140; bash $HOME/w.sh" /dev/null
+    local longest
+    longest=$(printf '%s' "$output" | grep -o 'y*' | awk '{ if (length > n) n = length } END { print n }')
+    # 80 columns leave room for at most 39 characters of output.
+    [ "$longest" -gt 80 ]
+}
