@@ -83,7 +83,8 @@ ui_monitor_start() {
         local frame_count=${#frames[@]} wave_count=${#wave[@]} grad=("${UI_GRADIENT[@]}") gradient_count=${#UI_GRADIENT[@]}
         local tick=0 width=80 start=$SECONDS elapsed last="" line carry="" max spinner_color read_fd="" n
         local manager="${_PKG_CURRENT:-}" anim progress_text shown idle=0 parent=$$
-        local hint_colored=""
+        local hint_colored="" clock ellipsis='...'
+        (( UI_HAS_UNICODE )) && ellipsis='…'
 
         progress_reset
         [[ -n $hint ]] && hint_colored=" $C_DIM$C_GRAY($hint)$C_RESET"
@@ -91,7 +92,9 @@ ui_monitor_start() {
         while :; do
             if (( tick % 16 == 0 )); then
                 sys_is_parent_alive "$parent" || exit 0
-                width=$(tput cols 2>/dev/null || echo 80); (( width > 0 )) || width=80
+                # Ask /dev/tty: here stdout is the substitution's pipe and a
+                # background job's stdin is /dev/null, so tput would say 80.
+                width=$(tput cols 2>/dev/null </dev/tty || echo 80); (( width > 0 )) || width=80
             fi
             elapsed=$(( SECONDS - start ))
             _ui_monitor_read
@@ -160,7 +163,8 @@ _ui_monitor_read() {
 }
 
 # Draw one frame on the current line: spinner, label, hint, progress bar or
-# wave, elapsed time and as much of last as fits the width w.
+# wave, elapsed time and as much of last as fits the width, cut with an
+# ellipsis, one column to spare so the line never wraps.
 _ui_monitor_frame() {
     progress_text=""
     if (( PROGRESS_TOTAL > 0 )); then
@@ -173,21 +177,31 @@ _ui_monitor_frame() {
         anim="${C_CYAN}${wave[tick % wave_count]}  ${C_RESET}"
         (( PROGRESS_CURRENT > 0 )) && progress_text="#${PROGRESS_CURRENT}"
     fi
+    printf -v clock '%d:%02d' $(( elapsed / 60 )) $(( elapsed % 60 ))
 
-    # 35 = indent, bar, counter, clock and the gaps between them.
-    max=$(( width - 35 - ${#frames[0]} - ${#label} - ${#hint} ))
+    # Indent 4, spinner, space, label, " (hint)", 2, bar or wave 10, space,
+    # counter (7 or more), 2, clock, 2, then the spare column.
+    max=$(( width - 4 - ${#frames[0]} - 1 - ${#label} - 2 - 10 - 1 - 2 - ${#clock} - 2 - 1 ))
+    [[ -n $hint ]] && max=$(( max - ${#hint} - 3 ))
+    if (( ${#progress_text} > 7 )); then max=$(( max - ${#progress_text} )); else max=$(( max - 7 )); fi
     (( max < 0 )) && max=0
-    shown=${last:0:max}
+    if (( ${#last} <= max )); then
+        shown=$last
+    elif (( max > ${#ellipsis} )); then
+        shown=${last:0:max-${#ellipsis}}$ellipsis
+    else
+        shown=${last:0:max}
+    fi
     if (( gradient_count > 0 )); then
         spinner_color=$'\e[38;5;'"${grad[(tick / 2) % gradient_count]}"'m'
     else
         spinner_color=$C_CYAN
     fi
-    printf '\r\e[K    %s%s%s %s%s%s%s  %s %s%-7s%s  %s%d:%02d%s  %s%s%s' \
+    printf '\r\e[K    %s%s%s %s%s%s%s  %s %s%-7s%s  %s%s%s  %s%s%s' \
         "$spinner_color$C_BOLD" "${frames[tick % frame_count]}" "$C_RESET" \
         "$C_BOLD" "$label" "$C_RESET" \
         "$hint_colored" \
         "$anim" "$C_BOLD" "$progress_text" "$C_RESET" \
-        "$C_GRAY" $(( elapsed / 60 )) $(( elapsed % 60 )) "$C_RESET" \
+        "$C_GRAY" "$clock" "$C_RESET" \
         "$C_DIM$C_GRAY" "$shown" "$C_RESET"
 }
