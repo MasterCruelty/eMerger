@@ -487,7 +487,8 @@ In order:
         user-space ones when \texttt{-{}-parallel} is active.
   \item Optionally clear user cache and trash (skippable with
         \texttt{-nc} and \texttt{-nt}), then, with
-        \texttt{-{}-deep-clean}, the system leftovers (Unix).
+        \texttt{-{}-deep-clean}, the system leftovers and the container
+        data (Unix).
   \item Execute \texttt{post.d} hooks.
   \item Snapshot the installed-packages list into \texttt{pkgs.after} and
         compute \texttt{pkgs.diff}.
@@ -519,7 +520,7 @@ In order:
 \texttt{-{}-deep-clean}                    & System leftovers (see \S\ref{sec:deepclean}) & Linux/macOS \\
 \texttt{-nl}, \texttt{-{}-no-logo}         & Hide logo                      & all \\
 \texttt{-ni}, \texttt{-{}-no-info}         & Hide system info line          & all \\
-\texttt{-nc}, \texttt{-{}-keep-cache}        & Skip user cache cleaning       & all \\
+\texttt{-nc}, \texttt{-{}-keep-cache}        & Skip user cache cleaning and the warning about space held by deleted files still open & all \\
 \texttt{-nt}, \texttt{-{}-keep-trash}        & Skip trash cleaning            & all \\
 \texttt{-{}-security}                      & Security-only updates          & supported managers \\
 \texttt{-{}-firmware}                      & Include \texttt{fwupdmgr}      & Linux \\
@@ -725,6 +726,12 @@ with a size bar, and asks which to remove: \texttt{a} (all), \texttt{n}
 own cache is always kept; \verb|CACHE_EXCLUDE="mozilla,pip*"| keeps more.
 With \texttt{-y} everything not excluded is cleaned.
 
+On Linux the step then reports the deleted files a running process
+still keeps open on the filesystems of \texttt{/} and
+\verb|$HOME|, when they hold 1M or more: the five biggest holders, by
+command. That space comes back only when the holder closes the files or
+exits, so nothing is deleted; restart the program named.
+
 \subsection{Deep clean}\label{sec:deepclean}
 \texttt{up -{}-deep-clean} goes after system-level leftovers a normal run
 doesn't touch, asking about each one and showing how much it would free.
@@ -738,10 +745,28 @@ Skip tasks with \verb|DEEP_CLEAN_SKIP="docker,journal"|.
 \texttt{kernels} & dnf: keep the 2 newest kernels; zypper: \texttt{purge-kernels} \\
 \texttt{residual} & \texttt{dpkg -{}-purge} config files of removed packages \\
 \texttt{snap} & remove disabled snap revisions \\
-\texttt{docker}, \texttt{podman} & \texttt{image prune -f} + \texttt{builder prune -f}
-      (dangling images and build cache only) \\
 \texttt{coredumps} & delete \verb|/var/lib/systemd/coredump| files \\
 \texttt{npm}, \texttt{go} & \texttt{npm cache clean -{}-force}, \texttt{go clean -cache} \\
+\bottomrule
+\end{longtable}
+
+Two more sections follow, with the same prompts and skip keys.
+
+\begin{longtable}{@{}p{0.22\linewidth} p{0.70\linewidth}@{}}
+\toprule
+\textbf{Key} & \textbf{Task} \\
+\midrule \endhead
+\texttt{docker}, \texttt{podman} & Containers section, per local docker
+      context (\texttt{unix://}; remote ones are skipped): \texttt{container prune -f}, \texttt{image prune -af},
+      \texttt{builder prune -af} (docker only) and \texttt{volume prune}
+      (\texttt{-af} on docker), each with its reclaimable size, a kind at
+      0B not offered, sizes read again after the container prune. Stopped
+      containers (toolbox, distrobox) and volumes hold data: never pruned
+      under \texttt{-y}. Only the Linux system docker daemon is tried
+      through \texttt{sudo}. Docker Desktop's data
+      (\verb|~/.docker/desktop|, on macOS
+      \verb|~/Library/Containers/com.docker.docker|) is shown from 1M,
+      since its disk image shrinks only from Docker Desktop \\
 \bottomrule
 \end{longtable}
 
@@ -1483,8 +1508,9 @@ To pin it, see the ignore list (section \ref{sec:ignore}).
         the \texttt{-{}-metrics} file, and deletions inside
         \verb|~/.cache| and the Trash when cleaning.
         \texttt{-{}-deep-clean} also deletes journal entries, old kernels,
-        leftover configs, snap revisions, container images and crash dumps
-        (\verb|/var/lib/systemd/coredump|), after asking for each.
+        leftover configs, snap revisions, crash dumps
+        (\verb|/var/lib/systemd/coredump|), unused containers, images,
+        build cache and volumes, after asking for each.
   \item On Windows, UAC elevation happens only for the managers that need
         admin. They run in an elevated child that loads no config, profile
         or hook. That child runs the code of the checkout: clone it into a
@@ -1812,8 +1838,10 @@ eMerger/
 \texttt{state/lock.sh}            & Global \texttt{flock}, \texttt{mkdir} fallback \\
 \texttt{clean/size.sh}            & Size of a path, short size format \\
 \texttt{clean/cache.sh}           & Selective \texttt{\textasciitilde{}/.cache} menu \\
+\texttt{clean/open.sh}            & Report of deleted files still open \\
 \texttt{clean/trash.sh}           & Trash \\
 \texttt{clean/deep.sh}            & \texttt{-{}-deep-clean} tasks \\
+\texttt{clean/containers.sh}      & \texttt{-{}-deep-clean} Containers section \\
 \bottomrule
 \end{longtable}
 \end{center}

@@ -261,9 +261,9 @@ main() {
         run_parallel "$((step+1))" "$total" "${parallel[@]}"
     fi
 
-    (( ARG_KEEP_CACHE )) || clean_cache
+    if (( ! ARG_KEEP_CACHE )); then clean_cache; clean_open_deleted; fi
     (( ARG_KEEP_TRASH )) || clean_trash
-    if (( ARG_DEEP_CLEAN )); then clean_deep; fi
+    if (( ARG_DEEP_CLEAN )); then clean_deep; clean_containers; fi
 
     hooks_run post
 

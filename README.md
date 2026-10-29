@@ -129,9 +129,9 @@ On Windows, a flag marked "Unix" prints a warning. The run goes on without it, e
 | `-ni`, `--no-info` | Hide the system line | all |
 | `-w`, `--weather` | Show a weather line from wttr.in | all |
 | `--ascii` | ASCII glyphs only | all |
-| `-nc`, `--keep-cache` | Skip user cache cleaning (Windows: `%TEMP%`) | all |
+| `-nc`, `--keep-cache` | Skip user cache cleaning (Windows: `%TEMP%`) and, on Linux, the warning about space still held by deleted files that a program keeps open | all |
 | `-nt`, `--keep-trash` | Skip trash cleaning (Windows: Recycle Bin) | all |
-| `--deep-clean` | Also clean the journal, old kernels, leftover configs, snap revisions, container images, crash dumps, npm and Go caches, asking for each | Unix |
+| `--deep-clean` | Also clean the journal, old kernels, leftover configs, snap revisions, crash dumps, npm and Go caches and unused docker and podman data, asking for each | Unix |
 | `--changed` | Show the last run's package changes | Unix |
 | `--changelog PKG` | Show the upstream changelog of `PKG` | Unix |
 | `--history` | Show the last runs | all |

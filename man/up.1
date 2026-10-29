@@ -12,7 +12,7 @@ the Windows build are in the eMerger manual, \fIdoc/documentation.pdf\fR.
 eMerger detects the package managers installed on the host and runs each of
 them in turn to refresh, upgrade and clean the system, then prints a summary.
 It can also clean the user cache, the trash and, with \fB\-\-deep\-clean\fR,
-system leftovers. Every cleaning step asks first unless \fB\-y\fR is given.
+system leftovers and unused container data. Every cleaning step asks first unless \fB\-y\fR is given.
 .PP
 Short flags from the set \fBh V n v q y w\fR can be bundled: \fB\-nv\fR is
 \fB\-n \-v\fR. Other short flags (\fB\-nl\fR, \fB\-qq\fR, \fB\-up\fR and so on)
@@ -132,7 +132,7 @@ ASCII glyphs only. The spinner becomes the ".:" pulse.
 .SH CLEANING
 .TP
 .B \-nc, \-\-keep\-cache
-Skip user cache cleaning.
+Skip user cache cleaning and the warning about space held by deleted files still open.
 .TP
 .B \-nt, \-\-keep\-trash
 Skip trash cleaning.
@@ -140,8 +140,11 @@ Skip trash cleaning.
 .B \-\-deep\-clean
 Also clean system leftovers, asking for each: journal above
 \fBJOURNAL_MAX_SIZE\fR, old kernels (dnf, zypper), config files of removed
-packages, disabled snap revisions, dangling docker/podman images and build
-cache, crash dumps, npm and Go caches.
+packages, disabled snap revisions, crash dumps, npm and Go caches. Then the
+Containers section: stopped containers, unused images, build cache and
+unused volumes of every local docker context (remote ones skipped) and of
+podman (stopped containers and volumes never under \fB\-y\fR), and the size
+of Docker Desktop's data.
 .SH INSPECTION
 .TP
 .B \-\-changed
