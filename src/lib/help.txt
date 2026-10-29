@@ -50,11 +50,12 @@ DISPLAY
       --ascii               Force ASCII glyphs only
 
 CLEANING
-  -nc, --keep-cache         Skip user cache cleaning
+  -nc, --keep-cache         Skip user cache cleaning and the warning about
+                            space held by deleted files still open
   -nt, --keep-trash         Skip trash cleaning
       --deep-clean          Also clean journal, old kernels, leftover configs,
-                            snap revisions, docker/podman dangling data,
-                            crash dumps, npm/go caches (asks for each)
+                            snap revisions, crash dumps, npm/go caches,
+                            unused docker/podman data (asks for each)
 
 INSPECTION
       --changed             Show packages added/removed/upgraded in the last run

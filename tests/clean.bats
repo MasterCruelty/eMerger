@@ -70,12 +70,10 @@ teardown() {
     stub journalctl 'echo "Archived and active journals take up 0B in the file system."'
     stub dnf 'exit 1'
     stub go 'exit 1'
-    stub docker 'case "$1" in info) exit 0 ;; *) exit 1 ;; esac'
     run sys_lib 'DRY_RUN=1; ARG_YES=1; clean_deep; echo "rc=$?"'
     [ "$status" -eq 0 ]
     [[ "$output" == *"rc=0"* ]]
     [[ "$output" != *"vacuum-size"* ]]
-    [[ "$output" == *"image prune -f"*"_ docker"* ]]
 }
 
 @test "deep clean: journal size in plain bytes is compared" {
@@ -83,15 +81,6 @@ teardown() {
     run sys_lib 'sys_is_root() { return 0; }; DRY_RUN=1; ARG_YES=1; JOURNAL_MAX_SIZE=100; clean_deep; echo "rc=$?"'
     [ "$status" -eq 0 ]
     [[ "$output" == *"[dry-run] journalctl --vacuum-size=100"* ]]
-}
-
-@test "deep clean: dry-run never calls sudo for the docker probe" {
-    stub docker 'exit 1'
-    stub sudo 'echo "$*" >>"$HOME/sudo.calls"; exit 0'
-    run sys_lib 'sys_is_root() { return 1; }; DRY_RUN=1; ARG_YES=1; clean_deep; echo "rc=$?"'
-    [ "$status" -eq 0 ]
-    [[ "$output" == *"rc=0"* ]]
-    [ ! -e "$HOME/sudo.calls" ]
 }
 
 @test "clean_trash: macOS empties ~/.Trash" {
@@ -168,8 +157,20 @@ teardown() {
     [ ! -e "$HOME/.cache/a"$'\x1f'keepme ]
 }
 
-@test "--deep-clean under dry-run exits 0 and prints the Deep clean section" {
+@test "--deep-clean under dry-run exits 0 and prints the Deep clean and Containers sections" {
+    stub docker 'case "$*" in "context ls"*) echo default ;; *info*) exit 0 ;; esac'
     run $EMERGER -n -y -nl -nc -nt --deep-clean --only none
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Deep clean"* ]]
+    [[ "$output" == *"Deep clean"*"Containers"* ]]
+}
+
+@test "the cache step reports deleted files still open, --keep-cache skips both" {
+    run bash -c "exec 3>\"\$HOME/held\"; head -c 3000000 /dev/zero >&3; rm \"\$HOME/held\"
+                 $EMERGER -n -y -nl -nt --only none || echo FAILED
+                 echo @@split@@; $EMERGER -n -y -nl -nt -nc --only none || echo FAILED"
+    [ "$status" -eq 0 ]
+    [[ "$output" != *FAILED* ]]
+    [[ "${output%%@@split@@*}" == *"User cache"*"held by deleted files still open"* ]]
+    [[ "${output#*@@split@@}" != *"User cache"* ]]
+    [[ "${output#*@@split@@}" != *"held by deleted files"* ]]
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # --deep-clean: system leftovers a normal run does not touch. Every task
-# asks first unless -y.
+# asks first unless -y. The Containers section of --deep-clean
+# (clean/containers.sh) shares these helpers.
 
 # --deep-clean. Task names for DEEP_CLEAN_SKIP:
 # journal kernels residual snap docker podman coredumps npm go
@@ -32,24 +33,22 @@ _deep_task() {
     fi
 }
 
-# Print the docker/podman command line for $1, one word per line: plain if
-# the daemon answers, else sudo (probed with sudo -n, never under --dry-run,
-# where sudo is assumed). Empty when the daemon is not reachable.
-_deep_container_cmd() {
-    local bin="$1"
-    if "$bin" info >/dev/null 2>&1; then
-        printf '%s' "$bin"
-    elif sys_is_root; then
+# _deep_task running command $5... for data the user may want: never
+# offered under -y, where message $4 is printed instead.
+_deep_task_asked() {
+    local key="$1" label="$2" detail="$3" kept="$4"; shift 4
+    _deep_is_skipped "$key" && return 0
+    if (( ARG_YES )); then
+        ui_muted "$kept"
         return 0
-    elif (( DRY_RUN )) || sudo -n "$bin" info >/dev/null 2>&1; then
-        printf 'sudo\n%s' "$bin"
     fi
+    _deep_task "$key" "$label" "$detail" "$@"
 }
 
-# Offer each --deep-clean task that has something to remove, then add the
+# Offer each Deep clean task that has something to remove, then add the
 # growth of free space on / to SUMMARY_FREED_KB (not under --dry-run).
 clean_deep() {
-    local sudo_cmd free_before free_after
+    local sudo_cmd free_before
     sudo_cmd=$(sys_sudo_prefix)
     ui_title "Deep clean"
     _DEEP_TASK_COUNT=0
@@ -59,7 +58,6 @@ clean_deep() {
     _deep_kernels
     _deep_residual
     _deep_snap
-    _deep_containers
     _deep_coredumps
     _deep_devcaches
 
@@ -67,6 +65,15 @@ clean_deep() {
         ui_ok "nothing to clean"
         return 0
     fi
+    _deep_report_freed "$free_before"
+    return 0
+}
+
+# Add the growth of free space on / since reading $1 (KiB, from
+# sys_free_space) to SUMMARY_FREED_KB and report it. Nothing under
+# --dry-run, when $1 is empty or when the space did not grow.
+_deep_report_freed() {
+    local free_before="$1" free_after
     free_after=$(sys_free_space k /)
     if [[ -n $free_before && -n $free_after ]] && (( ! DRY_RUN )) && (( free_after > free_before )); then
         SUMMARY_FREED_KB=$(( SUMMARY_FREED_KB + free_after - free_before ))
@@ -136,32 +143,6 @@ _deep_snap() {
                 _ "$sudo_cmd" "${rev_args[@]}"
         fi
     fi
-    return 0
-}
-
-# Offer to prune dangling images and build cache of docker and podman.
-_deep_containers() {
-    local bin
-    for bin in docker podman; do
-        sys_has "$bin" || continue
-        local -a command=()
-        mapfile -t command < <(_deep_container_cmd "$bin")
-        if (( ${#command[@]} == 0 )); then
-            ui_muted "$bin: daemon not reachable (not in the $bin group?), skipped"
-            continue
-        fi
-        local reclaim=""
-        # Under --dry-run a sudo command line is not run, not even to read.
-        if [[ ${command[0]} != sudo ]] || (( ! DRY_RUN )); then
-            reclaim=$({ "${command[@]}" system df --format '{{.Type}}|{{.Reclaimable}}' 2>/dev/null || true; } | awk -F'|' '
-                $1 == "Images" || $1 ~ /^Build/ {
-                    v = $2; sub(/ *\(.*/, "", v)
-                    printf "%s%s %s", sep, ($1 == "Images" ? "images" : "build cache"), v; sep = ", "
-                }')
-        fi
-        _deep_task "$bin" "Prune $bin dangling images + build cache" "(reclaimable: ${reclaim:-?})" \
-            bash -c '"$@" image prune -f && { "$@" builder prune -f 2>/dev/null || true; }' _ "${command[@]}"
-    done
     return 0
 }
 
