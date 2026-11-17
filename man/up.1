@@ -11,8 +11,9 @@ the Windows build are in the eMerger manual, \fIdoc/documentation.pdf\fR.
 .PP
 eMerger detects the package managers installed on the host and runs each of
 them in turn to refresh, upgrade and clean the system, then prints a summary.
-It can also clean the user cache, the trash and, with \fB\-\-deep\-clean\fR,
-system leftovers and unused container data. Every cleaning step asks first unless \fB\-y\fR is given.
+It also cleans the user cache, the trash and, unless \fB\-\-soft\-clean\fR
+is given, system leftovers, unused container data, unused AI models and Rust
+build directories. Every cleaning step asks first unless \fB\-y\fR is given.
 .PP
 Short flags from the set \fBh V n v q y w\fR can be bundled: \fB\-nv\fR is
 \fB\-n \-v\fR. Other short flags (\fB\-nl\fR, \fB\-qq\fR, \fB\-up\fR and so on)
@@ -137,14 +138,19 @@ Skip user cache cleaning and the warning about space held by deleted files still
 .B \-nt, \-\-keep\-trash
 Skip trash cleaning.
 .TP
-.B \-\-deep\-clean
-Also clean system leftovers, asking for each: journal above
-\fBJOURNAL_MAX_SIZE\fR, old kernels (dnf, zypper), config files of removed
-packages, disabled snap revisions, crash dumps, npm and Go caches. Then the
-Containers section: stopped containers, unused images, build cache and
-unused volumes of every local docker context (remote ones skipped) and of
-podman (stopped containers and volumes never under \fB\-y\fR), and the size
-of Docker Desktop's data.
+.B \-\-soft\-clean
+Skip the deep clean. Without it a run offers, asking for each: emptying the
+systemd journal and the plain-text system logs (syslog, messages, user.log,
+naming the program writing most of them), old kernels (dnf, zypper), config
+files of removed packages, disabled snap revisions, crash dumps, npm and Go
+caches. Then the Containers section: stopped containers, unused images,
+build cache and unused volumes of every local docker context (remote ones
+skipped) and of podman, and the size of Docker Desktop's data. Then the AI
+models section: Ollama and Hugging Face models whose weights were not read
+for \fBAI_UNUSED_DAYS\fR, and unfinished Ollama downloads. Then the Build
+artifacts section: the cargo \fBtarget\fR directories under
+\fBBUILD_SCAN_ROOTS\fR. Under \fB\-y\fR the logs, models, build
+directories, stopped containers and volumes are never touched.
 .SH INSPECTION
 .TP
 .B \-\-changed
@@ -212,12 +218,16 @@ Seconds before the first retry; the n-th retry waits n times as long (3).
 .B CACHE_MENU_ROWS
 Cache entries listed before the rest is grouped as "others" (12).
 .TP
-.B JOURNAL_MAX_SIZE
-Journal size \fB\-\-deep\-clean\fR vacuums down to (200M).
+.B AI_UNUSED_DAYS
+Days without a read after which the deep clean offers an AI model (30).
+.TP
+.B BUILD_SCAN_ROOTS
+Directories, separated by ":", searched for Rust target directories
+(\fB$HOME\fR). Hidden directories and node_modules are not searched.
 .TP
 .B DEEP_CLEAN_SKIP
-Deep-clean tasks to skip: journal, kernels, residual, snap, docker, podman,
-coredumps, npm, go.
+Deep-clean tasks to skip: journal, syslog, kernels, residual, snap,
+coredumps, npm, go, docker, podman, ollama, huggingface, cargo.
 .TP
 .B RPI_ABORT_ON_UNDERVOLTAGE
 On a Raspberry Pi, abort even with \-y when the board is under-voltage (0).
@@ -290,7 +300,7 @@ ARG_WEATHER          \-w
 ARG_ASCII            \-\-ascii
 ARG_KEEP_CACHE       \-nc
 ARG_KEEP_TRASH       \-nt
-ARG_DEEP_CLEAN       \-\-deep\-clean
+ARG_SOFT_CLEAN       \-\-soft\-clean
 .ft
 .fi
 .PP

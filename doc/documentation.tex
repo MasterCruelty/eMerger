@@ -486,9 +486,9 @@ In order:
         \textit{clean}; serial for system managers, concurrent for safe
         user-space ones when \texttt{-{}-parallel} is active.
   \item Optionally clear user cache and trash (skippable with
-        \texttt{-nc} and \texttt{-nt}), then, with
-        \texttt{-{}-deep-clean}, the system leftovers and the container
-        data (Unix).
+        \texttt{-nc} and \texttt{-nt}), then, unless
+        \texttt{-{}-soft-clean}, the deep clean: system leftovers,
+        container data, unused AI models, Rust build directories (Unix).
   \item Execute \texttt{post.d} hooks.
   \item Snapshot the installed-packages list into \texttt{pkgs.after} and
         compute \texttt{pkgs.diff}.
@@ -517,7 +517,7 @@ In order:
 \texttt{-y}, \texttt{-{}-yes}              & Assume yes on prompts          & all \\
 \texttt{-w}, \texttt{-{}-weather}          & Show weather line via wttr.in  & all \\
 \texttt{-{}-ascii}                      & Force ASCII glyphs only        & all \\
-\texttt{-{}-deep-clean}                    & System leftovers (see \S\ref{sec:deepclean}) & Linux/macOS \\
+\texttt{-{}-soft-clean}                    & Skip the deep clean (see \S\ref{sec:deepclean}) & Linux/macOS \\
 \texttt{-nl}, \texttt{-{}-no-logo}         & Hide logo                      & all \\
 \texttt{-ni}, \texttt{-{}-no-info}         & Hide system info line          & all \\
 \texttt{-nc}, \texttt{-{}-keep-cache}        & Skip user cache cleaning and the warning about space held by deleted files still open & all \\
@@ -550,7 +550,7 @@ On Windows, \texttt{-{}-changed}, \texttt{-{}-changelog PKG} and
 \texttt{-{}-rollback} print a warning and exit 0 without updating.
 \texttt{-{}-firmware}, \texttt{-{}-no-firmware}, \texttt{-{}-snapshot},
 \texttt{-{}-parallel}, \texttt{-{}-resume}, \texttt{-{}-download-only},
-\texttt{-{}-deep-clean} and \texttt{-{}-refresh-mirrors} print a warning
+\texttt{-{}-soft-clean} and \texttt{-{}-refresh-mirrors} print a warning
 and the run goes on without them.
 
 \subsection{Combining flags}
@@ -733,15 +733,20 @@ command. That space comes back only when the holder closes the files or
 exits, so nothing is deleted; restart the program named.
 
 \subsection{Deep clean}\label{sec:deepclean}
-\texttt{up -{}-deep-clean} goes after system-level leftovers a normal run
-doesn't touch, asking about each one and showing how much it would free.
-Skip tasks with \verb|DEEP_CLEAN_SKIP="docker,journal"|.
+Every run goes after system-level leftovers, asking about each one and
+showing how much it would free; answer no to keep it. \texttt{-{}-soft-clean}
+skips the whole deep clean; a list of task keys such as
+\verb|DEEP_CLEAN_SKIP="docker,journal"| skips single tasks. Under
+\texttt{-y} the logs, models, build directories, stopped containers and
+volumes are never touched. Logs are emptied once; no size cap or other
+system setting is changed.
 
 \begin{longtable}{@{}p{0.22\linewidth} p{0.70\linewidth}@{}}
 \toprule
 \textbf{Key} & \textbf{Task} \\
 \midrule \endhead
-\texttt{journal} & \verb|journalctl --vacuum-size=$JOURNAL_MAX_SIZE| (200M), only if bigger \\
+\texttt{journal} & \verb|journalctl --rotate --vacuum-time=1s|: every archived entry, never under \texttt{-y} \\
+\texttt{syslog} & \texttt{truncate -s 0} the non-empty \verb|/var/log/syslog|, \texttt{messages}, \texttt{user.log} and their \texttt{.1}, naming the program that wrote over half of the last MiB of the biggest; never under \texttt{-y} \\
 \texttt{kernels} & dnf: keep the 2 newest kernels; zypper: \texttt{purge-kernels} \\
 \texttt{residual} & \texttt{dpkg -{}-purge} config files of removed packages \\
 \texttt{snap} & remove disabled snap revisions \\
@@ -750,7 +755,7 @@ Skip tasks with \verb|DEEP_CLEAN_SKIP="docker,journal"|.
 \bottomrule
 \end{longtable}
 
-Two more sections follow, with the same prompts and skip keys.
+Three more sections follow, with the same prompts and skip keys.
 
 \begin{longtable}{@{}p{0.22\linewidth} p{0.70\linewidth}@{}}
 \toprule
@@ -767,6 +772,24 @@ Two more sections follow, with the same prompts and skip keys.
       (\verb|~/.docker/desktop|, on macOS
       \verb|~/Library/Containers/com.docker.docker|) is shown from 1M,
       since its disk image shrinks only from Docker Desktop \\
+\texttt{ollama} & AI models section: Ollama models (stores in
+      \verb|$OLLAMA_MODELS|, \verb|~/.ollama/models|,
+      \verb|/usr/share/ollama/.ollama/models|, \verb|/var/lib/ollama|)
+      whose weights were not read for \texttt{AI\_UNUSED\_DAYS} (30), as a
+      menu, biggest first. Removed with \texttt{ollama rm} when the server
+      answers, else by deleting the manifest and the blobs no other
+      manifest lists (through \texttt{sudo} when the store is not
+      writable). Also unfinished downloads (\texttt{-partial} blobs
+      untouched for a day). Models are never offered under \texttt{-y} \\
+\texttt{huggingface} & Hugging Face hub repos (\verb|$HF_HUB_CACHE|, else
+      \verb|$HF_HOME/hub|, else \verb|~/.cache/huggingface/hub|) whose
+      newest blob was not read for \texttt{AI\_UNUSED\_DAYS}, as a menu \\
+\texttt{cargo} & Build artifacts section: cargo \texttt{target}
+      directories (holding \texttt{CACHEDIR.TAG}, beside a
+      \texttt{Cargo.toml}) of 1M or more under \texttt{BUILD\_SCAN\_ROOTS}
+      (\verb|$HOME|, \texttt{:}-separated), hidden directories and
+      \texttt{node\_modules} not searched, as a menu with the days since
+      the last build. Never offered under \texttt{-y} \\
 \bottomrule
 \end{longtable}
 
@@ -985,7 +1008,7 @@ command line only: setting their variables in a file has no effect.
 \texttt{-{}-ascii}                   & \texttt{ARG\_ASCII} & \texttt{Ascii} \\
 \texttt{-nc}                         & \texttt{ARG\_KEEP\_CACHE} & \texttt{KeepCache} \\
 \texttt{-nt}                         & \texttt{ARG\_KEEP\_TRASH} & \texttt{KeepTrash} \\
-\texttt{-{}-deep-clean}              & \texttt{ARG\_DEEP\_CLEAN} & \texttt{DeepClean} \\
+\texttt{-{}-soft-clean}              & \texttt{ARG\_SOFT\_CLEAN} & \texttt{SoftClean} \\
 \texttt{-{}-changed}                 & \texttt{ARG\_CHANGED} & \texttt{Changed} \\
 \texttt{-{}-changelog PKG}           & \texttt{ARG\_CHANGELOG} & \texttt{Changelog} \\
 \texttt{-{}-history}                 & \texttt{ARG\_HISTORY} & \texttt{History} \\
@@ -1011,7 +1034,8 @@ environment on Unix; in \texttt{config.ps1} or a profile as
 \texttt{QUIET\_HOURS}                & (unset)  & Unix & \texttt{"HH:MM-HH:MM"}, may wrap past midnight: a run with \texttt{-y} inside it exits 0 \\
 \texttt{CACHE\_EXCLUDE}              & (empty)  & Unix & \verb|~/.cache| entries never offered (names or globs) \\
 \texttt{CACHE\_MENU\_ROWS}           & 12       & Unix & rows in the cache menu before ``others'' \\
-\texttt{JOURNAL\_MAX\_SIZE}          & 200M     & Unix & journal target for \texttt{-{}-deep-clean} \\
+\texttt{AI\_UNUSED\_DAYS}            & 30       & Unix & days without a read before an AI model is offered \\
+\texttt{BUILD\_SCAN\_ROOTS}          & \verb|$HOME| & Unix & where Rust target directories are searched \\
 \texttt{DEEP\_CLEAN\_SKIP}           & (empty)  & Unix & deep-clean tasks to skip (\S\ref{sec:deepclean}) \\
 \texttt{RPI\_ABORT\_ON\_UNDERVOLTAGE} & 0       & Unix & abort even with \texttt{-y} on Pi under-voltage \\
 \texttt{RPI\_TEMP\_WARN}             & 80       & Unix & Pi SoC temperature warning ($^\circ$C) \\
@@ -1507,10 +1531,12 @@ To pin it, see the ignore list (section \ref{sec:ignore}).
         (\texttt{-{}-refresh-mirrors}), a snapshot (\texttt{-{}-snapshot}),
         the \texttt{-{}-metrics} file, and deletions inside
         \verb|~/.cache| and the Trash when cleaning.
-        \texttt{-{}-deep-clean} also deletes journal entries, old kernels,
-        leftover configs, snap revisions, crash dumps
+        The deep clean (unless \texttt{-{}-soft-clean}) also deletes
+        journal entries, system log contents, old kernels, leftover
+        configs, snap revisions, crash dumps
         (\verb|/var/lib/systemd/coredump|), unused containers, images,
-        build cache and volumes, after asking for each.
+        build cache and volumes, AI models and Rust target directories,
+        after asking for each.
   \item On Windows, UAC elevation happens only for the managers that need
         admin. They run in an elevated child that loads no config, profile
         or hook. That child runs the code of the checkout: clone it into a
@@ -1840,8 +1866,10 @@ eMerger/
 \texttt{clean/cache.sh}           & Selective \texttt{\textasciitilde{}/.cache} menu \\
 \texttt{clean/open.sh}            & Report of deleted files still open \\
 \texttt{clean/trash.sh}           & Trash \\
-\texttt{clean/deep.sh}            & \texttt{-{}-deep-clean} tasks \\
-\texttt{clean/containers.sh}      & \texttt{-{}-deep-clean} Containers section \\
+\texttt{clean/deep.sh}            & deep clean tasks and shared helpers \\
+\texttt{clean/containers.sh}      & deep clean, Containers section \\
+\texttt{clean/ai.sh}              & deep clean, AI models section \\
+\texttt{clean/builds.sh}          & deep clean, Build artifacts section \\
 \bottomrule
 \end{longtable}
 \end{center}
@@ -1898,7 +1926,7 @@ shellcheck -S error src/emerger.sh src/lib/**/*.sh install.sh uninstall.sh
 
 Each \texttt{tests/<feature>.bats} covers one feature: \texttt{cli.bats}
 the flags, \texttt{lock.bats} the run lock, \texttt{clean.bats} the cache,
-trash and \texttt{-{}-deep-clean}, and so on.
+trash and the deep clean, and so on.
 \texttt{tests/test\_helper.bash} holds the shared fixture (temp
 \texttt{HOME}, stubs on \texttt{PATH}, \texttt{lib} to source modules). The
 \texttt{tests/ps\_*.bats} files cover the PowerShell half and skip without

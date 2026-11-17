@@ -5,7 +5,7 @@
 
 ARG_HELP=0; ARG_VERSION=0
 ARG_SELF_UPDATE=0; ARG_AUTO_UPDATE=0; ARG_ERRORS=0; ARG_REBUILD_CACHE=0; ARG_HISTORY=0
-ARG_NO_LOGO=0; ARG_NO_INFO=0; ARG_KEEP_CACHE=0; ARG_KEEP_TRASH=0; ARG_DEEP_CLEAN=0
+ARG_NO_LOGO=0; ARG_NO_INFO=0; ARG_KEEP_CACHE=0; ARG_KEEP_TRASH=0; ARG_SOFT_CLEAN=0
 ARG_WEATHER=0
 ARG_FIRMWARE=0; ARG_NO_FIRMWARE=0; ARG_DEV=0; ARG_SECURITY=0
 ARG_YES=0; ARG_PARALLEL=0
@@ -117,7 +117,7 @@ args_parse() {
             -ni|--no-info)                ARG_NO_INFO=1 ;;
             -nc|--keep-cache)             ARG_KEEP_CACHE=1 ;;
             -nt|--keep-trash)             ARG_KEEP_TRASH=1 ;;
-            --deep-clean)                 ARG_DEEP_CLEAN=1 ;;
+            --soft-clean)                 ARG_SOFT_CLEAN=1 ;;
             -w|--weather)                 ARG_WEATHER=1 ;;
 
             -q|--quiet)                   QUIET_LEVEL=$(( QUIET_LEVEL + 1 )) ;;

@@ -263,7 +263,7 @@ main() {
 
     if (( ! ARG_KEEP_CACHE )); then clean_cache; clean_open_deleted; fi
     (( ARG_KEEP_TRASH )) || clean_trash
-    if (( ARG_DEEP_CLEAN )); then clean_deep; clean_containers; fi
+    if (( ! ARG_SOFT_CLEAN )); then clean_deep; clean_containers; clean_ai; clean_builds; fi
 
     hooks_run post
 

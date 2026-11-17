@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-# --deep-clean: system leftovers a normal run does not touch. Every task
-# asks first unless -y. The Containers section of --deep-clean
-# (clean/containers.sh) shares these helpers.
+# Deep clean, run by default unless --soft-clean: system leftovers, offered
+# one task at a time. Every task asks first unless -y. The Containers, AI
+# models and Build artifacts sections (clean/containers.sh, clean/ai.sh,
+# clean/builds.sh) share these helpers.
 
-# --deep-clean. Task names for DEEP_CLEAN_SKIP:
-# journal kernels residual snap docker podman coredumps npm go
-: "${JOURNAL_MAX_SIZE:=200M}"
+# Task names for DEEP_CLEAN_SKIP: journal syslog kernels residual snap
+# coredumps npm go docker podman ollama huggingface cargo
 : "${DEEP_CLEAN_SKIP:=}"
+
+# Plain-text system logs _deep_syslog offers to empty: the files rsyslog
+# writes and the copy logrotate leaves uncompressed.
+_DEEP_SYSLOG_FILES=(/var/log/syslog /var/log/syslog.1 /var/log/messages /var/log/messages.1
+                    /var/log/user.log /var/log/user.log.1)
 
 # Return 0 when task key $1 is listed in DEEP_CLEAN_SKIP (comma, space or
 # tab separated, compared literally).
@@ -55,6 +60,7 @@ clean_deep() {
     free_before=$(sys_free_space k /)
 
     _deep_journal
+    _deep_syslog
     _deep_kernels
     _deep_residual
     _deep_snap
@@ -77,31 +83,126 @@ _deep_report_freed() {
     free_after=$(sys_free_space k /)
     if [[ -n $free_before && -n $free_after ]] && (( ! DRY_RUN )) && (( free_after > free_before )); then
         SUMMARY_FREED_KB=$(( SUMMARY_FREED_KB + free_after - free_before ))
-        ui_ok "freed $(_clean_format_kb $(( free_after - free_before ))) on /"
+        ui_ok "Freed $(_clean_format_kb $(( free_after - free_before ))) on /"
     fi
     return 0
+}
+
+# Offer the rows of the caller's menu_names, menu_kb (KiB) and menu_notes
+# as a numbered menu under DEEP_CLEAN_SKIP key $1, asking question $2, and
+# call function $4 with the menu_refs entry and the name of each row picked.
+# Nothing when the menu is empty or $1 is skipped. Under -y message $3 is
+# printed instead: the rows hold data the user may want.
+_deep_menu() {
+    local key="$1" question="$2" kept="$3" remover="$4" i
+    (( ${#menu_names[@]} > 0 )) || return 0
+    _deep_is_skipped "$key" && return 0
+    if (( ARG_YES )); then
+        ui_muted "$kept"
+        return 0
+    fi
+    _DEEP_TASK_COUNT=$(( _DEEP_TASK_COUNT + 1 ))
+    for i in "${!menu_names[@]}"; do
+        printf '    %s%2d%s  %-36.36s %s%6s%s  %s\n' "$C_MAGENTA" $(( i + 1 )) "$C_RESET" \
+            "${menu_names[i]}" "$C_BOLD" "$(_clean_format_kb "${menu_kb[i]}")" "$C_RESET" "${menu_notes[i]}"
+    done
+    ui_ask "$question" "a/N" "a = all, n = none, or numbers like 1 3 5-7" || true
+    _clean_parse_pick "$UI_ANSWER" "${#menu_names[@]}"
+    if (( ${#_CLEAN_PICK[@]} == 0 )); then
+        ui_muted "skipped"
+        return 0
+    fi
+    for i in "${_CLEAN_PICK[@]}"; do
+        "$remover" "${menu_refs[i-1]}" "${menu_names[i-1]}"
+    done
+    return 0
+}
+
+# Fill the caller's menu_names, menu_kb, menu_notes and menu_refs from
+# lines "KiB<TAB>name<TAB>note<TAB>ref" on stdin, biggest first.
+_deep_menu_read() {
+    local kb name note ref
+    while IFS=$'\t' read -r kb name note ref; do
+        menu_kb+=("$kb"); menu_names+=("$name"); menu_notes+=("$note"); menu_refs+=("$ref")
+    done < <(sort -t $'\t' -k1,1nr)
+    return 0
+}
+
+# Print the days between epoch seconds $1 and now, 0 when $1 is in the future.
+_deep_days_since() {
+    local now days
+    now=$(date +%s)
+    days=$(( (now - $1) / 86400 ))
+    (( days < 0 )) && days=0
+    printf '%d' "$days"
+}
+
+# Print the last access time of file $1 in epoch seconds (GNU or BSD stat),
+# 0 when it cannot be read.
+_deep_atime() {
+    stat -c %X -- "$1" 2>/dev/null || stat -f %a -- "$1" 2>/dev/null || echo 0
+}
+
+# Print the last modification time of file $1 in epoch seconds (GNU or BSD
+# stat), 0 when it cannot be read.
+_deep_mtime() {
+    stat -c %Y -- "$1" 2>/dev/null || stat -f %m -- "$1" 2>/dev/null || echo 0
 }
 
 # Deep clean tasks, called by clean_deep only: each reads its local sudo_cmd
 # (privilege prefix) and returns 0, offered or not.
 
-# Offer to shrink the systemd journal to JOURNAL_MAX_SIZE when it is larger.
+# Offer to empty the systemd journal (rotate, then delete every archived
+# file), with its size. Never offered under -y: a log may be needed.
 _deep_journal() {
     if sys_has journalctl; then
-        local usage
+        local usage usage_bytes
         # "take up 1.5G" or, under 1 KiB, "take up 512B".
         usage=$({ journalctl --disk-usage 2>/dev/null || true; } | sed -nE 's/.*take up ([0-9.]+[KMGTPE]?)B?.*/\1/p' | head -n 1)
         if [[ -n $usage ]]; then
-            local usage_bytes limit_bytes
             usage_bytes=$(numfmt --from=iec "$usage" 2>/dev/null || echo 0)
-            limit_bytes=$(numfmt --from=iec "$JOURNAL_MAX_SIZE" 2>/dev/null || echo 0)
-            if (( usage_bytes > limit_bytes )); then
-                _deep_task journal "Shrink journal to $JOURNAL_MAX_SIZE" "(now $usage)" \
-                    $sudo_cmd journalctl --vacuum-size="$JOURNAL_MAX_SIZE"
+            if (( usage_bytes > 0 )); then
+                _deep_task_asked journal "Empty the journal" "(now $usage)" "journal kept under -y" \
+                    $sudo_cmd journalctl --rotate --vacuum-time=1s
             fi
         fi
     fi
     return 0
+}
+
+# Offer to empty the non-empty system logs of _DEEP_SYSLOG_FILES, with
+# their size and the program writing most of the biggest. Never offered
+# under -y: a log may be needed. The files are truncated, not deleted:
+# rsyslog keeps them open.
+_deep_syslog() {
+    local file bytes total=0 top=0 biggest="" writer
+    local -a logs=()
+    for file in "${_DEEP_SYSLOG_FILES[@]}"; do
+        [[ -f $file ]] || continue
+        bytes=$(stat -c %s -- "$file" 2>/dev/null || stat -f %z -- "$file" 2>/dev/null || echo 0)
+        (( bytes > 0 )) || continue
+        logs+=("$file"); total=$(( total + bytes ))
+        if (( bytes > top )); then top=$bytes; biggest=$file; fi
+    done
+    (( ${#logs[@]} > 0 )) || return 0
+    writer=$(_deep_log_writer "$biggest")
+    printf -v file '%s, ' "${logs[@]}"
+    _deep_task_asked syslog "Empty system logs" \
+        "($(_clean_format_kb $(( total / 1024 ))) in ${file%, }${writer:+, mostly from $writer})" \
+        "system logs kept under -y" $sudo_cmd truncate -s 0 "${logs[@]}"
+    return 0
+}
+
+# Print the program that wrote more than half of the last MiB of syslog
+# file $1 (ISO or classic timestamps), empty when none did or the file
+# cannot be read.
+_deep_log_writer() {
+    { tail -c 1048576 -- "$1" 2>/dev/null || true; } | awk '
+        { prog = ($1 ~ /^[0-9][0-9][0-9][0-9]-/) ? $3 : $5
+          sub(/\[.*/, "", prog); sub(/:$/, "", prog)
+          if (prog != "") count[prog]++
+          lines++ }
+        END { for (p in count) if (count[p] * 2 > lines) print p }'
 }
 
 # Offer to remove installed kernels beyond the newest two (dnf, zypper).

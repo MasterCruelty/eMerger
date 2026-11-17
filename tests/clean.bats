@@ -70,17 +70,50 @@ teardown() {
     stub journalctl 'echo "Archived and active journals take up 0B in the file system."'
     stub dnf 'exit 1'
     stub go 'exit 1'
-    run sys_lib 'DRY_RUN=1; ARG_YES=1; clean_deep; echo "rc=$?"'
+    run sys_lib '_DEEP_SYSLOG_FILES=(); DRY_RUN=1; clean_deep; echo "rc=$?"'
     [ "$status" -eq 0 ]
     [[ "$output" == *"rc=0"* ]]
-    [[ "$output" != *"vacuum-size"* ]]
+    [[ "$output" != *"journal"* ]]
 }
 
-@test "deep clean: journal size in plain bytes is compared" {
+@test "deep clean: a journal in plain bytes is offered for emptying, kept under -y" {
     stub journalctl 'echo "Archived and active journals take up 512B in the file system."'
-    run sys_lib 'sys_is_root() { return 0; }; DRY_RUN=1; ARG_YES=1; JOURNAL_MAX_SIZE=100; clean_deep; echo "rc=$?"'
+    run sys_lib 'sys_is_root() { return 0; }; _DEEP_SYSLOG_FILES=(); DRY_RUN=1; ui_confirm() { echo "ASK $1 $3"; return 0; }
+                 clean_deep; ARG_YES=1; clean_deep'
     [ "$status" -eq 0 ]
-    [[ "$output" == *"[dry-run] journalctl --vacuum-size=100"* ]]
+    [[ "$output" == *"ASK Empty the journal? (now 512)"* ]]
+    [[ "$output" == *"[dry-run] journalctl --rotate --vacuum-time=1s"* ]]
+    [[ "$output" == *"journal kept under -y"* ]]
+}
+
+@test "deep clean: non-empty system logs are offered with total size and main writer, empty or missing ones left out" {
+    mkdir -p "$HOME/log"
+    for i in $(seq 1 3); do echo "2026-01-01T00:00:00+00:00 host tracker-miner-fs-3[630074]: warn $i"; done >"$HOME/log/syslog"
+    echo "Jan  1 00:00:00 host cron[12]: job" >>"$HOME/log/syslog"
+    head -c 2048 /dev/zero >"$HOME/log/syslog.1"
+    : >"$HOME/log/messages"
+    run sys_lib 'sys_is_root() { return 0; }; DRY_RUN=1; ui_confirm() { echo "ASK $1 $3"; return 0; }
+                 _DEEP_SYSLOG_FILES=("$HOME/log/syslog" "$HOME/log/syslog.1" "$HOME/log/messages" "$HOME/log/none")
+                 clean_deep'
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"ASK Empty system logs? (2K in $HOME/log/syslog, $HOME/log/syslog.1)"* ]]
+    [[ "$output" == *"[dry-run] truncate -s 0 $HOME/log/syslog $HOME/log/syslog.1"* ]]
+    run sys_lib '_deep_log_writer "$HOME/log/syslog"'
+    [ "$output" = "tracker-miner-fs-3" ]
+}
+
+@test "deep clean: system logs with no majority writer name none, truncated for real on yes, kept under -y" {
+    mkdir -p "$HOME/log"
+    printf 'Jan  1 00:00:00 host a[1]: x\nJan  1 00:00:01 host b: y\n' >"$HOME/log/syslog"
+    run sys_lib 'sys_is_root() { return 0; }; ui_confirm() { echo "ASK $1 $3"; return 0; }
+                 _DEEP_SYSLOG_FILES=("$HOME/log/syslog"); _DEEP_TASK_COUNT=0; sudo_cmd=""
+                 _deep_syslog; [ -s "$HOME/log/syslog" ] || echo emptied
+                 echo z >"$HOME/log/syslog"; ARG_YES=1; _deep_syslog'
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"in $HOME/log/syslog)"* ]]
+    [[ "$output" != *"mostly"* ]]
+    [[ "$output" == *"emptied"*"system logs kept under -y"* ]]
+    [ -s "$HOME/log/syslog" ]
 }
 
 @test "clean_trash: macOS empties ~/.Trash" {
@@ -157,11 +190,15 @@ teardown() {
     [ ! -e "$HOME/.cache/a"$'\x1f'keepme ]
 }
 
-@test "--deep-clean under dry-run exits 0 and prints the Deep clean and Containers sections" {
+@test "a plain run under dry-run prints the Deep clean and Containers sections, --soft-clean skips them" {
     stub docker 'case "$*" in "context ls"*) echo default ;; *info*) exit 0 ;; esac'
-    run $EMERGER -n -y -nl -nc -nt --deep-clean --only none
+    run $UP -n -y -nl -nc -nt --only none
     [ "$status" -eq 0 ]
     [[ "$output" == *"Deep clean"*"Containers"* ]]
+    run $UP -n -y -nl -nc -nt --only none --soft-clean
+    [ "$status" -eq 0 ]
+    [[ "$output" != *"Deep clean"* ]]
+    [[ "$output" != *"Containers"* ]]
 }
 
 @test "the cache step reports deleted files still open, --keep-cache skips both" {

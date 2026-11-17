@@ -49,7 +49,7 @@ _up() {
         '--keep-cache[skip cache cleaning and the deleted-but-open files warning]'
         '-nt[no trash clean]'
         '--keep-trash[no trash clean]'
-        '--deep-clean[clean journal, old kernels, containers]'
+        '--soft-clean[skip the deep clean]'
         '-w[weather]'
         '--weather[weather]'
         '--changed[show package diff]'

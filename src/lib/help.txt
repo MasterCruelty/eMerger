@@ -53,9 +53,12 @@ CLEANING
   -nc, --keep-cache         Skip user cache cleaning and the warning about
                             space held by deleted files still open
   -nt, --keep-trash         Skip trash cleaning
-      --deep-clean          Also clean journal, old kernels, leftover configs,
-                            snap revisions, crash dumps, npm/go caches,
-                            unused docker/podman data (asks for each)
+      --soft-clean          Skip the deep clean. Without it, every run asks
+                            about each of these before removing it: journal,
+                            system logs, old kernels, leftover configs, snap
+                            revisions, crash dumps, npm/go caches, unused
+                            docker/podman data, unused AI models, Rust
+                            target directories
 
 INSPECTION
       --changed             Show packages added/removed/upgraded in the last run

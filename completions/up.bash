@@ -76,7 +76,7 @@ _up_completion() {
           --profile --list-profiles --only --except
           --snapshot --rollback --refresh-mirrors --resume --reboot --reboot-exit
           --download-only
-          -nl --no-logo -ni --no-info -nc --keep-cache -nt --keep-trash --deep-clean -w --weather
+          -nl --no-logo -ni --no-info -nc --keep-cache -nt --keep-trash --soft-clean -w --weather
           --changed --changelog --history --metrics -err --errors
           -up --self-update -au --auto-update -rc --rebuild-cache"
     _up_reply compgen -W "$opts" -- "$cur"

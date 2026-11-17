@@ -1,12 +1,14 @@
 # Shared fixture of the bash test files: `load test_helper` from a file's top.
 
 # Point HOME at a fresh temp directory, the old value kept in HOME_BAK, and
-# export REPO_DIR, LIB, EMERGER (the entry point command), NO_COLOR and an
-# empty stub directory STUBS.
+# export REPO_DIR, LIB, UP (the entry point command), EMERGER (UP under
+# --soft-clean, so a run never reaches the host's logs, containers or
+# models), NO_COLOR and an empty stub directory STUBS.
 setup_home() {
     export REPO_DIR="${BATS_TEST_DIRNAME}/.."
     export LIB="$REPO_DIR/src/lib"
-    export EMERGER="bash $REPO_DIR/src/emerger.sh"
+    export UP="bash $REPO_DIR/src/emerger.sh"
+    export EMERGER="$UP --soft-clean"
     export HOME_BAK="$HOME"
     export HOME="$(mktemp -d)"
     export NO_COLOR=1
@@ -70,7 +72,7 @@ setup_minbin() {
     mkdir -p "$MINBIN"
     local t p
     for t in bash sh awk cat cut date df du find grep head mkdir mktemp numfmt \
-             paste rm sed sleep sort stat tail timeout touch tr uname wc id comm join env mv; do
+             paste rm sed sleep sort stat tail timeout touch tr truncate uname wc id comm join env mv; do
         p=$(command -v "$t") && ln -s "$p" "$MINBIN/$t"
     done
 }

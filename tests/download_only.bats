@@ -37,7 +37,7 @@ pkg() {
 
 @test "sudo check: --download-only leaves managers without a download mode out" {
     stub snap 'exit 0'
-    run lib 'ARG_DOWNLOAD_ONLY=1; ARG_ONLY=snap
+    run lib 'ARG_DOWNLOAD_ONLY=1; ARG_SOFT_CLEAN=1; ARG_ONLY=snap
              if run_needs_sudo; then echo sudo; else echo none; fi'
     [ "$output" = "none" ]
 }

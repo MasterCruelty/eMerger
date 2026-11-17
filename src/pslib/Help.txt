@@ -61,7 +61,7 @@ NOT AVAILABLE ON WINDOWS
   --changed --changelog --rollback
                             Print a warning and exit 0, nothing is updated
   --firmware --no-firmware --snapshot --parallel --resume --download-only
-  --deep-clean --refresh-mirrors
+  --soft-clean --refresh-mirrors
                             Print a warning, the run goes on without them
 
 EXAMPLES

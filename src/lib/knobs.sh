@@ -33,7 +33,7 @@ knob_switch() {
 # or profile, before any arithmetic reads them.
 knobs_validate() {
     for _knob in DISK_MIN_FREE_MB:1024 BATTERY_MIN_PCT:20 RPI_TEMP_WARN:80 \
-            RETRY_ATTEMPTS:2 RETRY_DELAY:3 CACHE_MENU_ROWS:12 \
+            RETRY_ATTEMPTS:2 RETRY_DELAY:3 CACHE_MENU_ROWS:12 AI_UNUSED_DAYS:30 \
             EMERGER_CACHE_TTL:86400 EMERGER_PROMPT_TIMEOUT:60 MANAGER_TIMEOUT:0 \
             UI_VERBOSE:0 ARG_ASCII:0; do
         knob_int "${_knob%%:*}" "${_knob#*:}"

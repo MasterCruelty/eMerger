@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# --deep-clean, Containers section: what docker (every local context) and
+# Deep clean, Containers section: what docker (every local context) and
 # podman keep without using it. Every task asks first unless -y. Stopped
 # containers (toolbox, distrobox) and unused volumes hold data: never offered
 # under -y. Remote contexts (ssh://, tcp://) are left alone.
