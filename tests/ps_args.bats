@@ -84,7 +84,7 @@ load ps_helper
 
 @test "ps: each Unix-only run flag warns and the run goes on" {
     local f
-    for f in --firmware --no-firmware --snapshot --parallel --resume --download-only --deep-clean --refresh-mirrors; do
+    for f in --firmware --no-firmware --snapshot --parallel --resume --download-only --soft-clean --refresh-mirrors; do
         run up_ps '' -n -y -nc -nt "$f"
         [ "$status" -eq 0 ] || { echo "$f: status $status"; return 1; }
         [[ "$output" == *"$f is not supported on Windows, ignored."* ]]

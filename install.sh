@@ -141,6 +141,7 @@ if [[ ! -f "$CONFIG_DIR/config.sh" ]]; then
 # ARG_DEV=1           # always include dev toolchains
 # ARG_WEATHER=1       # always show weather
 # ARG_KEEP_TRASH=1    # never touch trash
+# ARG_SOFT_CLEAN=1    # skip the deep clean
 # DISK_MIN_FREE_MB=2048
 # QUIET_HOURS="23:00-07:00"    # skip when timer fires inside this window
 EOF

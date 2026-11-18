@@ -50,7 +50,7 @@ function Args-Parse {
             '^--reboot-exit$'            { $options.RebootExit = $true }
             '^--download-only$'          { $options.DownloadOnly = $true }
             '^--accept-licenses$'        { $options.AcceptLicenses = $true }
-            '^--deep-clean$'             { $options.DeepClean = $true }
+            '^--soft-clean$'             { $options.SoftClean = $true }
             '^--no-firmware$'            { $options.NoFirmware = $true }
             '^--refresh-mirrors$'        { $options.RefreshMirrors = $true }
             '^--rollback$'               { $options.Rollback = $true }
@@ -96,7 +96,7 @@ function _Args-Defaults {
         ListProfiles=$false; Ascii=$false
         Parallel=$false; Changed=$false; Resume=$false
         Json=$false; Weather=$false; RebootExit=$false; DownloadOnly=$false; AcceptLicenses=$false
-        DeepClean=$false; NoFirmware=$false; RefreshMirrors=$false; Rollback=$false
+        SoftClean=$false; NoFirmware=$false; RefreshMirrors=$false; Rollback=$false
         Only=''; Except=''; Metrics=''
     }
 }
@@ -157,7 +157,7 @@ function Args-Warn-Unsupported {
     $unsupported = [ordered]@{
         Firmware = '--firmware'; NoFirmware = '--no-firmware'; Snapshot = '--snapshot'
         Parallel = '--parallel'; Resume = '--resume'; DownloadOnly = '--download-only'
-        DeepClean = '--deep-clean'; RefreshMirrors = '--refresh-mirrors'
+        SoftClean = '--soft-clean'; RefreshMirrors = '--refresh-mirrors'
     }
     foreach ($field in $unsupported.Keys) {
         if ($script:ArgsGlobal.$field) { UI-Warn "$($unsupported[$field]) is not supported on Windows, ignored." }

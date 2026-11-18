@@ -11,7 +11,7 @@ _LOAD_MODULES=(
     managers/progress state/estimate
     run/command run/select run/parallel run/sudo args ignore
     managers/registry managers/detect managers/icon managers/recipes
-    clean/size clean/cache clean/open clean/trash clean/deep clean/containers
+    clean/size clean/cache clean/open clean/trash clean/deep clean/containers clean/ai clean/builds
     hooks selfupdate autoupdate
     system/notify system/rpi managers/rpi_eeprom system/reboot state/diff
     system/preflight system/snapshot system/mirrors state/resume state/lock

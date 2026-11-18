@@ -131,7 +131,7 @@ On Windows, a flag marked "Unix" prints a warning. The run goes on without it, e
 | `--ascii` | ASCII glyphs only | all |
 | `-nc`, `--keep-cache` | Skip user cache cleaning (Windows: `%TEMP%`) and, on Linux, the warning about space still held by deleted files that a program keeps open | all |
 | `-nt`, `--keep-trash` | Skip trash cleaning (Windows: Recycle Bin) | all |
-| `--deep-clean` | Also clean the journal, old kernels, leftover configs, snap revisions, crash dumps, npm and Go caches and unused docker and podman data, asking for each | Unix |
+| `--soft-clean` | Skip the deep clean. Without this flag, every run asks about each of these before removing it: journal, system logs, old kernels, leftover configs, snap revisions, crash dumps, npm and Go caches, unused docker and podman data, AI models unused for 30 days or more (Ollama, Hugging Face), Rust `target` directories | Unix |
 | `--changed` | Show the last run's package changes | Unix |
 | `--changelog PKG` | Show the upstream changelog of `PKG` | Unix |
 | `--history` | Show the last runs | all |
@@ -204,7 +204,7 @@ Every variable, its default and the plugin API: [the documentation](doc/document
 
 ## Security
 
-- `up` changes only what you ask for. Cleaning the cache, the Trash and `--deep-clean` ask before deleting anything.
+- `up` changes only what you ask for. Cleaning the cache, the Trash and the deep clean ask before deleting anything. Under `-y` the deep clean never touches logs, models, build directories, stopped containers or volumes.
 - On its own, `up` goes online only for `--weather`, `--self-update`, `--firmware`, `--refresh-mirrors` and one connectivity check in `--doctor`. All other traffic comes from your package managers.
 - `up` runs with `sudo`, so keep the eMerger folder writable by you alone. If other users can write to it, `up` refuses to start.
 - Your config, profiles, plugins and hooks follow the same rule: `up` skips any that another user could change.

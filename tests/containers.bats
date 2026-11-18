@@ -88,7 +88,7 @@ esac"
     [ "$status" -eq 0 ]
     [ "$(cat "$HOME/docker.calls")" = "docker --context default image prune -af
 docker --context default builder prune -af" ]
-    [[ "$output" == *"freed 1M on /"* ]]
+    [[ "$output" == *"Freed 1M on /"* ]]
     [[ "$output" == *"freed=1024"* ]]
 }
 

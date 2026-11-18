@@ -27,7 +27,8 @@ run_skip_reason() {
     return 0
 }
 
-# Return 0 if a manager selected for this run, or --deep-clean, needs sudo.
+# Return 0 if a manager selected for this run, or the deep clean (Linux,
+# not under --soft-clean), needs sudo.
 # Same selection as the run loop (run_skip_reason).
 run_needs_sudo() {
     local manager
@@ -37,7 +38,7 @@ run_needs_sudo() {
         [[ -n $RUN_SKIP_REASON ]] && continue
         if pkg_needs_sudo "$manager"; then return 0; fi
     done
-    (( ${ARG_DEEP_CLEAN:-0} ))
+    (( ! ${ARG_SOFT_CLEAN:-0} )) && ! sys_is_macos
 }
 
 # Append each detected manager this run updates to the caller's arrays:

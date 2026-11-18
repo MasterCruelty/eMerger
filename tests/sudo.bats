@@ -46,19 +46,27 @@ teardown() {
 
 @test "sudo check: --no-firmware leaves fwupd out" {
     stub fwupdmgr 'exit 0'
-    run lib 'ARG_FIRMWARE=1; ARG_NO_FIRMWARE=1; ARG_ONLY=fwupd
+    run lib 'ARG_SOFT_CLEAN=1; ARG_FIRMWARE=1; ARG_NO_FIRMWARE=1; ARG_ONLY=fwupd
              if run_needs_sudo; then echo sudo; else echo none; fi'
     [ "$output" = "none" ]
 }
 
 @test "sudo check: --resume leaves completed managers out" {
     stub apt 'exit 0'
-    run lib 'ARG_RESUME=1; ARG_ONLY=apt; RESUME_DONE=(apt)
+    run lib 'ARG_SOFT_CLEAN=1; ARG_RESUME=1; ARG_ONLY=apt; RESUME_DONE=(apt)
              if run_needs_sudo; then echo sudo; else echo none; fi'
     [ "$output" = "none" ]
     run lib 'ARG_ONLY=apt; RESUME_DONE=()
              if run_needs_sudo; then echo sudo; else echo none; fi'
     [ "$output" = "sudo" ]
+}
+
+@test "sudo check: the deep clean needs sudo on Linux, not under --soft-clean or on macOS" {
+    run lib 'ARG_ONLY=none; if run_needs_sudo; then echo sudo; else echo none; fi
+             ARG_SOFT_CLEAN=1; if run_needs_sudo; then echo sudo; else echo none; fi
+             ARG_SOFT_CLEAN=0; sys_is_macos() { return 0; }; if run_needs_sudo; then echo sudo; else echo none; fi'
+    [ "$status" -eq 0 ]
+    [ "$output" = $'sudo\nnone\nnone' ]
 }
 
 @test "pkg_run: sudo prefix only when not root" {

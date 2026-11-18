@@ -42,7 +42,7 @@ complete -c up      -l rollback      -d 'revert last snapshot'
 complete -c up      -l reboot-exit   -d 'exit 4 if reboot required'
 complete -c up      -l download-only -d 'download, do not install'
 complete -c up      -l metrics       -d 'export Prometheus textfile' -r
-complete -c up      -l deep-clean    -d 'journal, old kernels, containers'
+complete -c up      -l soft-clean    -d 'skip the deep clean'
 complete -c up      -l profile       -d 'load profile' -xa '(__up_profiles)'
 complete -c up      -l list-profiles -d 'list profiles'
 complete -c up      -l snapshot      -d 'pre-update snapshot'
